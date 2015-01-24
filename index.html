@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="author"             content="Andrew J. Baran" />
+	<link rel="stylesheet" href="dist/styles/compiler.css" type="text/css" media="screen" />
+	<title>
+		Insert name of Compiler
+	</title>
+
+	<script type="text/javascript" src="dist/scripts/globals.js"></script>
+	<script type="text/javascript" src="dist/scripts/control.js"></script>
+   
+</head>
+
+<body>
+
+<div id="pageHeader">
+	<h4>Compiler</h4>
+</div> 
+
+<div id="mainBody">
+
+	<div id="buttonBar">
+		<input type="button"
+				id="buttonCompile"
+				name="buttonCompile"
+				class="normal_button"
+				value="Compile"
+				tabindex="0"
+				onclick="TSCompiler.Control.buttonCompileClick(this);">
+
+	</div>
+
+	Input Code:
+	<div id="divInputCode">
+		<textarea name="textboxInputCode"
+					id="textboxInputCode"
+					rows="20"
+					cols="50">
+		</textarea>
+	</div>
+
+	Log:
+	<div id="divLog">
+		<textarea name="textboxLog"
+					id="textboxLog"
+					rows="20"
+					cols="50">
+		</textarea>
+	</div>
+
+
+
+</div>
+
+
+</body>
+</html>
