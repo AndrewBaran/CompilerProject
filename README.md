@@ -4,7 +4,7 @@ Compiler
 This is my Spring 2015 Compilers class project.
 See [Alan's Website](http://www.labouseur.com/courses/compilers/) for details.
 
-[Access the Compiler](http://andrewbaran.github.io/compiler/)
+[Access the Compiler](http://andrewbaran.github.io/CompilerProject/)
 ===========================================================
 Last updated for **Project 0**: January 23, 2015
 
