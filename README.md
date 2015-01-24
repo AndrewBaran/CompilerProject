@@ -12,7 +12,7 @@ Last updated for **Project 0**: January 23, 2015
 Purpose
 =======
 
-This is a compiler, written in TypeScript, that takes as input a source file in the [following grammar](http://www.labouseur.com/courses/compilers/grammar.pdf) and generates 6502 Assembly OP codes.
+This is a compiler, written in TypeScript, that takes an input source file in the [following grammar](http://www.labouseur.com/courses/compilers/grammar.pdf) and generates 6502 Assembly OP codes.
 
 
 Project 1 Checklist
