@@ -1,7 +1,9 @@
 module TSCompiler {
+	
 	export class Logger {
 
 		// Writes out the user supplied input message to the log textbox
+		// TODO: Make it so first line is not skipped
 		public static write(logMessage: string): void {
 
 			// Get the log textbox

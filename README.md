@@ -20,14 +20,15 @@ Project 1 Checklist
 
 - [ ] Write a complete lexer
 - [ ] Write a complete parser
-	- [ ] Include verbose output functionality that races the stages of the parser
+	- [ ] Include verbose output functionality that traces the stages of the parser
 - [ ] Create several test programs that cause as many different types of errors as you can
 - [ ] Provide both errors and warnings
 
 Project 2 Checklist
 ===================
 
-- [ ] Modify your parser to create a concrete syntax tree (CST) while parsing. Display the CST as well
+- [ ] Modify your parser to create a concrete syntax tree (CST) while parsing
+	- [ ] Display the CST
 - [ ] Write a semantic analyzer that scope-checks and type-checks the CST for our grammar
 	- [ ] Create a display a symbol table with type and scope information
 	- [ ] Create an display the abstract syntax tree (AST)

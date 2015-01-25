@@ -4,6 +4,7 @@ var TSCompiler;
         function Logger() {
         }
         // Writes out the user supplied input message to the log textbox
+        // TODO: Make it so first line is not skipped
         Logger.write = function (logMessage) {
             // Get the log textbox
             var logContents = document.getElementById("textboxLog");

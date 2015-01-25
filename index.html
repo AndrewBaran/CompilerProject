@@ -15,6 +15,8 @@
 
 	<script type="text/javascript" src="dist/scripts/compiler.js"></script>
 	<script type="text/javascript" src="dist/scripts/lexer.js"></script>
+	<script type="text/javascript" src="dist/scripts/token.js"></script>
+
    
 </head>
 
@@ -33,7 +35,7 @@
 		<input type="button"
 				id="buttonCompile"
 				name="buttonCompile"
-				class="normal_button"
+				class="normalButton"
 				value="Compile"
 				tabindex="0"
 				onclick="TSCompiler.Control.buttonCompileClick(this);">
@@ -41,21 +43,47 @@
 	</div>
 
 	<div id="divInputCode">
+		<label>Code</label>
+		<br />
+		
 		<textarea name="textboxInputCode"
 					id="textboxInputCode"
 					rows="20"
 					cols="50"></textarea>
-		<br />
-		<label>Code</label>
+
 	</div>
 
 	<div id="divLog">
+		<label>Log</label>
+		<br />
+		
 		<textarea name="textboxLog"
 					id="textboxLog"
 					rows="20"
 					cols="50"></textarea>
+
+	</div>
+
+	<!-- TODO: Abstract this to dynamically create buttons given a list of strings of code -->
+	<div id="divTestPrograms">
+		<label>Test Programs</label>
 		<br />
-		<label>Log</label>
+
+		<input type="button"
+				id="buttonTest1"
+				name="buttonTest1"
+				class="normalButton"
+				value="Test 1"
+				tabindex="0"
+				onclick="TSCompiler.Control.buttonTest1(this);">
+
+		<input type="button"
+				id="buttonTest2"
+				name="buttonTest2"
+				class="normalButton"
+				value="Test 2"
+				tabindex="1"
+				onclick="TSCompiler.Control.buttonTest2(this);">
 	</div>
 
 </div>

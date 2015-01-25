@@ -11,10 +11,30 @@ var TSCompiler;
 
         // Starts the compilation process using the input code
         Control.buttonCompileClick = function (button) {
-            // TODO: Remove console.log
-            console.log("Compile button clicked");
+            // Disable compile button
+            document.getElementById("buttonCompile").disabled = true;
 
-            TSCompiler.Compiler.compile();
+            // Compile the program
+            // TODO: Make use of the boolean result
+            var compileResult = TSCompiler.Compiler.compile();
+
+            // Enable compile button
+            document.getElementById("buttonCompile").disabled = false;
+        };
+
+        Control.buttonTest1 = function (button) {
+            var code = "int a\na = 10";
+            this.loadTestCode(code);
+        };
+
+        Control.buttonTest2 = function (button) {
+            var code = "int b\nb = 20";
+            this.loadTestCode(code);
+        };
+
+        // Loads the specified test code into the code textbox
+        Control.loadTestCode = function (code) {
+            document.getElementById("textboxInputCode").value = code;
         };
         return Control;
     })();
