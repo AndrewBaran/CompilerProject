@@ -9,7 +9,6 @@ module TSCompiler {
 			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
 		}
 
-
 		// Starts the compilation process using the input code
 		public static buttonCompileClick(button): void {
 
@@ -17,12 +16,13 @@ module TSCompiler {
 			document.getElementById("buttonCompile").disabled = true;
 
 			// Compile the program
-			// TODO: Make use of the boolean result
 			var compileResult: boolean = Compiler.compile();
 
 			// Enable compile button
 			document.getElementById("buttonCompile").disabled = false;
 
+			// TODO: Make use of the boolean result
+			// TODO: Make it show error messages and stuff
 		}
 
 		public static buttonTest1(button): void {

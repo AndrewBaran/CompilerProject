@@ -15,11 +15,12 @@ var TSCompiler;
             document.getElementById("buttonCompile").disabled = true;
 
             // Compile the program
-            // TODO: Make use of the boolean result
             var compileResult = TSCompiler.Compiler.compile();
 
             // Enable compile button
             document.getElementById("buttonCompile").disabled = false;
+            // TODO: Make use of the boolean result
+            // TODO: Make it show error messages and stuff
         };
 
         Control.buttonTest1 = function (button) {

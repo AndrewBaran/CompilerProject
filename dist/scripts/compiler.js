@@ -13,7 +13,8 @@ var TSCompiler;
             console.log("Compiling the following code: " + codeToCompile);
 
             // Pass the code to the lexer
-            TSCompiler.Lexer.tokenizeCode(codeToCompile);
+            // TODO: Need to pass back boolean value to see if lex was successful
+            var tokenList = TSCompiler.Lexer.tokenizeCode(codeToCompile);
 
             // Return flag if compile was successful
             return compileResult;
