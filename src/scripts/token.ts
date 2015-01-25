@@ -1,4 +1,4 @@
-module TSCompiler {
+module Compiler {
 	
 	export class Token {
 

@@ -1,5 +1,5 @@
-var TSCompiler;
-(function (TSCompiler) {
+var Compiler;
+(function (Compiler) {
     var Control = (function () {
         function Control() {
         }
@@ -15,11 +15,11 @@ var TSCompiler;
             document.getElementById("buttonCompile").disabled = true;
 
             // Compile the program
-            var compileResult = TSCompiler.Compiler.compile();
+            var compileResult = Compiler.Compiler.compile();
 
             // Enable compile button
             document.getElementById("buttonCompile").disabled = false;
-            // TODO: Make use of the boolean result
+            // TODO: Make use of the boolean result of the compilation
             // TODO: Make it show error messages and stuff
         };
 
@@ -39,5 +39,5 @@ var TSCompiler;
         };
         return Control;
     })();
-    TSCompiler.Control = Control;
-})(TSCompiler || (TSCompiler = {}));
+    Compiler.Control = Control;
+})(Compiler || (Compiler = {}));

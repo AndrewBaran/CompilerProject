@@ -1,4 +1,4 @@
-module TSCompiler {
+module Compiler {
 
 	export class Control {
 
@@ -21,7 +21,7 @@ module TSCompiler {
 			// Enable compile button
 			document.getElementById("buttonCompile").disabled = false;
 
-			// TODO: Make use of the boolean result
+			// TODO: Make use of the boolean result of the compilation
 			// TODO: Make it show error messages and stuff
 		}
 

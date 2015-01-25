@@ -1,18 +1,17 @@
-var TSCompiler;
-(function (TSCompiler) {
+var Compiler;
+(function (Compiler) {
     var Logger = (function () {
         function Logger() {
         }
         // Writes out the user supplied input message to the log textbox
-        // TODO: Make it so first line in log is not skipped
         Logger.write = function (logMessage) {
             // Get the log textbox
             var logContents = document.getElementById("textboxLog");
 
             // Add new log message to the end of the log
-            logContents.value = logContents.value + "\n" + logMessage;
+            logContents.value = logContents.value + logMessage + "\n";
         };
         return Logger;
     })();
-    TSCompiler.Logger = Logger;
-})(TSCompiler || (TSCompiler = {}));
+    Compiler.Logger = Logger;
+})(Compiler || (Compiler = {}));

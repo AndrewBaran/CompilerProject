@@ -1,5 +1,5 @@
-var TSCompiler;
-(function (TSCompiler) {
+var Compiler;
+(function (Compiler) {
     var Token = (function () {
         function Token() {
             this.type = "";
@@ -7,5 +7,5 @@ var TSCompiler;
         }
         return Token;
     })();
-    TSCompiler.Token = Token;
-})(TSCompiler || (TSCompiler = {}));
+    Compiler.Token = Token;
+})(Compiler || (Compiler = {}));

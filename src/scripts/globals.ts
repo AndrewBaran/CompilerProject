@@ -1,5 +1,6 @@
-// Constants and other functions used in the compiler
+// Global, constants, and other functions used in the compiler
 
-var onDocumentLoad = function() {
-	TSCompiler.Control.clearData();
-};
+// Sets up the browser environment for the compiler
+function onDocumentLoad() {
+	Compiler.Control.clearData();
+}

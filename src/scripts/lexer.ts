@@ -1,4 +1,4 @@
-module TSCompiler {
+module Compiler {
 	
 	export class Lexer {
 
@@ -8,7 +8,9 @@ module TSCompiler {
 			console.log("In tokenizeCode()");
 			Logger.write("Performing lexical analysis");
 
-			var tokenList: Token[] = []; 
+			var tokenList: Token[] = [];
+
+			// TODO: Actually lex the code
 
 			return tokenList;
 		}

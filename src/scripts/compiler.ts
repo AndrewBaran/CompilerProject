@@ -1,4 +1,4 @@
-module TSCompiler {
+module Compiler {
 	
 	export class Compiler {
 
@@ -6,11 +6,8 @@ module TSCompiler {
 
 			console.log("In compile()");
 
-			// Grab the code from the code textbox
 			var compileResult: boolean = false;
 			var codeToCompile: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
-
-			console.log("Compiling the following code: " + codeToCompile);
 
 			// Pass the code to the lexer
 			// TODO: Need to pass back boolean value to see if lex was successful
