@@ -23,18 +23,32 @@ var Compiler;
             // TODO: Make it show error messages and stuff
         };
 
-        Control.buttonTest1 = function (button) {
-            var code = "int a\na = 10";
-            this.loadTestCode(code);
+        // Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled
+        Control.createTestButtons = function () {
+            // Get the div that will contain the buttons
+            var buttonDiv = document.getElementById("divTestPrograms");
+
+            for (var i = 0; i < _testCodeList.length; i++) {
+                var newButton = document.createElement("button");
+
+                // Name / value of button correlates to which code fragment is loaded
+                newButton.innerHTML = i.toString();
+                newButton.value = i.toString();
+
+                // When button is clicked, button is passed and its value is ued to update the code
+                newButton.onclick = function () {
+                    Control.loadTestCode(this);
+                };
+
+                buttonDiv.appendChild(newButton);
+            }
         };
 
-        Control.buttonTest2 = function (button) {
-            var code = "int b\nb = 20";
-            this.loadTestCode(code);
-        };
+        // Loads the specified test code into the code textbox using the button that was clicked
+        Control.loadTestCode = function (button) {
+            var index = parseInt(button.value, 10);
+            var code = _testCodeList[index];
 
-        // Loads the specified test code into the code textbox
-        Control.loadTestCode = function (code) {
             document.getElementById("textboxInputCode").value = code;
         };
         return Control;

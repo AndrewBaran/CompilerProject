@@ -25,20 +25,34 @@ module Compiler {
 			// TODO: Make it show error messages and stuff
 		}
 
-		public static buttonTest1(button): void {
+		// Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled
+		public static createTestButtons(): void {
 
-			var code: string = "int a\na = 10";
-			this.loadTestCode(code);
+			// Get the div that will contain the buttons
+			var buttonDiv = document.getElementById("divTestPrograms");
+
+			for(var i: number = 0; i < _testCodeList.length; i++) {
+
+				var newButton = document.createElement("button");
+
+				// Name / value of button correlates to which code fragment is loaded
+				newButton.innerHTML = i.toString(); 
+				newButton.value = i.toString();
+
+				// When button is clicked, button is passed and its value is ued to update the code
+				newButton.onclick = function() {
+					Control.loadTestCode(this);
+				}
+
+				buttonDiv.appendChild(newButton);
+			}
 		}
 
-		public static buttonTest2(button): void {
-
-			var code: string = "int b\nb = 20";
-			this.loadTestCode(code);
-		}
-
-		// Loads the specified test code into the code textbox
-		private static loadTestCode(code: string): void {
+		// Loads the specified test code into the code textbox using the button that was clicked
+		private static loadTestCode(button): void {
+			
+			var index: number = parseInt(button.value, 10);
+			var code: string = _testCodeList[index];
 
 			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = code;
 		}
