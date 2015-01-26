@@ -5,7 +5,7 @@ body
 
 #mainBody
 {
-
+	text-align: center;
 }
 
 #pageHeader
@@ -23,17 +23,23 @@ body
 
 #divInputCode
 {
-	float: left;
+	float: left
 }
 
 #divLog
 {
+	float: left
+}
+
+#divTestPrograms
+{
 	float: left;
+	width: 100px;
 }
 
 #pageFooter
 {
 	text-align: center;
 	clear: both;
-	font-size: 12px;
+	font-size: 10px;
 }
