@@ -6,7 +6,7 @@ See [Alan's Website](http://www.labouseur.com/courses/compilers/) for details.
 
 [Access the Compiler](http://andrewbaran.github.io/CompilerProject/)
 ===========================================================
-Last updated: January 24, 2015
+Last updated: January 26, 2015
 
 
 Purpose
