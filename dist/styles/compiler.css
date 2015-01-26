@@ -21,6 +21,17 @@ body
 	text-align: center;
 }
 
+.normalButton
+{
+
+}
+
+.bigButton
+{
+	width: 100px;
+	height: 40px;
+}
+
 #divInputCode
 {
 	float: left
