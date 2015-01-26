@@ -28,7 +28,12 @@ body
 
 #divLog
 {
-	float: left
+	float: left;
+}
+
+#textboxLog
+{
+	
 }
 
 #divTestPrograms
