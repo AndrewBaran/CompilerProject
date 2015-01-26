@@ -1,0 +1,101 @@
+Andrew Baran
+Professor Labouseur
+Design of Compilers
+January 26, 2015
+
+Lab 1:
+
+Crafting a Compiler:
+
+1.11.
+	I always thought Carle was kidding with us when he said he had tools to check for similarities between code. Sounds like a cool program.
+
+3.1.
+	Tokens produced:
+		main: ID
+		(: Left paren
+		): Right paren
+		{: Left brace
+		
+		const: Modifier
+		float: Type
+		payment: ID
+		=: Equals
+		384.00: Float literal (Extra Info)
+		;: Semicolon
+		
+		float: Type
+		bal: ID
+		;: Semicolon
+		
+		int: Type
+		month: ID
+		=: Equals
+		0: Int literal (Extra Info)
+		;: Semicolon
+		
+		bal: ID
+		=: Equals
+		15000: Int literal (Extra Info)
+		
+		while: while
+		(: Left paren
+		>: Right bracket
+		0: Int literal (Extra Info)
+		): Right paren
+		{: Left Brace
+		
+		printf: ID
+		(: Left paren
+		"Month %2d...": String literal
+		,: Comma
+		month: ID
+		,: Comma
+		bal: ID
+		): Right paren
+		;: Semicolon
+
+		bal: ID
+		=: Equals
+		bal: ID
+		-: Minus
+		payment: ID
+		+: Plus
+		0.015: Float literal (Extra Info)
+		*: Multiplication
+		bal: ID
+		;: Semicolon
+		month: ID
+		=: Equals
+		month: ID
+		+: Plus
+		1: Int literal
+		;: Semicolon
+
+		}: Right brace
+
+		}: Right brace
+
+Dragon:
+
+1.1.4. 
+	The advantage of using C as a target language is that is is really, really, really fast. C is basically portable assembly language, so it can be used almost universally on any machine. It also translates quicker to assembly, as it is a lower-level language.
+
+1.6.1. (Variables shown with scope level)
+	i.1 = 4
+	j.1 = 5
+		j.2 = 7
+		i.1 = 6
+		w.1 = 13
+
+	x.1 = 11
+		i.2 = 8
+		y.1 = 13
+
+	z.1 = 11
+
+	At the end:
+		w = 13
+		x = 11
+		y = 13
+		z = 11
