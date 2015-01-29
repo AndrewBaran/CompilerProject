@@ -2,7 +2,7 @@ var Compiler;
 (function (Compiler) {
     var Token = (function () {
         function Token() {
-            this.type = "";
+            this.kind = "";
             this.value = "";
         }
         return Token;

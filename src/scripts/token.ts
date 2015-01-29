@@ -2,11 +2,11 @@ module Compiler {
 	
 	export class Token {
 
-		public type: string;
+		public kind: string;
 		public value: string;
 
 		constructor() {
-			this.type = "";
+			this.kind = "";
 			this.value = "";
 		}
 

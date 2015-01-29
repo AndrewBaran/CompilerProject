@@ -18,6 +18,10 @@ var Compiler;
             // Disable compile button
             document.getElementById("buttonCompile").disabled = true;
 
+            // TODO: Refactor into individual functions for clearing specific portions of textboxes / checkboxes
+            // Clear the previous log
+            document.getElementById("textboxLog").value = "";
+
             // Compile the program
             var compileResult = Compiler.Compiler.compile();
 
