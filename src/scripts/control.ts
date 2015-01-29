@@ -5,8 +5,12 @@ module Compiler {
 		// Clears out the code and log textboxes when the page is loaded
 		public static clearData(): void {
 
+			// Clear textboxes of any content
 			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = "";
 			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+
+			// Reset selections on compiler flags
+			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = false;
 		}
 
 		// Starts the compilation process using the input code

@@ -5,8 +5,12 @@ var Compiler;
         }
         // Clears out the code and log textboxes when the page is loaded
         Control.clearData = function () {
+            // Clear textboxes of any content
             document.getElementById("textboxInputCode").value = "";
             document.getElementById("textboxLog").value = "";
+
+            // Reset selections on compiler flags
+            document.getElementById("checkboxDebug").checked = false;
         };
 
         // Starts the compilation process using the input code

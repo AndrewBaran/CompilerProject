@@ -6,7 +6,7 @@ module Compiler {
 		public static tokenizeCode(inputCode: string): Token [] {
 
 			console.log("In tokenizeCode()");
-			Logger.write("Performing lexical analysis");
+			Logger.log("Performing lexical analysis");
 
 			var tokenList: Token[] = [];
 

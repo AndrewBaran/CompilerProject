@@ -3,7 +3,7 @@ module Compiler {
 	export class Logger {
 
 		// Writes out the user supplied input message to the log textbox
-		public static write(logMessage: string): void {
+		public static log(logMessage: string): void {
 
 			// Get the log textbox
 			var logContents = <HTMLInputElement> document.getElementById("textboxLog");

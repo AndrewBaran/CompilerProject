@@ -6,7 +6,7 @@ var Compiler;
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode) {
             console.log("In tokenizeCode()");
-            Compiler.Logger.write("Performing lexical analysis");
+            Compiler.Logger.log("Performing lexical analysis");
 
             var tokenList = [];
 
