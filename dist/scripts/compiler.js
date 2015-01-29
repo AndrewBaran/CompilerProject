@@ -13,6 +13,7 @@ var Compiler;
             // TODO: Need to pass back boolean value to see if lex was successful
             var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile);
 
+            // TODO: Make debugging window appear that shows tokens received from lex
             // Return flag if compile was successful
             return compileResult;
         };
