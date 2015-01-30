@@ -33,7 +33,7 @@ module Compiler {
 			// TODO: Make it show error messages and stuff
 		}
 
-		// Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled
+		// Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled when clicked
 		public static createTestButtons(): void {
 
 			// Get the div that will contain the buttons
@@ -43,9 +43,9 @@ module Compiler {
 
 				var newButton = document.createElement("button");
 
-				// Name / value of button correlates to which code fragment is loaded
-				newButton.innerHTML = i.toString(); 
+				// Value of button correlates to which code fragment is loaded
 				newButton.value = i.toString();
+				newButton.innerHTML = _testCodeList[i].name;
 
 				// When button is clicked, button is passed and its value is ued to update the code
 				newButton.onclick = function() {
@@ -60,7 +60,7 @@ module Compiler {
 		private static loadTestCode(button): void {
 			
 			var index: number = parseInt(button.value, 10);
-			var code: string = _testCodeList[index];
+			var code: string = _testCodeList[index].code;
 
 			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = code;
 		}
