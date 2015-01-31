@@ -5,9 +5,9 @@ module Compiler {
 		public kind: string;
 		public value: string;
 
-		constructor() {
-			this.kind = "";
-			this.value = "";
+		constructor(kind: string, value: string) {
+			this.kind = kind;
+			this.value = value;
 		}
 
 	}

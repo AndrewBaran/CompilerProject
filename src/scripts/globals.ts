@@ -9,10 +9,35 @@ function onDocumentLoad(): void {
 
 // Used to dynamically set up the test code in the form of buttons
 var _testCodeList = [
-	{name: "Assignment", code: "{\n\tint a\n\ta = 10\n\tprint(a)\n} $"},
+	{name: "Assignment", code: "{\n\tint a\n\ta = 1\n\tprint(a)\n} $"},
 	{name: "String", code: "{\n\tstring s\n\ts = \"This is a string\"\n\tprint(s)\n} $"},
-	{name: "Addition", code: "{\n\tint a\n\ta = 40\n\n\tint b\n\tb = 2 + a\n\n\tprint(b)\n} $"},
+	{name: "Addition", code: "{\n\tint a\n\ta = 4\n\n\tint b\n\tb = 2 + a\n\n\tprint(b)\n} $"},
 	{name: "If and Increment", code: "{\n\tint i\n\ti = 0\n\n\tprint(i)\n\n\tif (i == 0) {\n\t\ti = 1 + i\n\t}\n\n\tprint(i)\n} $"},
     {name: "If-else", code: "{\n\tif true {\n\t\tprint(\"This will print\")\n\t}\n\n\tif false {\n\t\tprint(\"This will not print\")\n\t}\n} $"},
-    {name: "While", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n}"}
+    {name: "While", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $"}
 ];
+
+// Types of each token that the lexer can identify
+enum TokenType {
+	T_LPAREN, // (
+	T_RPAREN, // )
+	T_LBRACE, // {
+	T_RBRACE, // }
+	T_QUOTE, // "
+	T_PRINT, // print
+	T_EOF, // $
+	T_WHILE, // while
+	T_IF, // if
+	T_DIGIT, // 0-9
+	T_CHAR, // a-z
+	T_PLUS, // +
+	T_SPACE, // ' '
+	T_INT, // int
+	T_STRING, // string
+	T_BOOL, // bool
+	T_SINGLE_EQUALS, // =
+	T_DOUBLE_EQUALS, // ==
+	T_NOT_EQUALS, // !=
+	T_FALSE, // false
+	T_TRUE // true
+}

@@ -1,9 +1,9 @@
 var Compiler;
 (function (Compiler) {
     var Token = (function () {
-        function Token() {
-            this.kind = "";
-            this.value = "";
+        function Token(kind, value) {
+            this.kind = kind;
+            this.value = value;
         }
         return Token;
     })();
