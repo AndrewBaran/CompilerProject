@@ -4,16 +4,18 @@ var Compiler;
         function Compiler() {
         }
         Compiler.compile = function () {
-            console.log("In compile()");
-
             this.setCompilerFlags();
 
             var compileResult = false;
             var codeToCompile = document.getElementById("textboxInputCode").value;
 
-            // Pass the code to the lexer
-            // TODO: Need to pass back boolean value to see if lex was successful
-            var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile);
+            // No available code to lex
+            if (codeToCompile.length == 0) {
+                _Compiler.Logger.log("Error! No code present to compile");
+            } else {
+                // TODO: Need to pass back boolean value to see if lex was successful
+                var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile);
+            }
 
             // TODO: Make debugging window appear that shows tokens received from lex
             // Return flag if compile was successful

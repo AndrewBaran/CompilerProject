@@ -11,7 +11,6 @@ module Compiler {
 			// TODO: Maybe move to another unit?
 			this.setupRegexPatterns();
 
-			console.log("In tokenizeCode()");
 			Logger.log("Performing lexical analysis");
 
 			var tokenList: Token[] = [];
@@ -22,7 +21,9 @@ module Compiler {
 
 			// TODO: Primitive lexer; doesn't work correctly
 			// Lex the code
-			while(inputCode.length > 0 && (currentChar = inputCode[currentIndex]) != "$") {
+			while(currentIndex != inputCode.length) {
+
+				currentChar = inputCode[currentIndex];
 
 				console.log("Found char: " + currentChar);
 				currentIndex++;
@@ -35,6 +36,8 @@ module Compiler {
 				}
 
 				else {
+
+					// TODO: Check if current word has whitespace strings already
 
 					var token: Token = new Token("", currentWord);
 					tokenList.push(token);

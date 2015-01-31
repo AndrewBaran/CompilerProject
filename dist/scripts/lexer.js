@@ -8,7 +8,6 @@ var Compiler;
             // TODO: Maybe move to another unit?
             this.setupRegexPatterns();
 
-            console.log("In tokenizeCode()");
             Compiler.Logger.log("Performing lexical analysis");
 
             var tokenList = [];
@@ -17,7 +16,9 @@ var Compiler;
             var currentIndex = 0;
             var currentWord = "";
 
-            while (inputCode.length > 0 && (currentChar = inputCode[currentIndex]) != "$") {
+            while (currentIndex != inputCode.length) {
+                currentChar = inputCode[currentIndex];
+
                 console.log("Found char: " + currentChar);
                 currentIndex++;
 
@@ -26,6 +27,7 @@ var Compiler;
                     console.log("Current word: " + currentWord);
                     currentWord += currentChar;
                 } else {
+                    // TODO: Check if current word has whitespace strings already
                     var token = new Compiler.Token("", currentWord);
                     tokenList.push(token);
                     currentWord = "";
