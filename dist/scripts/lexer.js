@@ -8,34 +8,31 @@ var Compiler;
             // TODO: Maybe move to another unit?
             this.setupRegexPatterns();
 
-            // TODO Incorporate this into setupRegexPatterns
-            var whitespaceRegex = /\s+/g;
-
             Compiler.Logger.log("Performing lexical analysis");
 
             var tokenList = [];
             var currentToken = null;
 
             var currentChar = "";
-            var currentIndex = 0;
             var currentWord = "";
+
+            var currentIndex = 0;
 
             while (currentIndex != inputCode.length) {
                 currentChar = inputCode[currentIndex];
                 currentIndex++;
 
-                Compiler.Logger.log("Found char: " + currentChar);
+                Compiler.Logger.log("Char: " + currentChar);
 
                 var patternMatched = false;
 
                 // See if currentChar is whitespace
-                if (whitespaceRegex.test(currentChar)) {
+                if (/\s/.test(currentChar)) {
                     Compiler.Logger.log("Found a whitespace.");
 
                     // See if currentToken is null
                     if (currentToken == null) {
-                        currentToken = new Compiler.Token(21 /* T_WHITE_SPACE */, "b");
-
+                        currentToken = new Compiler.Token(21 /* T_WHITE_SPACE */, "");
                         Compiler.Logger.log("Creating token of type whitespace");
                     } else {
                         Compiler.Logger.log("Current token: " + currentToken.type);
@@ -44,7 +41,7 @@ var Compiler;
                         tokenList.push(currentToken);
 
                         // Reset tokens
-                        currentToken = new Compiler.Token(21 /* T_WHITE_SPACE */, "b");
+                        currentToken = new Compiler.Token(21 /* T_WHITE_SPACE */, "");
                         currentWord = "";
                     }
                 } else if (currentToken != null && currentToken.type == 21 /* T_WHITE_SPACE */) {
@@ -58,18 +55,20 @@ var Compiler;
                 currentWord += currentChar;
 
                 for (var i = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
-                    var regex = this.tokenPatterns[i];
+                    var tokenRegex = this.tokenPatterns[i].regex;
+                    var tokenType = this.tokenPatterns[i].type;
 
-                    // Passed regex
-                    if (regex.test(currentWord)) {
+                    // Regex passed
+                    if (tokenRegex.test(currentWord)) {
                         patternMatched = true;
 
-                        // If token, like int or string, then look for more matches
-                        Compiler.Logger.log(currentWord + " matched a word.");
-                        Compiler.Logger.log("Regex that matched it: " + regex);
+                        // TODO: If token, like int or string, then look for more matches
+                        Compiler.Logger.log(currentWord + " matched the regex " + tokenRegex);
 
-                        // TODO Test values
-                        currentToken = new Compiler.Token(1, "b");
+                        // Enum is treated as array, so index it with enum type to get name of token
+                        Compiler.Logger.log("Token matched: " + TokenType[tokenType]);
+
+                        currentToken = new Compiler.Token(tokenType, "");
                     }
                 }
 
@@ -84,29 +83,29 @@ var Compiler;
         // TODO: Refactor regex patterns to dynamically load from a (global) array containing all of this
         // Set up patterns that will match tokens
         Lexer.setupRegexPatterns = function () {
-            // Prevent repeats of the same regexs
-            this.tokenPatterns = [];
-
-            // TODO: THIS IS PROBABLY NOT HOW YOU DO THIS
-            // Add each regex and associated token
-            this.tokenPatterns.push(/while/);
-            this.tokenPatterns.push(/if/);
-            this.tokenPatterns.push(/\(/);
-            this.tokenPatterns.push(/\)/);
-            this.tokenPatterns.push(/\{/);
-            this.tokenPatterns.push(/\}/);
-            this.tokenPatterns.push(/int/);
-            this.tokenPatterns.push(/string/);
-            this.tokenPatterns.push(/boolean/);
-            this.tokenPatterns.push(/[a-z]/);
-            this.tokenPatterns.push(/[0-9]/);
-            this.tokenPatterns.push(/\+/);
-            this.tokenPatterns.push(/\$/);
-            this.tokenPatterns.push(/==/);
-            this.tokenPatterns.push(/!=/);
-            this.tokenPatterns.push(/true/);
-            this.tokenPatterns.push(/false/);
-            this.tokenPatterns.push(/"/);
+            this.tokenPatterns = [
+                { regex: /while/, type: 7 /* T_WHILE */ },
+                { regex: /if/, type: 8 /* T_IF */ },
+                { regex: /\(/, type: 0 /* T_LPAREN */ },
+                { regex: /\)/, type: 0 /* T_LPAREN */ },
+                { regex: /\{/, type: 2 /* T_LBRACE */ },
+                { regex: /\}/, type: 3 /* T_RBRACE */ },
+                { regex: /"/, type: 4 /* T_QUOTE */ },
+                { regex: /int/, type: 13 /* T_INT */ },
+                { regex: /string/, type: 14 /* T_STRING */ },
+                { regex: /boolean/, type: 15 /* T_BOOLEAN */ },
+                { regex: /print/, type: 5 /* T_PRINT */ },
+                { regex: /[a-z]/, type: 10 /* T_CHAR */ },
+                { regex: /[0-9]/, type: 9 /* T_DIGIT */ },
+                { regex: /\+/, type: 11 /* T_PLUS */ },
+                { regex: /\$/, type: 6 /* T_EOF */ },
+                { regex: /=/, type: 16 /* T_SINGLE_EQUALS */ },
+                { regex: /==/, type: 17 /* T_DOUBLE_EQUALS */ },
+                { regex: /!=/, type: 18 /* T_NOT_EQUALS */ },
+                { regex: /true/, type: 20 /* T_TRUE */ },
+                { regex: /false/, type: 19 /* T_FALSE */ },
+                { regex: /\s+/, type: 21 /* T_WHITE_SPACE */ }
+            ];
         };
         return Lexer;
     })();

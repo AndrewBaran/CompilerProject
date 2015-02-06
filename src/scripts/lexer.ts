@@ -3,7 +3,7 @@ module Compiler {
 	export class Lexer {
 
 		// TODO: Probably refactor this somewhere else
-		private static tokenPatterns: RegExp [];
+		private static tokenPatterns; 
 
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string): Token [] {
@@ -11,17 +11,15 @@ module Compiler {
 			// TODO: Maybe move to another unit?
 			this.setupRegexPatterns();
 
-			// TODO Incorporate this into setupRegexPatterns
-			var whitespaceRegex: RegExp = /\s+/g;
-
 			Logger.log("Performing lexical analysis");
 
 			var tokenList: Token[] = [];
 			var currentToken: Token = null;
 
 			var currentChar: string = "";
-			var currentIndex: number = 0;
 			var currentWord: string = "";
+
+			var currentIndex: number = 0;
 
 			// TODO: Primitive lexer; doesn't work correctly
 			// Lex the code
@@ -30,20 +28,19 @@ module Compiler {
 				currentChar = inputCode[currentIndex];
 				currentIndex++;
 
-				Logger.log("Found char: " + currentChar);
+				Logger.log("Char: " + currentChar);
 
 				var patternMatched: boolean = false;
 
 				// See if currentChar is whitespace
-				if(whitespaceRegex.test(currentChar)) {
+				if(/\s/.test(currentChar)) {
 
 					Logger.log("Found a whitespace.");
 
 					// See if currentToken is null
 					if(currentToken == null) {
 
-						currentToken = new Token(TokenType.T_WHITE_SPACE, "b");
-
+						currentToken = new Token(TokenType.T_WHITE_SPACE, "");
 						Logger.log("Creating token of type whitespace");
 					}
 
@@ -56,7 +53,7 @@ module Compiler {
 						tokenList.push(currentToken);
 
 						// Reset tokens
-						currentToken = new Token(TokenType.T_WHITE_SPACE, "b");
+						currentToken = new Token(TokenType.T_WHITE_SPACE, "");
 						currentWord = "";
 					}
 				}
@@ -76,22 +73,24 @@ module Compiler {
 				// Check if currentWord matches any regex for a token
 				for(var i: number = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
 
-					var regex: RegExp = this.tokenPatterns[i];
+					var tokenRegex: RegExp = this.tokenPatterns[i].regex;
+					var tokenType: TokenType = this.tokenPatterns[i].type;
 
-					// Passed regex
-					if(regex.test(currentWord)) {
+					// Regex passed
+					if(tokenRegex.test(currentWord)) {
 
 						patternMatched = true;
 
-						// If token, like int or string, then look for more matches
-						Logger.log(currentWord + " matched a word.");
-						Logger.log("Regex that matched it: " + regex);
+						// TODO: If token, like int or string, then look for more matches
+						Logger.log(currentWord + " matched the regex " + tokenRegex);
 
-						// TODO Test values
-						currentToken = new Token(1, "b");
+						// Enum is treated as array, so index it with enum type to get name of token
+						Logger.log("Token matched: " + TokenType[tokenType]);
+
+						currentToken = new Token(tokenType, "");
 					}
 
-				} // for
+				}
 
 				if(!patternMatched) {
 					Logger.log("No patterns matched.");
@@ -106,29 +105,29 @@ module Compiler {
 		// Set up patterns that will match tokens
 		private static setupRegexPatterns(): void {
 
-			// Prevent repeats of the same regexs
-			this.tokenPatterns = [];
-
-			// TODO: THIS IS PROBABLY NOT HOW YOU DO THIS
-			// Add each regex and associated token
-			this.tokenPatterns.push(/while/);
-			this.tokenPatterns.push(/if/);
-			this.tokenPatterns.push(/\(/);
-			this.tokenPatterns.push(/\)/);
-			this.tokenPatterns.push(/\{/);
-			this.tokenPatterns.push(/\}/);
-			this.tokenPatterns.push(/int/);
-			this.tokenPatterns.push(/string/);
-			this.tokenPatterns.push(/boolean/);
-			this.tokenPatterns.push(/[a-z]/);
-			this.tokenPatterns.push(/[0-9]/);
-			this.tokenPatterns.push(/\+/);
-			this.tokenPatterns.push(/\$/);
-			this.tokenPatterns.push(/==/);
-			this.tokenPatterns.push(/!=/);
-			this.tokenPatterns.push(/true/);
-			this.tokenPatterns.push(/false/);
-			this.tokenPatterns.push(/"/);
+			this.tokenPatterns = [
+				{regex: /while/, type: TokenType.T_WHILE},
+				{regex: /if/, type: TokenType.T_IF},
+				{regex: /\(/, type: TokenType.T_LPAREN},
+				{regex: /\)/, type: TokenType.T_LPAREN},
+				{regex: /\{/, type: TokenType.T_LBRACE},
+				{regex: /\}/, type: TokenType.T_RBRACE},
+				{regex: /"/, type: TokenType.T_QUOTE},
+				{regex: /int/, type: TokenType.T_INT},
+				{regex: /string/, type: TokenType.T_STRING},
+				{regex: /boolean/, type: TokenType.T_BOOLEAN},
+				{regex: /print/, type: TokenType.T_PRINT},
+				{regex: /[a-z]/, type: TokenType.T_CHAR},
+				{regex: /[0-9]/, type: TokenType.T_DIGIT},
+				{regex: /\+/, type: TokenType.T_PLUS},
+				{regex: /\$/, type: TokenType.T_EOF},
+				{regex: /=/, type: TokenType.T_SINGLE_EQUALS},
+				{regex: /==/, type: TokenType.T_DOUBLE_EQUALS},
+				{regex: /!=/, type: TokenType.T_NOT_EQUALS},
+				{regex: /true/, type: TokenType.T_TRUE},
+				{regex: /false/, type: TokenType.T_FALSE},
+				{regex: /\s+/, type: TokenType.T_WHITE_SPACE}
+			];
 
 		}
 	}
