@@ -126,6 +126,10 @@ module Compiler {
 			this.tokenPatterns.push(/\$/);
 			this.tokenPatterns.push(/==/);
 			this.tokenPatterns.push(/!=/);
+			this.tokenPatterns.push(/true/);
+			this.tokenPatterns.push(/false/);
+			this.tokenPatterns.push(/"/);
+
 		}
 	}
 }

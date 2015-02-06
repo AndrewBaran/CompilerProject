@@ -36,7 +36,7 @@ var TokenType;
     TokenType[TokenType["T_SPACE"] = 12] = "T_SPACE";
     TokenType[TokenType["T_INT"] = 13] = "T_INT";
     TokenType[TokenType["T_STRING"] = 14] = "T_STRING";
-    TokenType[TokenType["T_BOOL"] = 15] = "T_BOOL";
+    TokenType[TokenType["T_BOOLEAN"] = 15] = "T_BOOLEAN";
     TokenType[TokenType["T_SINGLE_EQUALS"] = 16] = "T_SINGLE_EQUALS";
     TokenType[TokenType["T_DOUBLE_EQUALS"] = 17] = "T_DOUBLE_EQUALS";
     TokenType[TokenType["T_NOT_EQUALS"] = 18] = "T_NOT_EQUALS";

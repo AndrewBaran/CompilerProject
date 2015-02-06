@@ -37,7 +37,7 @@ enum TokenType {
 	T_SPACE, // ' '
 	T_INT, // int
 	T_STRING, // string
-	T_BOOL, // bool
+	T_BOOLEAN, // bool
 	T_SINGLE_EQUALS, // =
 	T_DOUBLE_EQUALS, // ==
 	T_NOT_EQUALS, // !=
