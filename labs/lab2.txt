@@ -1,0 +1,23 @@
+Andrew Baran
+Professor Labouseur
+Design of Compilers
+February 3, 2015
+
+Lab 2:
+
+Crafting a Compiler:
+
+3.3:
+	Words
+
+3.4:
+	Words
+
+3.15:
+	Words
+
+
+Dragon:
+
+3.3.4:
+	Words

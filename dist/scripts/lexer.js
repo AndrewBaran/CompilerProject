@@ -8,9 +8,13 @@ var Compiler;
             // TODO: Maybe move to another unit?
             this.setupRegexPatterns();
 
+            // TODO Incorporate this into setupRegexPatterns
+            var whitespaceRegex = /\s+/g;
+
             Compiler.Logger.log("Performing lexical analysis");
 
             var tokenList = [];
+            var currentToken = null;
 
             var currentChar = "";
             var currentIndex = 0;
@@ -18,21 +22,59 @@ var Compiler;
 
             while (currentIndex != inputCode.length) {
                 currentChar = inputCode[currentIndex];
-
-                console.log("Found char: " + currentChar);
                 currentIndex++;
 
-                // Not whitespace
-                if (!(/\s/.test(currentChar))) {
-                    console.log("Current word: " + currentWord);
-                    currentWord += currentChar;
-                } else {
-                    // TODO: Check if current word has whitespace strings already
-                    var token = new Compiler.Token("", currentWord);
-                    tokenList.push(token);
-                    currentWord = "";
+                Compiler.Logger.log("Found char: " + currentChar);
 
-                    Compiler.Logger.log("Found lexeme: " + token.value);
+                var patternMatched = false;
+
+                // See if currentChar is whitespace
+                if (whitespaceRegex.test(currentChar)) {
+                    Compiler.Logger.log("Found a whitespace.");
+
+                    // See if currentToken is null
+                    if (currentToken == null) {
+                        currentToken = new Compiler.Token(21 /* T_WHITE_SPACE */, "b");
+
+                        Compiler.Logger.log("Creating token of type whitespace");
+                    } else {
+                        Compiler.Logger.log("Current token: " + currentToken.type);
+                        Compiler.Logger.log("Adding it to the stream");
+
+                        tokenList.push(currentToken);
+
+                        // Reset tokens
+                        currentToken = new Compiler.Token(21 /* T_WHITE_SPACE */, "b");
+                        currentWord = "";
+                    }
+                } else if (currentToken != null && currentToken.type == 21 /* T_WHITE_SPACE */) {
+                    Compiler.Logger.log("Found nonwhite space after whitespace tokens. Rejecting this whitespace token.");
+
+                    // Reset token
+                    currentToken = null;
+                    currentWord = "";
+                }
+
+                currentWord += currentChar;
+
+                for (var i = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
+                    var regex = this.tokenPatterns[i];
+
+                    // Passed regex
+                    if (regex.test(currentWord)) {
+                        patternMatched = true;
+
+                        // If token, like int or string, then look for more matches
+                        Compiler.Logger.log(currentWord + " matched a word.");
+                        Compiler.Logger.log("Regex that matched it: " + regex);
+
+                        // TODO Test values
+                        currentToken = new Compiler.Token(1, "b");
+                    }
+                }
+
+                if (!patternMatched) {
+                    Compiler.Logger.log("No patterns matched.");
                 }
             }
 
@@ -59,6 +101,9 @@ var Compiler;
             this.tokenPatterns.push(/[a-z]/);
             this.tokenPatterns.push(/[0-9]/);
             this.tokenPatterns.push(/\+/);
+            this.tokenPatterns.push(/\$/);
+            this.tokenPatterns.push(/==/);
+            this.tokenPatterns.push(/!=/);
         };
         return Lexer;
     })();

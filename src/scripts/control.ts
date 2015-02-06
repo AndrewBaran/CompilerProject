@@ -11,6 +11,9 @@ module Compiler {
 
 			// Reset selections on compiler flags
 			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = false;
+
+			// Reset compile button
+			document.getElementById("buttonCompile").disabled = false;
 		}
 
 		// Starts the compilation process using the input code

@@ -11,9 +11,13 @@ module Compiler {
 			// TODO: Maybe move to another unit?
 			this.setupRegexPatterns();
 
+			// TODO Incorporate this into setupRegexPatterns
+			var whitespaceRegex: RegExp = /\s+/g;
+
 			Logger.log("Performing lexical analysis");
 
 			var tokenList: Token[] = [];
+			var currentToken: Token = null;
 
 			var currentChar: string = "";
 			var currentIndex: number = 0;
@@ -24,28 +28,76 @@ module Compiler {
 			while(currentIndex != inputCode.length) {
 
 				currentChar = inputCode[currentIndex];
-
-				console.log("Found char: " + currentChar);
 				currentIndex++;
 
-				// Not whitespace
-				if(!(/\s/.test(currentChar))) {
+				Logger.log("Found char: " + currentChar);
 
-					console.log("Current word: " + currentWord);
-					currentWord += currentChar;
+				var patternMatched: boolean = false;
+
+				// See if currentChar is whitespace
+				if(whitespaceRegex.test(currentChar)) {
+
+					Logger.log("Found a whitespace.");
+
+					// See if currentToken is null
+					if(currentToken == null) {
+
+						currentToken = new Token(TokenType.T_WHITE_SPACE, "b");
+
+						Logger.log("Creating token of type whitespace");
+					}
+
+					// Move current token to stream
+					else {
+
+						Logger.log("Current token: " + currentToken.type);
+						Logger.log("Adding it to the stream");
+
+						tokenList.push(currentToken);
+
+						// Reset tokens
+						currentToken = new Token(TokenType.T_WHITE_SPACE, "b");
+						currentWord = "";
+					}
 				}
 
-				else {
+				// Check if current token is whitespace
+				else if(currentToken != null && currentToken.type == TokenType.T_WHITE_SPACE) {
 
-					// TODO: Check if current word has whitespace strings already
+					Logger.log("Found nonwhite space after whitespace tokens. Rejecting this whitespace token.");
 
-					var token: Token = new Token("", currentWord);
-					tokenList.push(token);
+					// Reset token
+					currentToken = null;
 					currentWord = "";
-
-					Logger.log("Found lexeme: " + token.value);
 				}
-			}
+
+				currentWord += currentChar;
+
+				// Check if currentWord matches any regex for a token
+				for(var i: number = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
+
+					var regex: RegExp = this.tokenPatterns[i];
+
+					// Passed regex
+					if(regex.test(currentWord)) {
+
+						patternMatched = true;
+
+						// If token, like int or string, then look for more matches
+						Logger.log(currentWord + " matched a word.");
+						Logger.log("Regex that matched it: " + regex);
+
+						// TODO Test values
+						currentToken = new Token(1, "b");
+					}
+
+				} // for
+
+				if(!patternMatched) {
+					Logger.log("No patterns matched.");
+				}
+
+			} // while
 
 			return tokenList;
 		}
@@ -71,6 +123,9 @@ module Compiler {
 			this.tokenPatterns.push(/[a-z]/);
 			this.tokenPatterns.push(/[0-9]/);
 			this.tokenPatterns.push(/\+/);
+			this.tokenPatterns.push(/\$/);
+			this.tokenPatterns.push(/==/);
+			this.tokenPatterns.push(/!=/);
 		}
 	}
 }
