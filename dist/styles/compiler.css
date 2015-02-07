@@ -53,6 +53,16 @@ body
 	width: 100px;
 }
 
+#divDebugToken
+{
+	float: left;
+	width: 200px;
+	height: 200px;
+	overflow: auto;
+
+	border: 1px solid black;
+}
+
 #pageFooter
 {
 	text-align: center;

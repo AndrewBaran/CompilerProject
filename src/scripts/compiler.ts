@@ -24,7 +24,11 @@ module Compiler {
 				var tokenList: Token[] = Lexer.tokenizeCode(codeToCompile);
 			}
 
-			// TODO: Make debugging window appear that shows tokens received from lex
+			// Show tokens produced
+			if(this.debugMode) {
+
+				Control.debugCreateTokenDiv(tokenList);
+			}
 
 			// Return flag if compile was successful
 			return compileResult;

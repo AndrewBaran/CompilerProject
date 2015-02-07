@@ -25,6 +25,12 @@ var Compiler;
             // Clear the previous log
             document.getElementById("textboxLog").value = "";
 
+            var divToRemove = document.getElementById("divDebugToken");
+
+            if (divToRemove !== null) {
+                document.getElementById("mainBody").removeChild(divToRemove);
+            }
+
             // Compile the program
             var compileResult = Compiler.Compiler.compile();
 
@@ -53,6 +59,24 @@ var Compiler;
 
                 buttonDiv.appendChild(newButton);
             }
+        };
+
+        // Displays tokens produced from lex if debug mode is enabled
+        Control.debugCreateTokenDiv = function (tokenList) {
+            var divTokenWindow = document.createElement("div");
+            divTokenWindow.id = "divDebugToken";
+
+            var stringBody = "Tokens found: <br />";
+
+            for (var i = 0; i < tokenList.length; i++) {
+                stringBody += TokenType[tokenList[i].type];
+                stringBody += "<br />";
+            }
+
+            divTokenWindow.innerHTML = stringBody;
+
+            // TODO Make it attach to right of test buttons
+            document.getElementById("mainBody").appendChild(divTokenWindow);
         };
 
         // Loads the specified test code into the code textbox using the button that was clicked

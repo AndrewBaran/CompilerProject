@@ -17,7 +17,11 @@ var Compiler;
                 var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile);
             }
 
-            // TODO: Make debugging window appear that shows tokens received from lex
+            // Show tokens produced
+            if (this.debugMode) {
+                _Compiler.Control.debugCreateTokenDiv(tokenList);
+            }
+
             // Return flag if compile was successful
             return compileResult;
         };
