@@ -31,7 +31,7 @@ var TokenType;
     TokenType[TokenType["T_WHILE"] = 7] = "T_WHILE";
     TokenType[TokenType["T_IF"] = 8] = "T_IF";
     TokenType[TokenType["T_DIGIT"] = 9] = "T_DIGIT";
-    TokenType[TokenType["T_CHAR"] = 10] = "T_CHAR";
+    TokenType[TokenType["T_ID"] = 10] = "T_ID";
     TokenType[TokenType["T_PLUS"] = 11] = "T_PLUS";
     TokenType[TokenType["T_SPACE"] = 12] = "T_SPACE";
     TokenType[TokenType["T_INT"] = 13] = "T_INT";

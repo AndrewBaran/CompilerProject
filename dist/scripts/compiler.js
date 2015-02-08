@@ -4,6 +4,8 @@ var Compiler;
         function Compiler() {
         }
         Compiler.compile = function () {
+            this.symbolTable = new _Compiler.SymbolTable();
+
             this.setCompilerFlags();
 
             var compileResult = false;
@@ -14,7 +16,7 @@ var Compiler;
                 _Compiler.Logger.log("Error! No code present to compile");
             } else {
                 // TODO: Need to pass back boolean value to see if lex was successful
-                var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile);
+                var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, this.symbolTable);
             }
 
             // Show tokens produced

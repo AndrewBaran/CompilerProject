@@ -32,7 +32,7 @@ enum TokenType {
 	T_WHILE, // while
 	T_IF, // if
 	T_DIGIT, // 0-9
-	T_CHAR, // a-z
+	T_ID, // a-z
 	T_PLUS, // +
 	T_SPACE, // ' '
 	T_INT, // int

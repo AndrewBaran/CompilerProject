@@ -2,14 +2,13 @@ module Compiler {
 	
 	export class Lexer {
 
-		// TODO: Probably refactor this somewhere else
+		// TODO: Give this a type eventually
 		private static tokenPatterns; 
 
 		// Separates the input code into a list of tokens and returns that list
-		public static tokenizeCode(inputCode: string): Token [] {
+		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
 
-			// TODO: Maybe move to another unit?
-			this.setupRegexPatterns();
+			this.setupTokenPatterns();
 
 			Logger.log("Performing lexical analysis");
 
@@ -21,7 +20,6 @@ module Compiler {
 
 			var currentIndex: number = 0;
 
-			// TODO: Primitive lexer; doesn't work correctly
 			// Lex the code
 			while(currentIndex != inputCode.length) {
 
@@ -31,6 +29,19 @@ module Compiler {
 				Logger.log("Char: " + currentChar);
 
 				var patternMatched: boolean = false;
+
+				// If currentChar is a token delimiter (whitespace, ( ) { } = " ! + etc)
+				//		If whitespace token, do other stuff (TODO)
+				//			Act like whitespace is one big token, continue lexing
+				//		Else
+				//			Submit token to stream
+				//			Reset token
+				// Add currentChar to the word
+				// Test the word against all regexes
+				//		If no matches, check for match against prefix of reserved word
+				//			If reserved word, continue lexing
+				//			If not, then error out
+				// Take the longest currently matching regex	
 
 				// See if currentChar is whitespace
 				if(/\s/.test(currentChar)) {
@@ -47,7 +58,7 @@ module Compiler {
 					// Move current token to stream
 					else {
 
-						Logger.log("Current token: " + currentToken.type);
+						Logger.log("Current token: " + TokenType[currentToken.type]);
 						Logger.log("Adding it to the stream");
 
 						tokenList.push(currentToken);
@@ -61,7 +72,8 @@ module Compiler {
 				// Check if current token is whitespace
 				else if(currentToken != null && currentToken.type == TokenType.T_WHITE_SPACE) {
 
-					Logger.log("Found nonwhite space after whitespace tokens. Rejecting this whitespace token.");
+					Logger.log("Non-whitespace found.");
+					Logger.log("Discarding current token: " + TokenType[currentToken.type]);
 
 					// Reset token
 					currentToken = null;
@@ -93,7 +105,11 @@ module Compiler {
 				}
 
 				if(!patternMatched) {
-					Logger.log("No patterns matched.");
+
+					if(symbolTable.hasReservedWordPrefix(currentWord)) {
+
+						Logger.log(currentWord + " is a prefix of a reserved word. Continue lexing.");
+					}
 				}
 
 			} // while
@@ -101,32 +117,31 @@ module Compiler {
 			return tokenList;
 		}
 
-		// TODO: Refactor regex patterns to dynamically load from a (global) array containing all of this
-		// Set up patterns that will match tokens
-		private static setupRegexPatterns(): void {
+		private static setupTokenPatterns(): void {
 
 			this.tokenPatterns = [
 				{regex: /while/, type: TokenType.T_WHILE},
 				{regex: /if/, type: TokenType.T_IF},
+				{regex: /true/, type: TokenType.T_TRUE},
+				{regex: /false/, type: TokenType.T_FALSE},
+				{regex: /int/, type: TokenType.T_INT},
+				{regex: /string/, type: TokenType.T_STRING},
+				{regex: /boolean/, type: TokenType.T_BOOLEAN},
+				{regex: /print/, type: TokenType.T_PRINT},
 				{regex: /\(/, type: TokenType.T_LPAREN},
 				{regex: /\)/, type: TokenType.T_LPAREN},
 				{regex: /\{/, type: TokenType.T_LBRACE},
 				{regex: /\}/, type: TokenType.T_RBRACE},
 				{regex: /"/, type: TokenType.T_QUOTE},
-				{regex: /int/, type: TokenType.T_INT},
-				{regex: /string/, type: TokenType.T_STRING},
-				{regex: /boolean/, type: TokenType.T_BOOLEAN},
-				{regex: /print/, type: TokenType.T_PRINT},
-				{regex: /[a-z]/, type: TokenType.T_CHAR},
+				{regex: /[a-z]/, type: TokenType.T_ID},
 				{regex: /[0-9]/, type: TokenType.T_DIGIT},
 				{regex: /\+/, type: TokenType.T_PLUS},
 				{regex: /\$/, type: TokenType.T_EOF},
 				{regex: /=/, type: TokenType.T_SINGLE_EQUALS},
 				{regex: /==/, type: TokenType.T_DOUBLE_EQUALS},
 				{regex: /!=/, type: TokenType.T_NOT_EQUALS},
-				{regex: /true/, type: TokenType.T_TRUE},
-				{regex: /false/, type: TokenType.T_FALSE},
-				{regex: /\s+/, type: TokenType.T_WHITE_SPACE}
+				{regex: /\$/, type: TokenType.T_EOF},
+				{regex: /\s+/, type: TokenType.T_WHITE_SPACE},
 			];
 
 		}

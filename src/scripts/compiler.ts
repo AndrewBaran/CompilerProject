@@ -2,10 +2,13 @@ module Compiler {
 	
 	export class Compiler {
 
-		// Flags used by the compiler
+		private static symbolTable: SymbolTable;
+
 		private static debugMode: boolean;
 
 		public static compile(): boolean {
+
+			this.symbolTable = new SymbolTable();
 
 			this.setCompilerFlags();
 
@@ -21,7 +24,7 @@ module Compiler {
 			else {
 
 				// TODO: Need to pass back boolean value to see if lex was successful
-				var tokenList: Token[] = Lexer.tokenizeCode(codeToCompile);
+				var tokenList: Token[] = Lexer.tokenizeCode(codeToCompile, this.symbolTable);
 			}
 
 			// Show tokens produced
