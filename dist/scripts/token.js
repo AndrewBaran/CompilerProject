@@ -1,9 +1,9 @@
 var Compiler;
 (function (Compiler) {
     var Token = (function () {
-        function Token(type, value) {
-            this.type = type;
-            this.value = value;
+        function Token() {
+            this.type = 1 /* T_DEFAULT */;
+            this.value = "";
         }
         return Token;
     })();

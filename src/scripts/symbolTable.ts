@@ -65,7 +65,7 @@ module Compiler {
 		public isReservedWord: boolean;
 
 		constructor() {
-			// TODO Fill out
+			
 		}
 	}
 }

@@ -3,24 +3,28 @@ var Compiler;
     var Compiler = (function () {
         function Compiler() {
         }
-        Compiler.compile = function () {
+        Compiler.compile = function (codeToCompile) {
             this.symbolTable = new _Compiler.SymbolTable();
-
             this.setCompilerFlags();
 
-            var compileResult = false;
-            var codeToCompile = document.getElementById("textboxInputCode").value;
+            var lexResult = true;
+            var compileResult = true;
+
+            var tokenList = [];
 
             // No available code to lex
             if (codeToCompile.length == 0) {
                 _Compiler.Logger.log("Error! No code present to compile");
             } else {
-                // TODO: Need to pass back boolean value to see if lex was successful
-                var tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+                try  {
+                    tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+                } catch (exception) {
+                    lexResult = false;
+                }
             }
 
             // Show tokens produced
-            if (this.debugMode) {
+            if (this.debugMode && tokenList.length > 0 && lexResult) {
                 _Compiler.Control.debugCreateTokenDiv(tokenList);
             }
 

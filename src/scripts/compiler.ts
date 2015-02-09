@@ -6,14 +6,16 @@ module Compiler {
 
 		private static debugMode: boolean;
 
-		public static compile(): boolean {
+
+		public static compile(codeToCompile: string): boolean {
 
 			this.symbolTable = new SymbolTable();
-
 			this.setCompilerFlags();
 
-			var compileResult: boolean = false;
-			var codeToCompile: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
+			var lexResult: boolean = true;
+			var compileResult: boolean = true;
+
+			var tokenList: Token[] = [];
 
 			// No available code to lex
 			if(codeToCompile.length == 0) {
@@ -23,12 +25,17 @@ module Compiler {
 
 			else {
 
-				// TODO: Need to pass back boolean value to see if lex was successful
-				var tokenList: Token[] = Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+				try {
+					tokenList = Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+				}
+
+				catch(exception) {
+					lexResult = false;
+				}
 			}
 
 			// Show tokens produced
-			if(this.debugMode) {
+			if(this.debugMode && tokenList.length > 0 && lexResult) {
 
 				Control.debugCreateTokenDiv(tokenList);
 			}

@@ -9,6 +9,8 @@ function onDocumentLoad(): void {
 
 // Used to dynamically set up the test code in the form of buttons
 var _testCodeList = [
+	{name: "Minimal", code: "{ } $"},
+	{name: "Simple", code: "{\n\tint x\n} $"},
 	{name: "Assignment", code: "{\n\tint a\n\ta = 1\n\tprint(a)\n} $"},
 	{name: "String", code: "{\n\tstring s\n\ts = \"This is a string\"\n\tprint(s)\n} $"},
 	{name: "Addition", code: "{\n\tint a\n\ta = 4\n\n\tint b\n\tb = 2 + a\n\n\tprint(b)\n} $"},
@@ -22,6 +24,8 @@ var _testCodeList = [
 
 // Types of each token that the lexer can identify
 enum TokenType {
+	T_NO_MATCH,
+	T_DEFAULT,
 	T_LPAREN, // (
 	T_RPAREN, // )
 	T_LBRACE, // {

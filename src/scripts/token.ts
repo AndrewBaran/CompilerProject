@@ -5,9 +5,9 @@ module Compiler {
 		public type: TokenType;
 		public value: string;
 
-		constructor(type: TokenType, value: string) {
-			this.type = type;
-			this.value = value;
+		constructor() {
+			this.type = TokenType.T_DEFAULT;
+			this.value = "";
 		}
 
 	}

@@ -33,7 +33,9 @@ module Compiler {
 			}
 
 			// Compile the program
-			var compileResult: boolean = Compiler.compile();
+			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
+
+			var compileResult: boolean = Compiler.compile(code);
 
 			// Enable compile button
 			document.getElementById("buttonCompile").disabled = false;

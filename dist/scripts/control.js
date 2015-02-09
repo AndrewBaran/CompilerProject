@@ -32,7 +32,9 @@ var Compiler;
             }
 
             // Compile the program
-            var compileResult = Compiler.Compiler.compile();
+            var code = document.getElementById("textboxInputCode").value;
+
+            var compileResult = Compiler.Compiler.compile(code);
 
             // Enable compile button
             document.getElementById("buttonCompile").disabled = false;

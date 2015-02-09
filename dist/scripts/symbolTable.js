@@ -46,7 +46,6 @@ var Compiler;
 
     var SymbolTableEntry = (function () {
         function SymbolTableEntry() {
-            // TODO Fill out
         }
         return SymbolTableEntry;
     })();

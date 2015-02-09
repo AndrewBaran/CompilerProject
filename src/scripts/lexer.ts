@@ -13,137 +13,161 @@ module Compiler {
 			Logger.log("Performing lexical analysis");
 
 			var tokenList: Token[] = [];
-			var currentToken: Token = null;
+			var currentToken: Token = new Token();
 
 			var currentChar: string = "";
 			var currentWord: string = "";
 
 			var currentIndex: number = 0;
 
+			var currentLine: number = 1;
+			var eofFound: boolean = false;
+
 			// Lex the code
-			while(currentIndex != inputCode.length) {
+			while(currentIndex != inputCode.length && !eofFound) {
 
 				currentChar = inputCode[currentIndex];
 				currentIndex++;
 
-				Logger.log("Char: " + currentChar);
-
-				var patternMatched: boolean = false;
-
-				// If currentChar is a token delimiter (whitespace, ( ) { } = " ! + etc)
-				//		If whitespace token, do other stuff (TODO)
-				//			Act like whitespace is one big token, continue lexing
-				//		Else
-				//			Submit token to stream
-				//			Reset token
-				// Add currentChar to the word
-				// Test the word against all regexes
-				//		If no matches, check for match against prefix of reserved word
-				//			If reserved word, continue lexing
-				//			If not, then error out
-				// Take the longest currently matching regex	
-
-				// See if currentChar is whitespace
-				if(/\s/.test(currentChar)) {
-
-					Logger.log("Found a whitespace.");
-
-					// See if currentToken is null
-					if(currentToken == null) {
-
-						currentToken = new Token(TokenType.T_WHITE_SPACE, "");
-						Logger.log("Creating token of type whitespace");
-					}
-
-					// Move current token to stream
-					else {
-
-						Logger.log("Current token: " + TokenType[currentToken.type]);
-						Logger.log("Adding it to the stream");
-
-						tokenList.push(currentToken);
-
-						// Reset tokens
-						currentToken = new Token(TokenType.T_WHITE_SPACE, "");
-						currentWord = "";
-					}
-				}
-
-				// Check if current token is whitespace
-				else if(currentToken != null && currentToken.type == TokenType.T_WHITE_SPACE) {
-
-					Logger.log("Non-whitespace found.");
-					Logger.log("Discarding current token: " + TokenType[currentToken.type]);
-
-					// Reset token
-					currentToken = null;
-					currentWord = "";
-				}
-
+				Logger.log("Char: \"" + currentChar + "\"");
 				currentWord += currentChar;
 
-				// Check if currentWord matches any regex for a token
-				for(var i: number = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
-
-					var tokenRegex: RegExp = this.tokenPatterns[i].regex;
-					var tokenType: TokenType = this.tokenPatterns[i].type;
-
-					// Regex passed
-					if(tokenRegex.test(currentWord)) {
-
-						patternMatched = true;
-
-						// TODO: If token, like int or string, then look for more matches
-						Logger.log(currentWord + " matched the regex " + tokenRegex);
-
-						// Enum is treated as array, so index it with enum type to get name of token
-						Logger.log("Token matched: " + TokenType[tokenType]);
-
-						currentToken = new Token(tokenType, "");
-					}
-
+				// Update counter for error reporting
+				if(currentChar === "\n") {
+					currentLine++;
 				}
 
-				if(!patternMatched) {
+				var tokenMatched: TokenMatch = this.matchesTokenPattern(currentWord);
 
+				if(tokenMatched.token.type !== TokenType.T_NO_MATCH) {
+					currentToken = tokenMatched.token;
+				}
+
+				Logger.log("Current = " + TokenType[currentToken.type]);
+
+				if(tokenMatched.isMatch) {
+
+					Logger.log("Token matched was: " + TokenType[currentToken.type]);
+				}
+
+				else {
+
+					// Didn't match a pattern
 					if(symbolTable.hasReservedWordPrefix(currentWord)) {
+						Logger.log(currentWord + " is a prefix of a reserved word.");
+					}
 
-						Logger.log(currentWord + " is a prefix of a reserved word. Continue lexing.");
+					// Not a prefix
+					else {
+
+						if(currentToken.type !== TokenType.T_DEFAULT) {
+
+							Logger.log("Adding to token stream and reseting words.");
+
+							tokenList.push(currentToken);
+
+							currentWord = "";
+							currentToken = new Token();
+
+							// Back up and re-lex the same character
+							currentIndex--;
+						}
+
+						else {
+
+							var errorMessage: string = "Error on line " + currentLine + ": " + currentWord + " is a not valid lexeme.";
+
+							Logger.log(errorMessage);
+							throw errorMessage;
+						}
 					}
 				}
 
 			} // while
 
+			// Extract last token
+			if(currentToken.type !== TokenType.T_DEFAULT) {
+				tokenList.push(currentToken);
+			}
+
+			// TODO: Routine to check for input beyond the EOF
+
 			return tokenList;
+		}
+
+		// Looks for a regex match for the word, and if it does, produces a token of the type to be returned
+		// in the currentToken formal parameter
+		private static matchesTokenPattern(currentWord: string): TokenMatch {
+
+			var returnTokenMatch: TokenMatch = new TokenMatch();
+			var patternMatched: boolean = false;
+
+			// Check if currentWord matches any regex for a token
+			for(var i: number = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
+
+				var tokenRegex: RegExp = this.tokenPatterns[i].regex;
+				var tokenType: TokenType = this.tokenPatterns[i].type;
+
+				// Regex passed
+				if(tokenRegex.test(currentWord)) {
+
+					patternMatched = true;
+
+					Logger.log(currentWord + " matched the regex " + tokenRegex);
+
+					// Enum is treated as array, so index it with enum type to get name of token
+					Logger.log("Token matched: " + TokenType[tokenType]);
+
+					var currentToken: Token = new Token();
+					currentToken.type = tokenType;
+
+					returnTokenMatch.token = currentToken;
+				}
+			}
+
+			returnTokenMatch.isMatch = patternMatched;
+			return returnTokenMatch;
 		}
 
 		private static setupTokenPatterns(): void {
 
 			this.tokenPatterns = [
-				{regex: /while/, type: TokenType.T_WHILE},
-				{regex: /if/, type: TokenType.T_IF},
-				{regex: /true/, type: TokenType.T_TRUE},
-				{regex: /false/, type: TokenType.T_FALSE},
-				{regex: /int/, type: TokenType.T_INT},
-				{regex: /string/, type: TokenType.T_STRING},
-				{regex: /boolean/, type: TokenType.T_BOOLEAN},
-				{regex: /print/, type: TokenType.T_PRINT},
-				{regex: /\(/, type: TokenType.T_LPAREN},
-				{regex: /\)/, type: TokenType.T_LPAREN},
-				{regex: /\{/, type: TokenType.T_LBRACE},
-				{regex: /\}/, type: TokenType.T_RBRACE},
-				{regex: /"/, type: TokenType.T_QUOTE},
-				{regex: /[a-z]/, type: TokenType.T_ID},
-				{regex: /[0-9]/, type: TokenType.T_DIGIT},
-				{regex: /\+/, type: TokenType.T_PLUS},
-				{regex: /\$/, type: TokenType.T_EOF},
-				{regex: /=/, type: TokenType.T_SINGLE_EQUALS},
-				{regex: /==/, type: TokenType.T_DOUBLE_EQUALS},
-				{regex: /!=/, type: TokenType.T_NOT_EQUALS},
-				{regex: /\$/, type: TokenType.T_EOF},
-				{regex: /\s+/, type: TokenType.T_WHITE_SPACE},
+				{regex: /^while$/g, type: TokenType.T_WHILE},
+				{regex: /^if$/g, type: TokenType.T_IF},
+				{regex: /^true$/g, type: TokenType.T_TRUE},
+				{regex: /^false$/g, type: TokenType.T_FALSE},
+				{regex: /^int$/g, type: TokenType.T_INT},
+				{regex: /^string$/g, type: TokenType.T_STRING},
+				{regex: /^boolean$/g, type: TokenType.T_BOOLEAN},
+				{regex: /^print$/g, type: TokenType.T_PRINT},
+				{regex: /^\($/g, type: TokenType.T_LPAREN},
+				{regex: /^\)$/g, type: TokenType.T_LPAREN},
+				{regex: /^\{$/g, type: TokenType.T_LBRACE},
+				{regex: /^\}$/g, type: TokenType.T_RBRACE},
+				{regex: /^"$/g, type: TokenType.T_QUOTE},
+				{regex: /^[a-z]$/g, type: TokenType.T_ID},
+				{regex: /^[0-9]$/g, type: TokenType.T_DIGIT},
+				{regex: /^\+$/g, type: TokenType.T_PLUS},
+				{regex: /^\$$/g, type: TokenType.T_EOF},
+				{regex: /^=$/g, type: TokenType.T_SINGLE_EQUALS},
+				{regex: /^==$/g, type: TokenType.T_DOUBLE_EQUALS},
+				{regex: /^!=$/g, type: TokenType.T_NOT_EQUALS},
+				{regex: /^[\s|\n]+$/g, type: TokenType.T_WHITE_SPACE},
 			];
 
+		}
+	}
+
+	export class TokenMatch {
+
+		public token: Token;
+		public isMatch: boolean;
+
+		constructor() {
+
+			this.token = new Token();
+			this.token.type = TokenType.T_NO_MATCH;
+			this.isMatch = false;
 		}
 	}
 }
