@@ -9,7 +9,7 @@ module Compiler {
 		constructor() {
 
 			// Populate the table with reserved words
-			var reservedWordList: string[] = ["while", "if", "print", "int", "string", "boolean", "false", "true"];
+			var reservedWordList: string[] = ["while", "if", "print", "int", "string", "boolean", "false", "true", "!=", "=", "=="];
 
 			this.table = [];
 

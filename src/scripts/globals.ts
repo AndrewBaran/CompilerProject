@@ -12,14 +12,13 @@ var _testCodeList = [
 	{name: "Minimal", code: "{ } $"},
 	{name: "Simple", code: "{\n\tint x\n} $"},
 	{name: "Assignment", code: "{\n\tint a\n\ta = 1\n\tprint(a)\n} $"},
-	{name: "String", code: "{\n\tstring s\n\ts = \"This is a string\"\n\tprint(s)\n} $"},
+	{name: "String", code: "{\n\tstring s\n\ts = \"this is a string\"\n\tprint(s)\n} $"},
 	{name: "Addition", code: "{\n\tint a\n\ta = 4\n\n\tint b\n\tb = 2 + a\n\n\tprint(b)\n} $"},
 	{name: "If and Increment", code: "{\n\tint i\n\ti = 0\n\n\tprint(i)\n\n\tif (i == 0) {\n\t\ti = 1 + i\n\t}\n\n\tprint(i)\n} $"},
-    {name: "If-else", code: "{\n\tif true {\n\t\tprint(\"This will print\")\n\t}\n\n\tif false {\n\t\tprint(\"This will not print\")\n\t}\n} $"},
+    {name: "If-else", code: "{\n\tif true {\n\t\tprint(\"this will print\")\n\t}\n\n\tif false {\n\t\tprint(\"this will not print\")\n\t}\n} $"},
     {name: "While", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $"},
     {name: "Tokens", code: "{\n\t{ } ( )\n\twhile if print\n\t\" \" 1 2 3 4 5 a b c d e\n\tint string boolean\n\t== != = +\n\tfalse true\n} $"},
-    {name: "Boolean", code: "{\n\tif (true) {\n\t\tprint(\"True\")\n\t}\n\n\tif true {\n\t\tprint(\"Still true\")\n\t}\n} $"},
-    {name: "Testing", code: "{ int a b c 1 2 3 false true } $"}
+    {name: "Boolean", code: "{\n\tif (true) {\n\t\tprint(\"true\")\n\t}\n\n\tif true {\n\t\tprint(\"still true\")\n\t}\n} $"}
 ];
 
 // Types of each token that the lexer can identify

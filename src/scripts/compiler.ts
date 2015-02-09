@@ -3,9 +3,7 @@ module Compiler {
 	export class Compiler {
 
 		private static symbolTable: SymbolTable;
-
 		private static debugMode: boolean;
-
 
 		public static compile(codeToCompile: string): boolean {
 
@@ -34,10 +32,13 @@ module Compiler {
 				}
 			}
 
-			// Show tokens produced
-			if(this.debugMode && tokenList.length > 0 && lexResult) {
+			if(tokenList.length > 0 && lexResult) {
 
-				Control.debugCreateTokenDiv(tokenList);
+				if(this.debugMode) {
+					Control.debugCreateTokenDiv(tokenList);
+				}
+
+				Parser.parseCode(tokenList, this.symbolTable);
 			}
 
 			// Return flag if compile was successful

@@ -3,7 +3,7 @@ var Compiler;
     var SymbolTable = (function () {
         function SymbolTable() {
             // Populate the table with reserved words
-            var reservedWordList = ["while", "if", "print", "int", "string", "boolean", "false", "true"];
+            var reservedWordList = ["while", "if", "print", "int", "string", "boolean", "false", "true", "!=", "=", "=="];
 
             this.table = [];
 

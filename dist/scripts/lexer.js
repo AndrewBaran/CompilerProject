@@ -3,6 +3,7 @@ var Compiler;
     var Lexer = (function () {
         function Lexer() {
         }
+        // TODO: Be able to lex strings
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();
@@ -17,48 +18,61 @@ var Compiler;
 
             var currentIndex = 0;
 
-            var currentLine = 1;
+            var logCurrentLetter = 1;
+            var logCurrentLine = 1;
+
             var eofFound = false;
 
             while (currentIndex != inputCode.length && !eofFound) {
                 currentChar = inputCode[currentIndex];
                 currentIndex++;
 
-                Compiler.Logger.log("Char: \"" + currentChar + "\"");
+                logCurrentLetter++;
+
                 currentWord += currentChar;
 
-                // Update counter for error reporting
+                // For error reporting
                 if (currentChar === "\n") {
-                    currentLine++;
+                    logCurrentLine++;
+                    logCurrentLetter = 0;
                 }
 
+                // Attempt to find match for token
                 var tokenMatched = this.matchesTokenPattern(currentWord);
 
+                // Disregard old token if new match was found
                 if (tokenMatched.token.type !== 0 /* T_NO_MATCH */) {
                     currentToken = tokenMatched.token;
                 }
 
-                Compiler.Logger.log("Current = " + TokenType[currentToken.type]);
-
                 if (tokenMatched.isMatch) {
-                    Compiler.Logger.log("Token matched was: " + TokenType[currentToken.type]);
+                    Compiler.Logger.log("Token found: " + TokenType[currentToken.type]);
                 } else {
                     // Didn't match a pattern
-                    if (symbolTable.hasReservedWordPrefix(currentWord)) {
-                        Compiler.Logger.log(currentWord + " is a prefix of a reserved word.");
-                    } else {
+                    if (!symbolTable.hasReservedWordPrefix(currentWord)) {
                         if (currentToken.type !== 1 /* T_DEFAULT */) {
-                            Compiler.Logger.log("Adding to token stream and reseting words.");
+                            if (currentToken.type === 8 /* T_EOF */) {
+                                eofFound = true;
+                            }
 
-                            tokenList.push(currentToken);
+                            // Discard whitespace tokens
+                            if (currentToken.type !== 23 /* T_WHITE_SPACE */) {
+                                Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
+                                tokenList.push(currentToken);
+                            }
 
                             currentWord = "";
                             currentToken = new Compiler.Token();
 
-                            // Back up and re-lex the same character
+                            // Back up and re-lex the current character
                             currentIndex--;
+                            logCurrentLetter--;
+
+                            if (currentChar === "\n") {
+                                logCurrentLine--;
+                            }
                         } else {
-                            var errorMessage = "Error on line " + currentLine + ": " + currentWord + " is a not valid lexeme.";
+                            var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme.";
 
                             Compiler.Logger.log(errorMessage);
                             throw errorMessage;
@@ -67,12 +81,27 @@ var Compiler;
                 }
             }
 
-            // Extract last token
+            // TODO: Refactor into while loop
+            // Extract last token from lex
             if (currentToken.type !== 1 /* T_DEFAULT */) {
+                Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
                 tokenList.push(currentToken);
             }
 
-            // TODO: Routine to check for input beyond the EOF
+            var whitespaceRegex = /[\s|\n]/;
+
+            // Check for input beyond EOF char
+            var indexAfterEOF = inputCode.indexOf("$") + 1;
+
+            for (currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
+                currentChar = inputCode[currentIndex];
+
+                if (!(whitespaceRegex.test(currentChar))) {
+                    Compiler.Logger.log("Warning! Input found after EOF character.");
+                    break;
+                }
+            }
+
             return tokenList;
         };
 
@@ -86,14 +115,8 @@ var Compiler;
                 var tokenRegex = this.tokenPatterns[i].regex;
                 var tokenType = this.tokenPatterns[i].type;
 
-                // Regex passed
                 if (tokenRegex.test(currentWord)) {
                     patternMatched = true;
-
-                    Compiler.Logger.log(currentWord + " matched the regex " + tokenRegex);
-
-                    // Enum is treated as array, so index it with enum type to get name of token
-                    Compiler.Logger.log("Token matched: " + TokenType[tokenType]);
 
                     var currentToken = new Compiler.Token();
                     currentToken.type = tokenType;
@@ -117,7 +140,7 @@ var Compiler;
                 { regex: /^boolean$/g, type: 17 /* T_BOOLEAN */ },
                 { regex: /^print$/g, type: 7 /* T_PRINT */ },
                 { regex: /^\($/g, type: 2 /* T_LPAREN */ },
-                { regex: /^\)$/g, type: 2 /* T_LPAREN */ },
+                { regex: /^\)$/g, type: 3 /* T_RPAREN */ },
                 { regex: /^\{$/g, type: 4 /* T_LBRACE */ },
                 { regex: /^\}$/g, type: 5 /* T_RBRACE */ },
                 { regex: /^"$/g, type: 6 /* T_QUOTE */ },

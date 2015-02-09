@@ -5,6 +5,7 @@ module Compiler {
 		// TODO: Give this a type eventually
 		private static tokenPatterns; 
 
+		// TODO: Be able to lex strings
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
 
@@ -20,7 +21,9 @@ module Compiler {
 
 			var currentIndex: number = 0;
 
-			var currentLine: number = 1;
+			var logCurrentLetter: number = 1;
+			var logCurrentLine: number = 1;
+
 			var eofFound: boolean = false;
 
 			// Lex the code
@@ -29,53 +32,63 @@ module Compiler {
 				currentChar = inputCode[currentIndex];
 				currentIndex++;
 
-				Logger.log("Char: \"" + currentChar + "\"");
+				logCurrentLetter++;
+
 				currentWord += currentChar;
 
-				// Update counter for error reporting
+				// For error reporting
 				if(currentChar === "\n") {
-					currentLine++;
+
+					logCurrentLine++;
+					logCurrentLetter = 0;
 				}
 
+				// Attempt to find match for token
 				var tokenMatched: TokenMatch = this.matchesTokenPattern(currentWord);
 
+				// Disregard old token if new match was found 
 				if(tokenMatched.token.type !== TokenType.T_NO_MATCH) {
 					currentToken = tokenMatched.token;
 				}
 
-				Logger.log("Current = " + TokenType[currentToken.type]);
-
 				if(tokenMatched.isMatch) {
-
-					Logger.log("Token matched was: " + TokenType[currentToken.type]);
+					Logger.log("Token found: " + TokenType[currentToken.type]);
 				}
 
 				else {
 
 					// Didn't match a pattern
-					if(symbolTable.hasReservedWordPrefix(currentWord)) {
-						Logger.log(currentWord + " is a prefix of a reserved word.");
-					}
-
-					// Not a prefix
-					else {
+					if(!symbolTable.hasReservedWordPrefix(currentWord)) {
 
 						if(currentToken.type !== TokenType.T_DEFAULT) {
 
-							Logger.log("Adding to token stream and reseting words.");
+							if(currentToken.type === TokenType.T_EOF) {
+								eofFound = true;
+							}
 
-							tokenList.push(currentToken);
+							// Discard whitespace tokens
+							if(currentToken.type !== TokenType.T_WHITE_SPACE) {
+
+								Logger.log("Producing token: " + TokenType[currentToken.type]);
+								tokenList.push(currentToken);
+							}
 
 							currentWord = "";
 							currentToken = new Token();
 
-							// Back up and re-lex the same character
+							// Back up and re-lex the current character
 							currentIndex--;
+							logCurrentLetter--;
+
+							if(currentChar === "\n") {
+								logCurrentLine--;
+							}
 						}
 
+						// Not a valid lexeme 
 						else {
 
-							var errorMessage: string = "Error on line " + currentLine + ": " + currentWord + " is a not valid lexeme.";
+							var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme.";
 
 							Logger.log(errorMessage);
 							throw errorMessage;
@@ -83,14 +96,31 @@ module Compiler {
 					}
 				}
 
-			} // while
+			}
 
-			// Extract last token
+			// TODO: Refactor into while loop
+			// Extract last token from lex
 			if(currentToken.type !== TokenType.T_DEFAULT) {
+
+				Logger.log("Producing token: " + TokenType[currentToken.type]);
 				tokenList.push(currentToken);
 			}
 
-			// TODO: Routine to check for input beyond the EOF
+			var whitespaceRegex: RegExp = /[\s|\n]/;
+
+			// Check for input beyond EOF char
+			var indexAfterEOF: number = inputCode.indexOf("$") + 1;
+
+			for(currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
+
+				currentChar = inputCode[currentIndex];
+
+				if(!(whitespaceRegex.test(currentChar))) {
+
+					Logger.log("Warning! Input found after EOF character.");
+					break;
+				}
+			}
 
 			return tokenList;
 		}
@@ -108,15 +138,9 @@ module Compiler {
 				var tokenRegex: RegExp = this.tokenPatterns[i].regex;
 				var tokenType: TokenType = this.tokenPatterns[i].type;
 
-				// Regex passed
 				if(tokenRegex.test(currentWord)) {
 
 					patternMatched = true;
-
-					Logger.log(currentWord + " matched the regex " + tokenRegex);
-
-					// Enum is treated as array, so index it with enum type to get name of token
-					Logger.log("Token matched: " + TokenType[tokenType]);
 
 					var currentToken: Token = new Token();
 					currentToken.type = tokenType;
@@ -141,7 +165,7 @@ module Compiler {
 				{regex: /^boolean$/g, type: TokenType.T_BOOLEAN},
 				{regex: /^print$/g, type: TokenType.T_PRINT},
 				{regex: /^\($/g, type: TokenType.T_LPAREN},
-				{regex: /^\)$/g, type: TokenType.T_LPAREN},
+				{regex: /^\)$/g, type: TokenType.T_RPAREN},
 				{regex: /^\{$/g, type: TokenType.T_LBRACE},
 				{regex: /^\}$/g, type: TokenType.T_RBRACE},
 				{regex: /^"$/g, type: TokenType.T_QUOTE},

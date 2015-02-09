@@ -23,9 +23,12 @@ var Compiler;
                 }
             }
 
-            // Show tokens produced
-            if (this.debugMode && tokenList.length > 0 && lexResult) {
-                _Compiler.Control.debugCreateTokenDiv(tokenList);
+            if (tokenList.length > 0 && lexResult) {
+                if (this.debugMode) {
+                    _Compiler.Control.debugCreateTokenDiv(tokenList);
+                }
+
+                _Compiler.Parser.parseCode(tokenList, this.symbolTable);
             }
 
             // Return flag if compile was successful
