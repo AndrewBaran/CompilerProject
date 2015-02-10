@@ -6,6 +6,9 @@ module Compiler {
 		private static tokenPatterns; 
 
 		// TODO: Be able to lex strings
+		// TODO: Associate values with certain tokens
+		// TODO: Place ids in the symbol table, link the value to the symbol table entry
+		// TODO: If EOF cuts off a lexeme mid way (ex: in$), fix that
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
 
@@ -23,6 +26,7 @@ module Compiler {
 
 			var logCurrentLetter: number = 1;
 			var logCurrentLine: number = 1;
+			var logWarningCount: number = 0;
 
 			var eofFound: boolean = false;
 
@@ -100,27 +104,49 @@ module Compiler {
 
 			// TODO: Refactor into while loop
 			// Extract last token from lex
-			if(currentToken.type !== TokenType.T_DEFAULT) {
+			if(currentToken.type !== TokenType.T_DEFAULT && currentToken.type !== TokenType.T_WHITE_SPACE) {
 
+				// Disregard prefixes
 				Logger.log("Producing token: " + TokenType[currentToken.type]);
 				tokenList.push(currentToken);
-			}
 
-			var whitespaceRegex: RegExp = /[\s|\n]/;
-
-			// Check for input beyond EOF char
-			var indexAfterEOF: number = inputCode.indexOf("$") + 1;
-
-			for(currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
-
-				currentChar = inputCode[currentIndex];
-
-				if(!(whitespaceRegex.test(currentChar))) {
-
-					Logger.log("Warning! Input found after EOF character.");
-					break;
+				if(currentToken.type === TokenType.T_EOF) {
+					eofFound = true;
 				}
 			}
+
+
+			if(eofFound) {
+
+				var whitespaceRegex: RegExp = /[\s|\n]/;
+				var indexAfterEOF: number = inputCode.indexOf("$") + 1;
+
+				for(currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
+
+					currentChar = inputCode[currentIndex];
+
+					if(!(whitespaceRegex.test(currentChar))) {
+
+						Logger.log("Warning! Input found after EOF character ( $ ).");
+						logWarningCount++;
+
+						break;
+					}
+				}
+			}
+
+			else {
+
+				Logger.log("Warning! EOF character ( $ ) was not found. Adding it to the list.");
+				logWarningCount++;
+
+				var eofToken: Token = new Token();
+				eofToken.type = TokenType.T_EOF;
+
+				tokenList.push(eofToken);
+			}
+
+			Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s).");
 
 			return tokenList;
 		}

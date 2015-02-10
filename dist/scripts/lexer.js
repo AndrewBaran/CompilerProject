@@ -4,6 +4,9 @@ var Compiler;
         function Lexer() {
         }
         // TODO: Be able to lex strings
+        // TODO: Associate values with certain tokens
+        // TODO: Place ids in the symbol table, link the value to the symbol table entry
+        // TODO: If EOF cuts off a lexeme mid way (ex: in$), fix that
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();
@@ -20,6 +23,7 @@ var Compiler;
 
             var logCurrentLetter = 1;
             var logCurrentLine = 1;
+            var logWarningCount = 0;
 
             var eofFound = false;
 
@@ -83,24 +87,41 @@ var Compiler;
 
             // TODO: Refactor into while loop
             // Extract last token from lex
-            if (currentToken.type !== 1 /* T_DEFAULT */) {
+            if (currentToken.type !== 1 /* T_DEFAULT */ && currentToken.type !== 23 /* T_WHITE_SPACE */) {
+                // Disregard prefixes
                 Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
                 tokenList.push(currentToken);
-            }
 
-            var whitespaceRegex = /[\s|\n]/;
-
-            // Check for input beyond EOF char
-            var indexAfterEOF = inputCode.indexOf("$") + 1;
-
-            for (currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
-                currentChar = inputCode[currentIndex];
-
-                if (!(whitespaceRegex.test(currentChar))) {
-                    Compiler.Logger.log("Warning! Input found after EOF character.");
-                    break;
+                if (currentToken.type === 8 /* T_EOF */) {
+                    eofFound = true;
                 }
             }
+
+            if (eofFound) {
+                var whitespaceRegex = /[\s|\n]/;
+                var indexAfterEOF = inputCode.indexOf("$") + 1;
+
+                for (currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
+                    currentChar = inputCode[currentIndex];
+
+                    if (!(whitespaceRegex.test(currentChar))) {
+                        Compiler.Logger.log("Warning! Input found after EOF character ( $ ).");
+                        logWarningCount++;
+
+                        break;
+                    }
+                }
+            } else {
+                Compiler.Logger.log("Warning! EOF character ( $ ) was not found. Adding it to the list.");
+                logWarningCount++;
+
+                var eofToken = new Compiler.Token();
+                eofToken.type = 8 /* T_EOF */;
+
+                tokenList.push(eofToken);
+            }
+
+            Compiler.Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s).");
 
             return tokenList;
         };
