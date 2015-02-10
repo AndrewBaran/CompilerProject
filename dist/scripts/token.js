@@ -5,6 +5,10 @@ var Compiler;
             this.type = 1 /* T_DEFAULT */;
             this.value = "";
         }
+        Token.prototype.toString = function () {
+            var result = TokenType[this.type] + ": " + this.value;
+            return result;
+        };
         return Token;
     })();
     Compiler.Token = Token;

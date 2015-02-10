@@ -28,11 +28,8 @@ module Compiler {
 			// Clear the previous log
 			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
 
-			var divToRemove = document.getElementById("divDebugToken");
-
-			if(divToRemove !== null) {
-				document.getElementById("mainBody").removeChild(divToRemove);
-			}
+			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
+			this.removeDivs(divsToRemove)
 
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
@@ -69,26 +66,6 @@ module Compiler {
 			}
 		}
 
-		// Displays tokens produced from lex if debug mode is enabled
-		public static debugCreateTokenDiv(tokenList: Token[]): void {
-
-			var divTokenWindow = document.createElement("div");
-			divTokenWindow.id = "divDebugToken";
-
-			var stringBody: string = "Tokens found: <br />";
-
-			for(var i: number = 0; i < tokenList.length; i++) {
-				stringBody += TokenType[tokenList[i].type];
-				stringBody += "<br />";
-			}
-
-			divTokenWindow.innerHTML = stringBody;
-
-			// TODO Make it attach to right of test buttons
-			document.getElementById("mainBody").appendChild(divTokenWindow);
-		}
-
-
 		// Loads the specified test code into the code textbox using the button that was clicked
 		private static loadTestCode(button): void {
 			
@@ -96,6 +73,63 @@ module Compiler {
 			var code: string = _testCodeList[index].code;
 
 			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = code;
+		}
+
+		// Displays tokens produced from lex if debug mode is enabled
+		public static debugCreateTokenDiv(tokenList: Token[]): void {
+
+			var divTokenWindow = document.createElement("div");
+			divTokenWindow.id = "divDebugToken";
+
+			var stringBody: string = "Tokens found: <hr />";
+
+			for(var i: number = 0; i < tokenList.length; i++) {
+
+				stringBody += tokenList[i].toString();
+				stringBody += "<br />";
+			}
+
+			divTokenWindow.innerHTML = stringBody;
+
+			document.getElementById("mainBody").appendChild(divTokenWindow);
+		}
+
+		public static debugCreateSymbolTableDiv(symbolTable: SymbolTable): void {
+
+			var divSymbolTable = document.createElement("div");
+			divSymbolTable.id = "divDebugSymbolTable";
+
+			var stringBody: string = "Symbol table: <hr />";
+
+			for(var i: number = 0; i < symbolTable.getSize(); i++) {
+
+				var currentEntry: SymbolTableEntry = symbolTable.getEntry(i);
+
+				if(currentEntry !== null) {
+
+					if(!currentEntry.isReservedWord) {
+
+						stringBody += currentEntry.toString();
+						stringBody += "<br />";
+					}
+				}
+			}
+
+			divSymbolTable.innerHTML = stringBody;
+
+			document.getElementById("mainBody").appendChild(divSymbolTable);
+		}
+
+		private static removeDivs(divList: string[]): void {
+
+			for(var i: number = 0; i < divList.length; i++) {
+
+				var div = document.getElementById(divList[i]);
+
+				if(div !== null) {
+					document.getElementById("mainBody").removeChild(div);
+				}
+			}
 		}
 
 	}

@@ -12,6 +12,7 @@ module Compiler {
 			var reservedWordList: string[] = ["while", "if", "print", "int", "string", "boolean", "false", "true", "!=", "=", "=="];
 
 			this.table = [];
+			this.nextAvailableIndex = 0;
 
 			for(var i: number = 0; i < reservedWordList.length; i++) {
 
@@ -35,6 +36,11 @@ module Compiler {
 			this.table.push(entry);
 		}
 
+		public getEntry(entryNumber: number): SymbolTableEntry {
+
+			return this.table[entryNumber];
+		}
+
 		public hasReservedWordPrefix(inputWord: string): boolean {
 
 			for(var i: number = 0; i < this.table.length; i++) {
@@ -54,9 +60,14 @@ module Compiler {
 
 			return false;
 		}
+
+		public getSize(): number {
+			return this.nextAvailableIndex;
+		}
 	}
 
 
+	// TODO Place in own file?
 	export class SymbolTableEntry {
 
 		public entryNumber: number;
@@ -73,5 +84,12 @@ module Compiler {
 			this.isReservedWord = false;
 			this.scopeLevel = 0;
 		}
+
+		public toString(): string {
+
+			var result = this.entryNumber + " | " + TokenType[this.tokenType] + " | " + this.tokenValue + " | " + this.scopeLevel;
+			return result;
+		}
+
 	}
 }

@@ -27,11 +27,8 @@ var Compiler;
             // Clear the previous log
             document.getElementById("textboxLog").value = "";
 
-            var divToRemove = document.getElementById("divDebugToken");
-
-            if (divToRemove !== null) {
-                document.getElementById("mainBody").removeChild(divToRemove);
-            }
+            var divsToRemove = ["divDebugToken", "divDebugSymbolTable"];
+            this.removeDivs(divsToRemove);
 
             // Compile the program
             var code = document.getElementById("textboxInputCode").value;
@@ -65,30 +62,61 @@ var Compiler;
             }
         };
 
-        // Displays tokens produced from lex if debug mode is enabled
-        Control.debugCreateTokenDiv = function (tokenList) {
-            var divTokenWindow = document.createElement("div");
-            divTokenWindow.id = "divDebugToken";
-
-            var stringBody = "Tokens found: <br />";
-
-            for (var i = 0; i < tokenList.length; i++) {
-                stringBody += TokenType[tokenList[i].type];
-                stringBody += "<br />";
-            }
-
-            divTokenWindow.innerHTML = stringBody;
-
-            // TODO Make it attach to right of test buttons
-            document.getElementById("mainBody").appendChild(divTokenWindow);
-        };
-
         // Loads the specified test code into the code textbox using the button that was clicked
         Control.loadTestCode = function (button) {
             var index = parseInt(button.value, 10);
             var code = _testCodeList[index].code;
 
             document.getElementById("textboxInputCode").value = code;
+        };
+
+        // Displays tokens produced from lex if debug mode is enabled
+        Control.debugCreateTokenDiv = function (tokenList) {
+            var divTokenWindow = document.createElement("div");
+            divTokenWindow.id = "divDebugToken";
+
+            var stringBody = "Tokens found: <hr />";
+
+            for (var i = 0; i < tokenList.length; i++) {
+                stringBody += tokenList[i].toString();
+                stringBody += "<br />";
+            }
+
+            divTokenWindow.innerHTML = stringBody;
+
+            document.getElementById("mainBody").appendChild(divTokenWindow);
+        };
+
+        Control.debugCreateSymbolTableDiv = function (symbolTable) {
+            var divSymbolTable = document.createElement("div");
+            divSymbolTable.id = "divDebugSymbolTable";
+
+            var stringBody = "Symbol table: <hr />";
+
+            for (var i = 0; i < symbolTable.getSize(); i++) {
+                var currentEntry = symbolTable.getEntry(i);
+
+                if (currentEntry !== null) {
+                    if (!currentEntry.isReservedWord) {
+                        stringBody += currentEntry.toString();
+                        stringBody += "<br />";
+                    }
+                }
+            }
+
+            divSymbolTable.innerHTML = stringBody;
+
+            document.getElementById("mainBody").appendChild(divSymbolTable);
+        };
+
+        Control.removeDivs = function (divList) {
+            for (var i = 0; i < divList.length; i++) {
+                var div = document.getElementById(divList[i]);
+
+                if (div !== null) {
+                    document.getElementById("mainBody").removeChild(div);
+                }
+            }
         };
         return Control;
     })();

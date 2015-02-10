@@ -6,6 +6,7 @@ var Compiler;
             var reservedWordList = ["while", "if", "print", "int", "string", "boolean", "false", "true", "!=", "=", "=="];
 
             this.table = [];
+            this.nextAvailableIndex = 0;
 
             for (var i = 0; i < reservedWordList.length; i++) {
                 var entry = new SymbolTableEntry();
@@ -26,6 +27,10 @@ var Compiler;
             this.table.push(entry);
         };
 
+        SymbolTable.prototype.getEntry = function (entryNumber) {
+            return this.table[entryNumber];
+        };
+
         SymbolTable.prototype.hasReservedWordPrefix = function (inputWord) {
             for (var i = 0; i < this.table.length; i++) {
                 var currentEntry = this.table[i];
@@ -40,10 +45,15 @@ var Compiler;
 
             return false;
         };
+
+        SymbolTable.prototype.getSize = function () {
+            return this.nextAvailableIndex;
+        };
         return SymbolTable;
     })();
     Compiler.SymbolTable = SymbolTable;
 
+    // TODO Place in own file?
     var SymbolTableEntry = (function () {
         function SymbolTableEntry() {
             this.entryNumber = -1;
@@ -52,6 +62,10 @@ var Compiler;
             this.isReservedWord = false;
             this.scopeLevel = 0;
         }
+        SymbolTableEntry.prototype.toString = function () {
+            var result = this.entryNumber + " | " + TokenType[this.tokenType] + " | " + this.tokenValue + " | " + this.scopeLevel;
+            return result;
+        };
         return SymbolTableEntry;
     })();
     Compiler.SymbolTableEntry = SymbolTableEntry;

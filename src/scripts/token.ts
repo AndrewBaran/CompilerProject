@@ -10,5 +10,11 @@ module Compiler {
 			this.value = "";
 		}
 
+		public toString(): string {
+
+			var result: string = TokenType[this.type] + ": " + this.value;
+			return result;
+		}
+
 	}
 }

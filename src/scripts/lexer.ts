@@ -6,8 +6,6 @@ module Compiler {
 		private static tokenPatterns; 
 
 		// TODO: Be able to lex strings
-		// TODO: Associate values with certain tokens
-		// TODO: Place ids in the symbol table, link the value to the symbol table entry
 		// TODO: If EOF cuts off a lexeme mid way (ex: in$), fix that
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
@@ -84,6 +82,12 @@ module Compiler {
 
 								Logger.log("Producing token: " + TokenType[currentToken.type]);
 								tokenList.push(currentToken);
+
+								if(currentToken.type === TokenType.T_ID || currentToken.type === TokenType.T_DIGIT) {
+
+									Logger.log("Adding token to symbol table.");
+									symbolTable.insert(currentToken);
+								}
 							}
 
 							currentWord = "";
@@ -118,6 +122,12 @@ module Compiler {
 				// Disregard prefixes
 				Logger.log("Producing token: " + TokenType[currentToken.type]);
 				tokenList.push(currentToken);
+				
+				if(currentToken.type === TokenType.T_ID || currentToken.type === TokenType.T_DIGIT) {
+
+					Logger.log("Adding token to symbol table.");
+					symbolTable.insert(currentToken);
+				}
 
 				if(currentToken.type === TokenType.T_EOF) {
 					eofFound = true;
@@ -179,6 +189,7 @@ module Compiler {
 
 					var currentToken: Token = new Token();
 					currentToken.type = tokenType;
+					currentToken.value = currentWord;
 
 					returnTokenMatch.token = currentToken;
 				}

@@ -4,8 +4,6 @@ var Compiler;
         function Lexer() {
         }
         // TODO: Be able to lex strings
-        // TODO: Associate values with certain tokens
-        // TODO: Place ids in the symbol table, link the value to the symbol table entry
         // TODO: If EOF cuts off a lexeme mid way (ex: in$), fix that
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
@@ -68,6 +66,11 @@ var Compiler;
                             if (currentToken.type !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
                                 Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
                                 tokenList.push(currentToken);
+
+                                if (currentToken.type === 12 /* T_ID */ || currentToken.type === 11 /* T_DIGIT */) {
+                                    Compiler.Logger.log("Adding token to symbol table.");
+                                    symbolTable.insert(currentToken);
+                                }
                             }
 
                             currentWord = "";
@@ -96,6 +99,11 @@ var Compiler;
                 // Disregard prefixes
                 Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
                 tokenList.push(currentToken);
+
+                if (currentToken.type === 12 /* T_ID */ || currentToken.type === 11 /* T_DIGIT */) {
+                    Compiler.Logger.log("Adding token to symbol table.");
+                    symbolTable.insert(currentToken);
+                }
 
                 if (currentToken.type === 8 /* T_EOF */) {
                     eofFound = true;
@@ -146,6 +154,7 @@ var Compiler;
 
                     var currentToken = new Compiler.Token();
                     currentToken.type = tokenType;
+                    currentToken.value = currentWord;
 
                     returnTokenMatch.token = currentToken;
                 }
