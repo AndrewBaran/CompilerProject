@@ -10,7 +10,9 @@ var Compiler;
             document.getElementById("textboxLog").value = "";
 
             // Reset selections on compiler flags
-            document.getElementById("checkboxDebug").checked = false;
+            // TODO: Checked for now (debugging)
+            document.getElementById("checkboxDebug").checked = true;
+            document.getElementById("checkboxParse").checked = true;
 
             // Reset compile button
             document.getElementById("buttonCompile").disabled = false;

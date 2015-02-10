@@ -61,11 +61,17 @@ module Compiler {
 
 		public entryNumber: number;
 		public tokenType: TokenType;
-		public tokenValue: string; // String?
+		public tokenValue: string;
 		public isReservedWord: boolean;
+		public scopeLevel: number;
 
 		constructor() {
-			
+
+			this.entryNumber = -1;
+			this.tokenType = TokenType.T_DEFAULT;
+			this.tokenValue = "";
+			this.isReservedWord = false;
+			this.scopeLevel = 0;
 		}
 	}
 }

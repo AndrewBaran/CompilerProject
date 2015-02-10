@@ -3,7 +3,9 @@ module Compiler {
 	export class Compiler {
 
 		private static symbolTable: SymbolTable;
+
 		private static debugMode: boolean;
+		private static parseMode: boolean;
 
 		public static compile(codeToCompile: string): boolean {
 
@@ -38,10 +40,12 @@ module Compiler {
 					Control.debugCreateTokenDiv(tokenList);
 				}
 
-				Parser.parseCode(tokenList, this.symbolTable);
+				if(this.parseMode) {
+					Parser.parseCode(tokenList, this.symbolTable);
+				}
+
 			}
 
-			// Return flag if compile was successful
 			return compileResult;
 		}
 
@@ -55,6 +59,8 @@ module Compiler {
 				Logger.log("Debug mode enabled");
 			}
 
+			var checkboxParse = <HTMLInputElement> document.getElementById("checkboxParse");
+			this.parseMode = checkboxParse.checked;
 		}
 
 		private static isDebugMode(): boolean {

@@ -25,6 +25,7 @@ var Compiler;
             var logCurrentLine = 1;
             var logWarningCount = 0;
 
+            var isPrefix = false;
             var eofFound = false;
 
             while (currentIndex != inputCode.length && !eofFound) {
@@ -51,16 +52,20 @@ var Compiler;
 
                 if (tokenMatched.isMatch) {
                     Compiler.Logger.log("Token found: " + TokenType[currentToken.type]);
+
+                    isPrefix = false;
                 } else {
                     // Didn't match a pattern
-                    if (!symbolTable.hasReservedWordPrefix(currentWord)) {
+                    if (symbolTable.hasReservedWordPrefix(currentWord)) {
+                        isPrefix = true;
+                    } else {
                         if (currentToken.type !== 1 /* T_DEFAULT */) {
                             if (currentToken.type === 8 /* T_EOF */) {
                                 eofFound = true;
                             }
 
                             // Discard whitespace tokens
-                            if (currentToken.type !== 23 /* T_WHITE_SPACE */) {
+                            if (currentToken.type !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
                                 Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
                                 tokenList.push(currentToken);
                             }

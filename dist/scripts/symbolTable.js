@@ -46,6 +46,11 @@ var Compiler;
 
     var SymbolTableEntry = (function () {
         function SymbolTableEntry() {
+            this.entryNumber = -1;
+            this.tokenType = 1 /* T_DEFAULT */;
+            this.tokenValue = "";
+            this.isReservedWord = false;
+            this.scopeLevel = 0;
         }
         return SymbolTableEntry;
     })();

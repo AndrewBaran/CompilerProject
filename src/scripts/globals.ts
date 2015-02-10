@@ -18,7 +18,8 @@ var _testCodeList = [
     {name: "If-else", code: "{\n\tif true {\n\t\tprint(\"this will print\")\n\t}\n\n\tif false {\n\t\tprint(\"this will not print\")\n\t}\n} $"},
     {name: "While", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $"},
     {name: "Tokens", code: "{\n\t{ } ( )\n\twhile if print\n\t\" \" 1 2 3 4 5 a b c d e\n\tint string boolean\n\t== != = +\n\tfalse true\n} $"},
-    {name: "Boolean", code: "{\n\tif (true) {\n\t\tprint(\"true\")\n\t}\n\n\tif true {\n\t\tprint(\"still true\")\n\t}\n} $"}
+    {name: "Boolean", code: "{\n\tif (true) {\n\t\tprint(\"true\")\n\t}\n\n\tif true {\n\t\tprint(\"still true\")\n\t}\n} $"},
+    {name: "Lex error", code: "i\nin\nint\nintt $"}
 ];
 
 // Types of each token that the lexer can identify

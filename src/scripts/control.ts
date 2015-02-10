@@ -10,7 +10,9 @@ module Compiler {
 			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
 
 			// Reset selections on compiler flags
-			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = false;
+			// TODO: Checked for now (debugging) 
+			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = true;
+			(<HTMLInputElement> document.getElementById("checkboxParse")).checked = true;
 
 			// Reset compile button
 			document.getElementById("buttonCompile").disabled = false;

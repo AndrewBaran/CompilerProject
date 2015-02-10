@@ -28,10 +28,11 @@ var Compiler;
                     _Compiler.Control.debugCreateTokenDiv(tokenList);
                 }
 
-                _Compiler.Parser.parseCode(tokenList, this.symbolTable);
+                if (this.parseMode) {
+                    _Compiler.Parser.parseCode(tokenList, this.symbolTable);
+                }
             }
 
-            // Return flag if compile was successful
             return compileResult;
         };
 
@@ -43,6 +44,9 @@ var Compiler;
             if (this.debugMode) {
                 _Compiler.Logger.log("Debug mode enabled");
             }
+
+            var checkboxParse = document.getElementById("checkboxParse");
+            this.parseMode = checkboxParse.checked;
         };
 
         Compiler.isDebugMode = function () {

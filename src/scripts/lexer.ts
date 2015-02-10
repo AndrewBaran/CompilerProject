@@ -28,6 +28,7 @@ module Compiler {
 			var logCurrentLine: number = 1;
 			var logWarningCount: number = 0;
 
+			var isPrefix: boolean = false;
 			var eofFound: boolean = false;
 
 			// Lex the code
@@ -56,13 +57,21 @@ module Compiler {
 				}
 
 				if(tokenMatched.isMatch) {
+
 					Logger.log("Token found: " + TokenType[currentToken.type]);
+
+					isPrefix = false;
 				}
 
 				else {
 
 					// Didn't match a pattern
-					if(!symbolTable.hasReservedWordPrefix(currentWord)) {
+					if(symbolTable.hasReservedWordPrefix(currentWord)) {
+
+						isPrefix = true;
+					}
+
+					else {
 
 						if(currentToken.type !== TokenType.T_DEFAULT) {
 
@@ -71,7 +80,7 @@ module Compiler {
 							}
 
 							// Discard whitespace tokens
-							if(currentToken.type !== TokenType.T_WHITE_SPACE) {
+							if(currentToken.type !== TokenType.T_WHITE_SPACE && !isPrefix) {
 
 								Logger.log("Producing token: " + TokenType[currentToken.type]);
 								tokenList.push(currentToken);
