@@ -8,9 +8,11 @@ var Compiler;
             this.setCompilerFlags();
 
             var lexResult = true;
+            var parseResult = true;
             var compileResult = true;
 
             var tokenList = [];
+            var concreteSyntaxTree = null;
 
             // No available code to lex
             if (codeToCompile.length == 0) {
@@ -30,8 +32,16 @@ var Compiler;
                 }
 
                 if (this.parseMode) {
-                    _Compiler.Parser.parseCode(tokenList, this.symbolTable);
+                    try  {
+                        concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList, this.symbolTable);
+                    } catch (exception) {
+                        parseResult = false;
+                    }
                 }
+            }
+
+            if (parseResult) {
+                // TOOD: Semantic analysis
             }
 
             return compileResult;
@@ -48,10 +58,6 @@ var Compiler;
 
             var checkboxParse = document.getElementById("checkboxParse");
             this.parseMode = checkboxParse.checked;
-        };
-
-        Compiler.isDebugMode = function () {
-            return this.debugMode;
         };
         return Compiler;
     })();

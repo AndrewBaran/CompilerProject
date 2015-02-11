@@ -7,13 +7,19 @@ module Compiler {
 
 		private static symbolTable: SymbolTable;
 
-		public static parseCode(tokenList: Token[], symbolTable: SymbolTable): void {
+		private static concreteSyntaxTree: ConcreteSyntaxTree;
+
+		public static parseCode(tokenList: Token[], symbolTable: SymbolTable): ConcreteSyntaxTree {
 
 			Logger.log("Parsing the code");
 
 			this.setupParsingEnvironment(tokenList, symbolTable);
 
 			this.parseProgram();
+
+			Logger.log("Parsing done");
+
+			return this.concreteSyntaxTree;
 		}
 
 		private static setupParsingEnvironment(tokenList: Token[], symbolTable: SymbolTable): void {
@@ -22,6 +28,8 @@ module Compiler {
 			this.symbolTable = symbolTable;
 
 			this.currentTokenIndex = 0;
+
+			this.concreteSyntaxTree = new ConcreteSyntaxTree();
 		}
 
 		private static parseProgram(): void {
@@ -49,7 +57,7 @@ module Compiler {
 
 				if(token.type === TokenType.T_RBRACE) {
 
-					Logger.log("Got a right brace");
+					Logger.log("Got a right brace!");
 
 					this.consumeToken();
 				}

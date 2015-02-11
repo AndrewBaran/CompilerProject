@@ -13,9 +13,11 @@ module Compiler {
 			this.setCompilerFlags();
 
 			var lexResult: boolean = true;
+			var parseResult: boolean = true;
 			var compileResult: boolean = true;
 
 			var tokenList: Token[] = [];
+			var concreteSyntaxTree: ConcreteSyntaxTree = null;
 
 			// No available code to lex
 			if(codeToCompile.length == 0) {
@@ -37,14 +39,27 @@ module Compiler {
 			if(tokenList.length > 0 && lexResult) {
 
 				if(this.debugMode) {
+
 					Control.debugCreateTokenDiv(tokenList);
 					Control.debugCreateSymbolTableDiv(this.symbolTable);
 				}
 
 				if(this.parseMode) {
-					Parser.parseCode(tokenList, this.symbolTable);
+
+					try {
+						concreteSyntaxTree = Parser.parseCode(tokenList, this.symbolTable);
+					}
+
+					catch(exception) {
+						parseResult = false;
+					}
 				}
 
+			}
+
+			if(parseResult) {
+
+				// TOOD: Semantic analysis
 			}
 
 			return compileResult;
@@ -62,11 +77,6 @@ module Compiler {
 
 			var checkboxParse = <HTMLInputElement> document.getElementById("checkboxParse");
 			this.parseMode = checkboxParse.checked;
-		}
-
-		private static isDebugMode(): boolean {
-
-			return this.debugMode;
 		}
 
 	}

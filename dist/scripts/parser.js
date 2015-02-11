@@ -9,6 +9,10 @@ var Compiler;
             this.setupParsingEnvironment(tokenList, symbolTable);
 
             this.parseProgram();
+
+            Compiler.Logger.log("Parsing done");
+
+            return this.concreteSyntaxTree;
         };
 
         Parser.setupParsingEnvironment = function (tokenList, symbolTable) {
@@ -16,6 +20,8 @@ var Compiler;
             this.symbolTable = symbolTable;
 
             this.currentTokenIndex = 0;
+
+            this.concreteSyntaxTree = new Compiler.ConcreteSyntaxTree();
         };
 
         Parser.parseProgram = function () {
@@ -39,7 +45,7 @@ var Compiler;
                 Compiler.Logger.log("Expecting a right brace!");
 
                 if (token.type === 5 /* T_RBRACE */) {
-                    Compiler.Logger.log("Got a right brace");
+                    Compiler.Logger.log("Got a right brace!");
 
                     this.consumeToken();
                 } else {
