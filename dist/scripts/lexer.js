@@ -49,7 +49,7 @@ var Compiler;
                 }
 
                 if (tokenMatched.isMatch) {
-                    Compiler.Logger.log("Token found: " + TokenType[currentToken.type]);
+                    Compiler.Logger.log("Token found: " + currentToken.getTokenName());
 
                     isPrefix = false;
                 } else {
@@ -64,11 +64,11 @@ var Compiler;
 
                             // Discard whitespace tokens
                             if (currentToken.type !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
-                                Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
+                                Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                                 tokenList.push(currentToken);
 
                                 if (currentToken.type === 12 /* T_ID */ || currentToken.type === 11 /* T_DIGIT */) {
-                                    Compiler.Logger.log("Adding token to symbol table.");
+                                    Compiler.Logger.log("Adding token to symbol table");
                                     symbolTable.insert(currentToken);
                                 }
                             }
@@ -84,7 +84,7 @@ var Compiler;
                                 logCurrentLine--;
                             }
                         } else {
-                            var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme.";
+                            var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
 
                             Compiler.Logger.log(errorMessage);
                             throw errorMessage;
@@ -97,11 +97,11 @@ var Compiler;
             // Extract last token from lex
             if (currentToken.type !== 1 /* T_DEFAULT */ && currentToken.type !== 23 /* T_WHITE_SPACE */) {
                 // Disregard prefixes
-                Compiler.Logger.log("Producing token: " + TokenType[currentToken.type]);
+                Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                 tokenList.push(currentToken);
 
                 if (currentToken.type === 12 /* T_ID */ || currentToken.type === 11 /* T_DIGIT */) {
-                    Compiler.Logger.log("Adding token to symbol table.");
+                    Compiler.Logger.log("Adding token to symbol table");
                     symbolTable.insert(currentToken);
                 }
 
@@ -118,14 +118,14 @@ var Compiler;
                     currentChar = inputCode[currentIndex];
 
                     if (!(whitespaceRegex.test(currentChar))) {
-                        Compiler.Logger.log("Warning! Input found after EOF character ( $ ).");
+                        Compiler.Logger.log("Warning! Input found after EOF character");
                         logWarningCount++;
 
                         break;
                     }
                 }
             } else {
-                Compiler.Logger.log("Warning! EOF character ( $ ) was not found. Adding it to the list.");
+                Compiler.Logger.log("Warning! EOF character was not found. Adding it to the list");
                 logWarningCount++;
 
                 var eofToken = new Compiler.Token();
@@ -134,7 +134,7 @@ var Compiler;
                 tokenList.push(eofToken);
             }
 
-            Compiler.Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s).");
+            Compiler.Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");
 
             return tokenList;
         };

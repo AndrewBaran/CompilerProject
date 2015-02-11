@@ -87,7 +87,11 @@ module Compiler {
 
 		public toString(): string {
 
-			var result = this.entryNumber + " | " + TokenType[this.tokenType] + " | " + this.tokenValue + " | " + this.scopeLevel;
+			var token: Token = new Token();
+			token.type = this.tokenType;
+			token.value = this.tokenValue;
+
+			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.value + " | " + this.scopeLevel;
 			return result;
 		}
 

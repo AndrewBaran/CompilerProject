@@ -12,7 +12,7 @@ module Compiler {
 			// Reset selections on compiler flags
 			// TODO: Checked for now (debugging) 
 			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = true;
-			(<HTMLInputElement> document.getElementById("checkboxParse")).checked = true;
+			(<HTMLInputElement> document.getElementById("checkboxParse")).checked = false;
 
 			// Reset compile button
 			document.getElementById("buttonCompile").disabled = false;

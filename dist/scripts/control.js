@@ -12,7 +12,7 @@ var Compiler;
             // Reset selections on compiler flags
             // TODO: Checked for now (debugging)
             document.getElementById("checkboxDebug").checked = true;
-            document.getElementById("checkboxParse").checked = true;
+            document.getElementById("checkboxParse").checked = false;
 
             // Reset compile button
             document.getElementById("buttonCompile").disabled = false;

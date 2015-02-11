@@ -16,5 +16,10 @@ module Compiler {
 			return result;
 		}
 
+		public getTokenName(): string {
+
+			return TokenType[this.type];
+		}
+
 	}
 }

@@ -63,7 +63,11 @@ var Compiler;
             this.scopeLevel = 0;
         }
         SymbolTableEntry.prototype.toString = function () {
-            var result = this.entryNumber + " | " + TokenType[this.tokenType] + " | " + this.tokenValue + " | " + this.scopeLevel;
+            var token = new Compiler.Token();
+            token.type = this.tokenType;
+            token.value = this.tokenValue;
+
+            var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.value + " | " + this.scopeLevel;
             return result;
         };
         return SymbolTableEntry;

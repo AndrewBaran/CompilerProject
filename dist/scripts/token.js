@@ -9,6 +9,10 @@ var Compiler;
             var result = TokenType[this.type] + ": " + this.value;
             return result;
         };
+
+        Token.prototype.getTokenName = function () {
+            return TokenType[this.type];
+        };
         return Token;
     })();
     Compiler.Token = Token;

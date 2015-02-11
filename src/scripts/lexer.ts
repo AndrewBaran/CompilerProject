@@ -56,7 +56,7 @@ module Compiler {
 
 				if(tokenMatched.isMatch) {
 
-					Logger.log("Token found: " + TokenType[currentToken.type]);
+					Logger.log("Token found: " + currentToken.getTokenName());
 
 					isPrefix = false;
 				}
@@ -80,12 +80,12 @@ module Compiler {
 							// Discard whitespace tokens
 							if(currentToken.type !== TokenType.T_WHITE_SPACE && !isPrefix) {
 
-								Logger.log("Producing token: " + TokenType[currentToken.type]);
+								Logger.log("Producing token: " + currentToken.getTokenName());
 								tokenList.push(currentToken);
 
 								if(currentToken.type === TokenType.T_ID || currentToken.type === TokenType.T_DIGIT) {
 
-									Logger.log("Adding token to symbol table.");
+									Logger.log("Adding token to symbol table");
 									symbolTable.insert(currentToken);
 								}
 							}
@@ -105,7 +105,7 @@ module Compiler {
 						// Not a valid lexeme 
 						else {
 
-							var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme.";
+							var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
 
 							Logger.log(errorMessage);
 							throw errorMessage;
@@ -120,12 +120,12 @@ module Compiler {
 			if(currentToken.type !== TokenType.T_DEFAULT && currentToken.type !== TokenType.T_WHITE_SPACE) {
 
 				// Disregard prefixes
-				Logger.log("Producing token: " + TokenType[currentToken.type]);
+				Logger.log("Producing token: " + currentToken.getTokenName());
 				tokenList.push(currentToken);
 				
 				if(currentToken.type === TokenType.T_ID || currentToken.type === TokenType.T_DIGIT) {
 
-					Logger.log("Adding token to symbol table.");
+					Logger.log("Adding token to symbol table");
 					symbolTable.insert(currentToken);
 				}
 
@@ -146,7 +146,7 @@ module Compiler {
 
 					if(!(whitespaceRegex.test(currentChar))) {
 
-						Logger.log("Warning! Input found after EOF character ( $ ).");
+						Logger.log("Warning! Input found after EOF character");
 						logWarningCount++;
 
 						break;
@@ -156,7 +156,7 @@ module Compiler {
 
 			else {
 
-				Logger.log("Warning! EOF character ( $ ) was not found. Adding it to the list.");
+				Logger.log("Warning! EOF character was not found. Adding it to the list");
 				logWarningCount++;
 
 				var eofToken: Token = new Token();
@@ -165,7 +165,7 @@ module Compiler {
 				tokenList.push(eofToken);
 			}
 
-			Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s).");
+			Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");
 
 			return tokenList;
 		}
