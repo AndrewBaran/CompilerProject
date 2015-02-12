@@ -20,8 +20,9 @@ var Compiler;
 
         // Starts the compilation process using the input code
         Control.buttonCompileClick = function (button) {
-            // Disable compile button
+            // Disable buttons
             document.getElementById("buttonCompile").disabled = true;
+            document.getElementById("buttonTest").disabled = true;
 
             // TODO: Refactor into individual functions for clearing specific portions of textboxes / checkboxes
             // Clear the previous log
@@ -35,10 +36,32 @@ var Compiler;
 
             var compileResult = Compiler.Compiler.compile(code);
 
-            // Enable compile button
+            // Enable buttons
             document.getElementById("buttonCompile").disabled = false;
+            document.getElementById("buttonTest").disabled = false;
             // TODO: Make use of the boolean result of the compilation
             // TODO: Make it show error messages and stuff
+        };
+
+        Control.buttonTestClick = function () {
+            Compiler.Logger.log("Running unit tests");
+
+            // Disable buttons
+            document.getElementById("buttonCompile").disabled = true;
+            document.getElementById("buttonTest").disabled = true;
+
+            // Clear the previous log
+            document.getElementById("textboxInputCode").value = "";
+            document.getElementById("textboxLog").value = "";
+
+            var divsToRemove = ["divDebugToken", "divDebugSymbolTable"];
+            this.removeDivs(divsToRemove);
+
+            this.runTests();
+
+            // Enable buttons
+            document.getElementById("buttonCompile").disabled = false;
+            document.getElementById("buttonTest").disabled = false;
         };
 
         // Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled when clicked
@@ -117,6 +140,34 @@ var Compiler;
                     document.getElementById("mainBody").removeChild(div);
                 }
             }
+        };
+
+        // TODO: Make it so it doesn't show normal log text
+        // TODO: Make it so it doesn't show symbol table and token debug table
+        // Executes each unit test and displays the result
+        Control.runTests = function () {
+            Compiler.Logger.log("Running the unit tests");
+
+            var unitTestsPassed = 0;
+            var totalUnitTests = _testCodeList.length;
+
+            for (var i = 0; i < _testCodeList.length; i++) {
+                var codeName = _testCodeList[i].name;
+                var code = _testCodeList[i].code;
+
+                var testResult = Compiler.Compiler.compile(code);
+
+                if (testResult) {
+                    Compiler.Logger.log("Program " + codeName + " passed.");
+                    unitTestsPassed++;
+                } else {
+                    Compiler.Logger.log("Program " + codeName + " did not pass.");
+                }
+            }
+
+            Compiler.Logger.log("Unit test summary");
+            Compiler.Logger.log("-------------------------");
+            Compiler.Logger.log(unitTestsPassed + " / " + totalUnitTests + " passed.");
         };
         return Control;
     })();

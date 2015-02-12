@@ -65,15 +65,20 @@ module Compiler {
 
 				else {
 
-					Logger.log("Error! Expected a right brace, but got a " + token.getTokenName());
+					var errorMessage: string = "Error! Expected a right brace, but got a " + token.getTokenName();
+
+					Logger.log(errorMessage);
+					throw errorMessage;
 				}
 			}
 
 			else {
 
-				Logger.log("Error! Expected a left brace, but got a " + token.getTokenName());
-			}
+				var errorMessage: string = "Error! Expected a left brace, but got a " + token.getTokenName();
 
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
 
 		}
 
@@ -251,18 +256,61 @@ module Compiler {
 		private static parseVariableDeclaration(): void {
 
 			Logger.log("Parsing VariableDeclaration");
+
+			this.parseType();
+			this.parseId();
 		}
 
 		// WhileStatement: while BooleanExpr Block
 		private static parseWhileStatement(): void {
 
 			Logger.log("Parsing WhileStatement");
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting a while");
+
+			if(token.getType() === TokenType.T_WHILE) {
+
+				this.consumeToken();
+				Logger.log("Got a while!");
+
+				this.parseBooleanExpression();
+				this.parseBlock();
+			}
+
+			else {
+
+				var errorMessage: string = "Error! Expected a while, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
 		}
 
 		// IfStatement: if BooleanExpr Block
 		private static parseIfStatement(): void {
 
 			Logger.log("Parsing IfStatement");
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting an if");
+
+			if(token.getType() === TokenType.T_IF) {
+
+				this.consumeToken();
+				Logger.log("Got an if!");
+
+				this.parseBooleanExpression();
+				this.parseBlock();
+			}
+
+			else {
+
+				var errorMessage: string = "Error! Expected an if, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
 		}
 
 		// Expr: IntExpr | String Expr | BooleanExpr | Id
@@ -270,14 +318,75 @@ module Compiler {
 
 			Logger.log("Parsing Expression");
 
-			// TODO: Debugging for now
-			this.consumeToken();
+			var token: Token = this.getToken();
+
+			switch(token.getType()) {
+
+				case TokenType.T_DIGIT:
+
+					this.parseIntExpression();
+					break;
+
+				case TokenType.T_QUOTE:
+
+					this.parseStringExpression();
+					break;
+
+				case TokenType.T_LPAREN:
+				case TokenType.T_NOT_EQUALS:
+				case TokenType.T_DOUBLE_EQUALS:
+
+					this.parseBooleanExpression();
+					break;
+
+				case TokenType.T_ID:
+
+					this.parseId();
+					break;
+
+				default:
+
+					var errorMessage: string = "Error! " + token.getTokenName() + " is not the beginning of any expression";
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+
+					break;
+			}
 		}
 
 		// IntExpr: digit intop Expr | digit
 		private static parseIntExpression(): void {
 
 			Logger.log("Parsing IntExpression");
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting a digit");
+
+			if(token.getType() === TokenType.T_DIGIT) {
+
+				this.consumeToken();
+				Logger.log("Got a digit!");
+
+				var intOpExisted: boolean = this.parseIntOperator();
+
+				if(intOpExisted) {
+					this.parseExpression();
+				}
+
+				// TODO Debug
+				else {
+					Logger.log(this.getToken().getTokenName() + " was not an int operator.");
+				}
+			}
+
+			else {
+
+				var errorMessage: string = "Error! Expected a digit, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
 		}
 
 		// StringExpr: " CharList "
@@ -290,6 +399,105 @@ module Compiler {
 		private static parseBooleanExpression(): void {
 
 			Logger.log("Parsing BooleanExpression");
+
+			var token: Token = this.getToken();
+
+			switch(token.getType()) {
+
+				case TokenType.T_LPAREN:
+
+					this.consumeToken();
+					Logger.log("Got a left paren!");
+
+					this.parseExpression();
+					this.parseBooleanOperator();
+					this.parseExpression();
+
+					token = this.getToken();
+					Logger.log("Expecting a right paren");
+
+					if(token.getType() === TokenType.T_RPAREN) {
+
+						this.consumeToken();
+						Logger.log("Got a right paren!");
+					}
+
+					else {
+
+						var errorMessage: string = "Error! Expected a right paren, but got a " + token.getTokenName();
+
+						Logger.log(errorMessage);
+						throw errorMessage;
+					}
+
+					break;
+
+				case TokenType.T_TRUE:
+
+					this.consumeToken();
+					Logger.log("Got a true!");
+
+					break;
+
+				case TokenType.T_FALSE:
+
+					this.consumeToken();
+					Logger.log("Got a false!");
+
+					break;
+
+				default:
+
+					var errorMessage: string = "Error! " + token.getTokenName() + " is not the beginning of any boolean expression";
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+
+					break;
+
+			}
+		}
+
+		// int | string | boolean
+		private static parseType(): void {
+
+			Logger.log("Parsing Type");
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting a type");
+
+			switch(token.getType()) {
+
+				case TokenType.T_INT:
+
+					this.consumeToken();
+					Logger.log("Got an int type!");
+
+					break;
+
+				case TokenType.T_STRING:
+
+					this.consumeToken();
+					Logger.log("Got a string type!");
+
+					break;
+
+				case TokenType.T_BOOLEAN:
+
+					this.consumeToken();
+					Logger.log("Got a boolean type!");
+
+					break;
+
+				default:
+
+					var errorMessage: string = "Error! Expected a type, but got a " + token.getTokenName();
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+
+					break;
+			}
 		}
 
 		// Id: char
@@ -321,8 +529,66 @@ module Compiler {
 			Logger.log("Parsing CharList");
 		}
 
+		private static parseIntOperator(): boolean {
+
+			Logger.log("Parsing IntOperator");
+
+			var token: Token = this.getToken();
+			Logger.log("Potentially expecting a plus operator");
+
+			if(token.getType() === TokenType.T_PLUS) {
+
+				this.consumeToken();
+				Logger.log("Got a plus operator!");
+
+				return true;
+			}
+
+			else {
+
+				return false;
+			}
+
+		}
+
+		private static parseBooleanOperator(): void {
+
+			Logger.log("Parsing BooleanOperator");
+
+			var token: Token = this.getToken();
+
+			switch(token.getType()) {
+
+				case TokenType.T_DOUBLE_EQUALS:
+
+					this.consumeToken();
+					Logger.log("Got a double equals!");
+
+					break;
+
+				case TokenType.T_NOT_EQUALS:
+
+					this.consumeToken();
+					Logger.log("Got a not equals!");
+
+					break;
+
+				default:
+
+					var errorMessage: string = "Error! " + token.getTokenName() + " is not a valid boolean operator."; 
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+
+					break;
+			}
+		}
+
 		private static getToken(): Token {
 
+			var token: Token = this.tokenList[this.currentTokenIndex];
+
+			Logger.log("Current token: " + token.getTokenName());
 			return this.tokenList[this.currentTokenIndex];
 		}
 
