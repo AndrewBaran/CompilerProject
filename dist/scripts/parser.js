@@ -177,6 +177,23 @@ var Compiler;
         // AssignmentStatement: Id = Expr
         Parser.parseAssignmentStatement = function () {
             Compiler.Logger.log("Parsing AssignmentStatement");
+
+            this.parseId();
+
+            var token = this.getToken();
+            Compiler.Logger.log("Expecting an = ");
+
+            if (token.getType() === 18 /* T_SINGLE_EQUALS */) {
+                this.consumeToken();
+                Compiler.Logger.log("Got a = !");
+
+                this.parseExpression();
+            } else {
+                var errorMessage = "Error! Expected an =, but got a " + token.getTokenName();
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            }
         };
 
         // VarDecl: type Id
@@ -220,6 +237,19 @@ var Compiler;
         // Id: char
         Parser.parseId = function () {
             Compiler.Logger.log("Parsing Id");
+
+            var token = this.getToken();
+            Compiler.Logger.log("Expecting an id");
+
+            if (token.getType() === 12 /* T_ID */) {
+                this.consumeToken();
+                Compiler.Logger.log("Got an id!");
+            } else {
+                var errorMessage = "Error! Expected an id, but got a " + token.getTokenName();
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            }
         };
 
         // CharList: char CharList | space CharList | ""

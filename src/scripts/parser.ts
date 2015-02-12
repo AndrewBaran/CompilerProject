@@ -224,6 +224,27 @@ module Compiler {
 
 			Logger.log("Parsing AssignmentStatement");
 
+			this.parseId();
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting an = ");
+
+			if(token.getType() === TokenType.T_SINGLE_EQUALS) {
+
+				this.consumeToken();
+				Logger.log("Got a = !");
+
+				this.parseExpression();
+			}
+
+			else {
+
+				var errorMessage: string = "Error! Expected an =, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
+
 		}
 
 		// VarDecl: type Id
@@ -275,6 +296,23 @@ module Compiler {
 		private static parseId(): void {
 
 			Logger.log("Parsing Id");
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting an id");
+
+			if(token.getType() === TokenType.T_ID) {
+
+				this.consumeToken();
+				Logger.log("Got an id!");
+			}
+
+			else {
+
+				var errorMessage: string = "Error! Expected an id, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
 		}
 
 		// CharList: char CharList | space CharList | ""

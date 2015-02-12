@@ -6,6 +6,7 @@ var Compiler;
         // TODO: Be able to lex strings
         // TODO: If EOF cuts off a lexeme mid way (ex: in$), fix that
         // TODO: This is also a problem with "ab" (two ids instead of lexeme error)
+        // TODO: Count number of newlines between tokens so parsing has some context
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();
@@ -92,6 +93,7 @@ var Compiler;
                         }
                     }
                 }
+                // TODO: Do final token processing here (when currentIndex === inputCode.length)
             }
 
             // TODO: Refactor into while loop
