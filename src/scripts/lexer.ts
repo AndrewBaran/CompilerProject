@@ -51,7 +51,7 @@ module Compiler {
 				var tokenMatched: TokenMatch = this.matchesTokenPattern(currentWord);
 
 				// Disregard old token if new match was found 
-				if(tokenMatched.token.type !== TokenType.T_NO_MATCH) {
+				if(tokenMatched.token.getType() !== TokenType.T_NO_MATCH) {
 					currentToken = tokenMatched.token;
 				}
 
@@ -72,19 +72,19 @@ module Compiler {
 
 					else {
 
-						if(currentToken.type !== TokenType.T_DEFAULT) {
+						if(currentToken.getType() !== TokenType.T_DEFAULT) {
 
-							if(currentToken.type === TokenType.T_EOF) {
+							if(currentToken.getType() === TokenType.T_EOF) {
 								eofFound = true;
 							}
 
 							// Discard whitespace tokens
-							if(currentToken.type !== TokenType.T_WHITE_SPACE && !isPrefix) {
+							if(currentToken.getType() !== TokenType.T_WHITE_SPACE && !isPrefix) {
 
 								Logger.log("Producing token: " + currentToken.getTokenName());
 								tokenList.push(currentToken);
 
-								if(currentToken.type === TokenType.T_ID || currentToken.type === TokenType.T_DIGIT) {
+								if(currentToken.getType() === TokenType.T_ID || currentToken.getType() === TokenType.T_DIGIT) {
 
 									Logger.log("Adding token to symbol table");
 									symbolTable.insert(currentToken);
@@ -118,19 +118,19 @@ module Compiler {
 
 			// TODO: Refactor into while loop
 			// Extract last token from lex
-			if(currentToken.type !== TokenType.T_DEFAULT && currentToken.type !== TokenType.T_WHITE_SPACE) {
+			if(currentToken.getType() !== TokenType.T_DEFAULT && currentToken.getType() !== TokenType.T_WHITE_SPACE) {
 
 				// Disregard prefixes
 				Logger.log("Producing token: " + currentToken.getTokenName());
 				tokenList.push(currentToken);
 				
-				if(currentToken.type === TokenType.T_ID || currentToken.type === TokenType.T_DIGIT) {
+				if(currentToken.getType() === TokenType.T_ID || currentToken.getType() === TokenType.T_DIGIT) {
 
 					Logger.log("Adding token to symbol table");
 					symbolTable.insert(currentToken);
 				}
 
-				if(currentToken.type === TokenType.T_EOF) {
+				if(currentToken.getType() === TokenType.T_EOF) {
 					eofFound = true;
 				}
 			}
@@ -161,7 +161,7 @@ module Compiler {
 				logWarningCount++;
 
 				var eofToken: Token = new Token();
-				eofToken.type = TokenType.T_EOF;
+				eofToken.setType(TokenType.T_EOF);
 
 				tokenList.push(eofToken);
 			}
@@ -189,8 +189,8 @@ module Compiler {
 					patternMatched = true;
 
 					var currentToken: Token = new Token();
-					currentToken.type = tokenType;
-					currentToken.value = currentWord;
+					currentToken.setType(tokenType);
+					currentToken.setValue(currentWord);
 
 					returnTokenMatch.token = currentToken;
 				}
@@ -237,7 +237,7 @@ module Compiler {
 		constructor() {
 
 			this.token = new Token();
-			this.token.type = TokenType.T_NO_MATCH;
+			this.token.setType(TokenType.T_NO_MATCH);
 			this.isMatch = false;
 		}
 	}

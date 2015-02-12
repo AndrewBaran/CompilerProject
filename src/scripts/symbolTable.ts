@@ -29,8 +29,8 @@ module Compiler {
 
 			var entry: SymbolTableEntry = new SymbolTableEntry();
 			entry.entryNumber = this.nextAvailableIndex++;
-			entry.tokenType = token.type;
-			entry.tokenValue = token.value;
+			entry.tokenType = token.getType();
+			entry.tokenValue = token.getValue();
 			entry.isReservedWord = false;
 
 			this.table.push(entry);
@@ -88,10 +88,10 @@ module Compiler {
 		public toString(): string {
 
 			var token: Token = new Token();
-			token.type = this.tokenType;
-			token.value = this.tokenValue;
+			token.setType(this.tokenType);
+			token.setValue(this.tokenValue);
 
-			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.value + " | " + this.scopeLevel;
+			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue() + " | " + this.scopeLevel;
 			return result;
 		}
 

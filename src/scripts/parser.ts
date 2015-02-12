@@ -11,12 +11,10 @@ module Compiler {
 
 		public static parseCode(tokenList: Token[], symbolTable: SymbolTable): ConcreteSyntaxTree {
 
-			Logger.log("Parsing the code");
-
 			this.setupParsingEnvironment(tokenList, symbolTable);
 
+			Logger.log("Parsing the code");
 			this.parseProgram();
-
 			Logger.log("Parsing done");
 
 			return this.concreteSyntaxTree;
@@ -44,7 +42,7 @@ module Compiler {
 
 			var token: Token = this.getToken();
 
-			if(token.type === TokenType.T_LBRACE) {
+			if(token.getType() === TokenType.T_LBRACE) {
 
 				Logger.log("Got a left brace!");
 
@@ -55,7 +53,7 @@ module Compiler {
 
 				Logger.log("Expecting a right brace!");
 
-				if(token.type === TokenType.T_RBRACE) {
+				if(token.getType() === TokenType.T_RBRACE) {
 
 					Logger.log("Got a right brace!");
 
@@ -82,7 +80,7 @@ module Compiler {
 
 			var token: Token = this.getToken();
 
-			if(token.type === TokenType.T_EOF) {
+			if(token.getType() === TokenType.T_EOF) {
 
 				Logger.log("Got an EOF!");
 
@@ -100,7 +98,7 @@ module Compiler {
 			var token: Token = this.getToken();
 
 			// Check for start of statement
-			if(token.type !== TokenType.T_RBRACE) {
+			if(token.getType() !== TokenType.T_RBRACE) {
 
 				this.parseStatement();
 				this.parseStatementList();
@@ -112,7 +110,7 @@ module Compiler {
 			var token: Token = this.getToken();
 
 			// Look at current token and see if it matches a statement
-			switch(token.type) {
+			switch(token.getType()) {
 
 				case TokenType.T_PRINT:
 					this.parsePrintStatement();
@@ -153,7 +151,7 @@ module Compiler {
 
 			Logger.log("Expecting a print");
 
-			if(token.type === TokenType.T_PRINT) {
+			if(token.getType() === TokenType.T_PRINT) {
 
 				Logger.log("Got a print!");
 
@@ -163,7 +161,7 @@ module Compiler {
 
 				Logger.log("Expecting a left paren");
 
-				if(token.type === TokenType.T_LPAREN) {
+				if(token.getType() === TokenType.T_LPAREN) {
 
 					Logger.log("Got a left paren!")
 
@@ -175,7 +173,7 @@ module Compiler {
 
 					Logger.log("Expecting a right paren");
 
-					if(token.type === TokenType.T_RPAREN) {
+					if(token.getType() === TokenType.T_RPAREN) {
 
 						Logger.log("Got a right paren!");
 

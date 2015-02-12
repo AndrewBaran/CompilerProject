@@ -6,8 +6,24 @@ var Compiler;
             this.type = 1 /* T_DEFAULT */;
             this.value = "";
         }
+        Token.prototype.getType = function () {
+            return this.type;
+        };
+
+        Token.prototype.setType = function (type) {
+            this.type = type;
+        };
+
+        Token.prototype.setValue = function (value) {
+            this.value = value;
+        };
+
+        Token.prototype.getValue = function () {
+            return this.value;
+        };
+
         Token.prototype.toString = function () {
-            var result = TokenType[this.type] + ": " + this.value;
+            var result = this.getTokenName + ": " + this.value;
             return result;
         };
 

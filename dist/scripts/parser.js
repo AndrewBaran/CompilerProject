@@ -4,12 +4,10 @@ var Compiler;
         function Parser() {
         }
         Parser.parseCode = function (tokenList, symbolTable) {
-            Compiler.Logger.log("Parsing the code");
-
             this.setupParsingEnvironment(tokenList, symbolTable);
 
+            Compiler.Logger.log("Parsing the code");
             this.parseProgram();
-
             Compiler.Logger.log("Parsing done");
 
             return this.concreteSyntaxTree;
@@ -34,7 +32,7 @@ var Compiler;
 
             var token = this.getToken();
 
-            if (token.type === 4 /* T_LBRACE */) {
+            if (token.getType() === 4 /* T_LBRACE */) {
                 Compiler.Logger.log("Got a left brace!");
 
                 this.consumeToken();
@@ -44,7 +42,7 @@ var Compiler;
 
                 Compiler.Logger.log("Expecting a right brace!");
 
-                if (token.type === 5 /* T_RBRACE */) {
+                if (token.getType() === 5 /* T_RBRACE */) {
                     Compiler.Logger.log("Got a right brace!");
 
                     this.consumeToken();
@@ -61,7 +59,7 @@ var Compiler;
 
             var token = this.getToken();
 
-            if (token.type === 8 /* T_EOF */) {
+            if (token.getType() === 8 /* T_EOF */) {
                 Compiler.Logger.log("Got an EOF!");
 
                 this.consumeToken();
@@ -74,7 +72,7 @@ var Compiler;
             var token = this.getToken();
 
             // Check for start of statement
-            if (token.type !== 5 /* T_RBRACE */) {
+            if (token.getType() !== 5 /* T_RBRACE */) {
                 this.parseStatement();
                 this.parseStatementList();
             }
@@ -83,7 +81,7 @@ var Compiler;
         Parser.parseStatement = function () {
             var token = this.getToken();
 
-            switch (token.type) {
+            switch (token.getType()) {
                 case 7 /* T_PRINT */:
                     this.parsePrintStatement();
                     break;
@@ -122,7 +120,7 @@ var Compiler;
 
             Compiler.Logger.log("Expecting a print");
 
-            if (token.type === 7 /* T_PRINT */) {
+            if (token.getType() === 7 /* T_PRINT */) {
                 Compiler.Logger.log("Got a print!");
 
                 this.consumeToken();
@@ -131,7 +129,7 @@ var Compiler;
 
                 Compiler.Logger.log("Expecting a left paren");
 
-                if (token.type === 2 /* T_LPAREN */) {
+                if (token.getType() === 2 /* T_LPAREN */) {
                     Compiler.Logger.log("Got a left paren!");
 
                     this.consumeToken();
@@ -142,7 +140,7 @@ var Compiler;
 
                     Compiler.Logger.log("Expecting a right paren");
 
-                    if (token.type === 3 /* T_RPAREN */) {
+                    if (token.getType() === 3 /* T_RPAREN */) {
                         Compiler.Logger.log("Got a right paren!");
 
                         this.consumeToken();

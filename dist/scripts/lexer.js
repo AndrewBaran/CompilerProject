@@ -45,7 +45,7 @@ var Compiler;
                 var tokenMatched = this.matchesTokenPattern(currentWord);
 
                 // Disregard old token if new match was found
-                if (tokenMatched.token.type !== 0 /* T_NO_MATCH */) {
+                if (tokenMatched.token.getType() !== 0 /* T_NO_MATCH */) {
                     currentToken = tokenMatched.token;
                 }
 
@@ -58,17 +58,17 @@ var Compiler;
                     if (symbolTable.hasReservedWordPrefix(currentWord)) {
                         isPrefix = true;
                     } else {
-                        if (currentToken.type !== 1 /* T_DEFAULT */) {
-                            if (currentToken.type === 8 /* T_EOF */) {
+                        if (currentToken.getType() !== 1 /* T_DEFAULT */) {
+                            if (currentToken.getType() === 8 /* T_EOF */) {
                                 eofFound = true;
                             }
 
                             // Discard whitespace tokens
-                            if (currentToken.type !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
+                            if (currentToken.getType() !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
                                 Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                                 tokenList.push(currentToken);
 
-                                if (currentToken.type === 12 /* T_ID */ || currentToken.type === 11 /* T_DIGIT */) {
+                                if (currentToken.getType() === 12 /* T_ID */ || currentToken.getType() === 11 /* T_DIGIT */) {
                                     Compiler.Logger.log("Adding token to symbol table");
                                     symbolTable.insert(currentToken);
                                 }
@@ -96,17 +96,17 @@ var Compiler;
 
             // TODO: Refactor into while loop
             // Extract last token from lex
-            if (currentToken.type !== 1 /* T_DEFAULT */ && currentToken.type !== 23 /* T_WHITE_SPACE */) {
+            if (currentToken.getType() !== 1 /* T_DEFAULT */ && currentToken.getType() !== 23 /* T_WHITE_SPACE */) {
                 // Disregard prefixes
                 Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                 tokenList.push(currentToken);
 
-                if (currentToken.type === 12 /* T_ID */ || currentToken.type === 11 /* T_DIGIT */) {
+                if (currentToken.getType() === 12 /* T_ID */ || currentToken.getType() === 11 /* T_DIGIT */) {
                     Compiler.Logger.log("Adding token to symbol table");
                     symbolTable.insert(currentToken);
                 }
 
-                if (currentToken.type === 8 /* T_EOF */) {
+                if (currentToken.getType() === 8 /* T_EOF */) {
                     eofFound = true;
                 }
             }
@@ -130,7 +130,7 @@ var Compiler;
                 logWarningCount++;
 
                 var eofToken = new Compiler.Token();
-                eofToken.type = 8 /* T_EOF */;
+                eofToken.setType(8 /* T_EOF */);
 
                 tokenList.push(eofToken);
             }
@@ -154,8 +154,8 @@ var Compiler;
                     patternMatched = true;
 
                     var currentToken = new Compiler.Token();
-                    currentToken.type = tokenType;
-                    currentToken.value = currentWord;
+                    currentToken.setType(tokenType);
+                    currentToken.setValue(currentWord);
 
                     returnTokenMatch.token = currentToken;
                 }
@@ -197,7 +197,7 @@ var Compiler;
     var TokenMatch = (function () {
         function TokenMatch() {
             this.token = new Compiler.Token();
-            this.token.type = 0 /* T_NO_MATCH */;
+            this.token.setType(0 /* T_NO_MATCH */);
             this.isMatch = false;
         }
         return TokenMatch;
