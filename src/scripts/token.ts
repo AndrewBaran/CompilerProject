@@ -1,5 +1,6 @@
 module Compiler {
 	
+	// TODO: Make fields private
 	export class Token {
 
 		public type: TokenType;

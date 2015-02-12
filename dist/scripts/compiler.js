@@ -28,8 +28,9 @@ var Compiler;
             if (tokenList.length > 0 && lexResult) {
                 if (this.debugMode) {
                     _Compiler.Control.debugCreateTokenDiv(tokenList);
-                    _Compiler.Control.debugCreateSymbolTableDiv(this.symbolTable);
                 }
+
+                _Compiler.Control.debugCreateSymbolTableDiv(this.symbolTable);
 
                 if (this.parseMode) {
                     try  {

@@ -41,9 +41,10 @@ module Compiler {
 				if(this.debugMode) {
 
 					Control.debugCreateTokenDiv(tokenList);
-					Control.debugCreateSymbolTableDiv(this.symbolTable);
 				}
 
+				Control.debugCreateSymbolTableDiv(this.symbolTable);
+				
 				if(this.parseMode) {
 
 					try {

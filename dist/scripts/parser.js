@@ -71,6 +71,110 @@ var Compiler;
         };
 
         Parser.parseStatementList = function () {
+            var token = this.getToken();
+
+            // Check for start of statement
+            if (token.type !== 5 /* T_RBRACE */) {
+                this.parseStatement();
+                this.parseStatementList();
+            }
+        };
+
+        Parser.parseStatement = function () {
+            var token = this.getToken();
+
+            switch (token.type) {
+                case 7 /* T_PRINT */:
+                    this.parsePrintStatement();
+                    break;
+
+                case 12 /* T_ID */:
+                    this.parseAssignmentStatement();
+                    break;
+
+                case 15 /* T_INT */:
+                case 16 /* T_STRING */:
+                case 17 /* T_BOOLEAN */:
+                    this.parseVariableDeclaration();
+                    break;
+
+                case 9 /* T_WHILE */:
+                    this.parseWhileStatement();
+                    break;
+
+                case 10 /* T_IF */:
+                    this.parseIfStatement();
+                    break;
+
+                case 4 /* T_LBRACE */:
+                    this.parseBlock();
+                    break;
+
+                default:
+                    Compiler.Logger.log("Error!");
+                    throw "Error!";
+                    break;
+            }
+        };
+
+        Parser.parsePrintStatement = function () {
+            var token = this.getToken();
+
+            Compiler.Logger.log("Expecting a print");
+
+            if (token.type === 7 /* T_PRINT */) {
+                Compiler.Logger.log("Got a print!");
+
+                this.consumeToken();
+
+                token = this.getToken();
+
+                Compiler.Logger.log("Expecting a left paren");
+
+                if (token.type === 2 /* T_LPAREN */) {
+                    Compiler.Logger.log("Got a left paren!");
+
+                    this.consumeToken();
+
+                    this.parseExpression();
+
+                    token = this.getToken();
+
+                    Compiler.Logger.log("Expecting a right paren");
+
+                    if (token.type === 3 /* T_RPAREN */) {
+                        Compiler.Logger.log("Got a right paren!");
+
+                        this.consumeToken();
+                    } else {
+                        Compiler.Logger.log("Expecting a right paren but got a " + token.getTokenName());
+                        throw "Error!";
+                    }
+                } else {
+                    Compiler.Logger.log("Expected a left paren but got a " + token.getTokenName());
+                    throw "Error!";
+                }
+            } else {
+                Compiler.Logger.log("Expected a print but got a " + token.getTokenName());
+                throw "Error!";
+            }
+        };
+
+        Parser.parseAssignmentStatement = function () {
+        };
+
+        Parser.parseVariableDeclaration = function () {
+        };
+
+        Parser.parseWhileStatement = function () {
+        };
+
+        Parser.parseIfStatement = function () {
+        };
+
+        Parser.parseExpression = function () {
+            // TODO: Debug mode
+            this.consumeToken();
         };
 
         Parser.getToken = function () {
