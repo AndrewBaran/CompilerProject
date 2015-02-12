@@ -1,6 +1,5 @@
 module Compiler {
 	
-	// TODO: Make fields private
 	export class Token {
 
 		private type: TokenType;
@@ -29,7 +28,7 @@ module Compiler {
 
 		public toString(): string {
 
-			var result: string = this.getTokenName + ": " + this.value;
+			var result: string = this.getTokenName() + ": " + this.value;
 			return result;
 		}
 

@@ -22,30 +22,33 @@ var Compiler;
             this.concreteSyntaxTree = new Compiler.ConcreteSyntaxTree();
         };
 
+        // Program: Block $
         Parser.parseProgram = function () {
+            Compiler.Logger.log("Parsing Program");
+
             this.parseBlock();
             this.parseEOF();
         };
 
+        // Block: { StatementList }
         Parser.parseBlock = function () {
-            Compiler.Logger.log("Expecting a left brace");
+            Compiler.Logger.log("Parsing Block");
 
             var token = this.getToken();
+            Compiler.Logger.log("Expecting a left brace");
 
             if (token.getType() === 4 /* T_LBRACE */) {
+                this.consumeToken();
                 Compiler.Logger.log("Got a left brace!");
 
-                this.consumeToken();
                 this.parseStatementList();
 
                 token = this.getToken();
-
                 Compiler.Logger.log("Expecting a right brace!");
 
                 if (token.getType() === 5 /* T_RBRACE */) {
-                    Compiler.Logger.log("Got a right brace!");
-
                     this.consumeToken();
+                    Compiler.Logger.log("Got a right brace!");
                 } else {
                     Compiler.Logger.log("Error! Expected a right brace, but got a " + token.getTokenName());
                 }
@@ -54,21 +57,25 @@ var Compiler;
             }
         };
 
+        // EOF: $
         Parser.parseEOF = function () {
-            Compiler.Logger.log("Expecting an EOF");
+            Compiler.Logger.log("Parsing EOF");
 
             var token = this.getToken();
+            Compiler.Logger.log("Expecting an EOF");
 
             if (token.getType() === 8 /* T_EOF */) {
-                Compiler.Logger.log("Got an EOF!");
-
                 this.consumeToken();
+                Compiler.Logger.log("Got an EOF!");
             } else {
                 Compiler.Logger.log("Error! Expected an EOF, but got a " + token.getTokenName());
             }
         };
 
+        // StatementList: Statement StatementList | ""
         Parser.parseStatementList = function () {
+            Compiler.Logger.log("Parsing StatementList");
+
             var token = this.getToken();
 
             // Check for start of statement
@@ -78,7 +85,10 @@ var Compiler;
             }
         };
 
+        // Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
         Parser.parseStatement = function () {
+            Compiler.Logger.log("Parsing Statement");
+
             var token = this.getToken();
 
             switch (token.getType()) {
@@ -109,70 +119,112 @@ var Compiler;
                     break;
 
                 default:
-                    Compiler.Logger.log("Error!");
-                    throw "Error!";
+                    var errorMessage = "Error! " + token.getTokenName() + " is not the beginning of any statement";
+
+                    Compiler.Logger.log(errorMessage);
+                    throw errorMessage;
+
                     break;
             }
         };
 
+        // PrintStatement: print ( Expr )
         Parser.parsePrintStatement = function () {
-            var token = this.getToken();
+            Compiler.Logger.log("Parsing PrintStatement");
 
+            var token = this.getToken();
             Compiler.Logger.log("Expecting a print");
 
             if (token.getType() === 7 /* T_PRINT */) {
+                this.consumeToken();
                 Compiler.Logger.log("Got a print!");
 
-                this.consumeToken();
-
                 token = this.getToken();
-
                 Compiler.Logger.log("Expecting a left paren");
 
                 if (token.getType() === 2 /* T_LPAREN */) {
-                    Compiler.Logger.log("Got a left paren!");
-
                     this.consumeToken();
+                    Compiler.Logger.log("Got a left paren!");
 
                     this.parseExpression();
 
                     token = this.getToken();
-
                     Compiler.Logger.log("Expecting a right paren");
 
                     if (token.getType() === 3 /* T_RPAREN */) {
-                        Compiler.Logger.log("Got a right paren!");
-
                         this.consumeToken();
+                        Compiler.Logger.log("Got a right paren!");
                     } else {
-                        Compiler.Logger.log("Expecting a right paren but got a " + token.getTokenName());
-                        throw "Error!";
+                        var errorMessage = "Error! Expected a right paren, but got a " + token.getTokenName();
+
+                        Compiler.Logger.log(errorMessage);
+                        throw errorMessage;
                     }
                 } else {
-                    Compiler.Logger.log("Expected a left paren but got a " + token.getTokenName());
-                    throw "Error!";
+                    var errorMessage = "Error! Expected a left paren, but got a " + token.getTokenName();
+
+                    Compiler.Logger.log(errorMessage);
+                    throw errorMessage;
                 }
             } else {
-                Compiler.Logger.log("Expected a print but got a " + token.getTokenName());
-                throw "Error!";
+                var errorMessage = "Error! Expected a print, but got a " + token.getTokenName();
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             }
         };
 
+        // AssignmentStatement: Id = Expr
         Parser.parseAssignmentStatement = function () {
+            Compiler.Logger.log("Parsing AssignmentStatement");
         };
 
+        // VarDecl: type Id
         Parser.parseVariableDeclaration = function () {
+            Compiler.Logger.log("Parsing VariableDeclaration");
         };
 
+        // WhileStatement: while BooleanExpr Block
         Parser.parseWhileStatement = function () {
+            Compiler.Logger.log("Parsing WhileStatement");
         };
 
+        // IfStatement: if BooleanExpr Block
         Parser.parseIfStatement = function () {
+            Compiler.Logger.log("Parsing IfStatement");
         };
 
+        // Expr: IntExpr | String Expr | BooleanExpr | Id
         Parser.parseExpression = function () {
-            // TODO: Debug mode
+            Compiler.Logger.log("Parsing Expression");
+
+            // TODO: Debugging for now
             this.consumeToken();
+        };
+
+        // IntExpr: digit intop Expr | digit
+        Parser.parseIntExpression = function () {
+            Compiler.Logger.log("Parsing IntExpression");
+        };
+
+        // StringExpr: " CharList "
+        Parser.parseStringExpression = function () {
+            Compiler.Logger.log("Parsing StringExpression");
+        };
+
+        // BooleanExpr: ( Expr boolop Expr ) | boolval
+        Parser.parseBooleanExpression = function () {
+            Compiler.Logger.log("Parsing BooleanExpression");
+        };
+
+        // Id: char
+        Parser.parseId = function () {
+            Compiler.Logger.log("Parsing Id");
+        };
+
+        // CharList: char CharList | space CharList | ""
+        Parser.parseCharList = function () {
+            Compiler.Logger.log("Parsing CharList");
         };
 
         Parser.getToken = function () {

@@ -68,8 +68,8 @@ var Compiler;
                                 Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                                 tokenList.push(currentToken);
 
-                                if (currentToken.getType() === 12 /* T_ID */ || currentToken.getType() === 11 /* T_DIGIT */) {
-                                    Compiler.Logger.log("Adding token to symbol table");
+                                if (currentToken.getType() === 12 /* T_ID */) {
+                                    Compiler.Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
                                     symbolTable.insert(currentToken);
                                 }
                             }
@@ -101,8 +101,8 @@ var Compiler;
                 Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                 tokenList.push(currentToken);
 
-                if (currentToken.getType() === 12 /* T_ID */ || currentToken.getType() === 11 /* T_DIGIT */) {
-                    Compiler.Logger.log("Adding token to symbol table");
+                if (currentToken.getType() === 12 /* T_ID */) {
+                    Compiler.Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
                     symbolTable.insert(currentToken);
                 }
 

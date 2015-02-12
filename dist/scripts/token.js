@@ -1,6 +1,5 @@
 var Compiler;
 (function (Compiler) {
-    // TODO: Make fields private
     var Token = (function () {
         function Token() {
             this.type = 1 /* T_DEFAULT */;
@@ -23,7 +22,7 @@ var Compiler;
         };
 
         Token.prototype.toString = function () {
-            var result = this.getTokenName + ": " + this.value;
+            var result = this.getTokenName() + ": " + this.value;
             return result;
         };
 

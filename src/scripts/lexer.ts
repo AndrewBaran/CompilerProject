@@ -84,9 +84,9 @@ module Compiler {
 								Logger.log("Producing token: " + currentToken.getTokenName());
 								tokenList.push(currentToken);
 
-								if(currentToken.getType() === TokenType.T_ID || currentToken.getType() === TokenType.T_DIGIT) {
+								if(currentToken.getType() === TokenType.T_ID) {
 
-									Logger.log("Adding token to symbol table");
+									Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
 									symbolTable.insert(currentToken);
 								}
 							}
@@ -124,9 +124,9 @@ module Compiler {
 				Logger.log("Producing token: " + currentToken.getTokenName());
 				tokenList.push(currentToken);
 				
-				if(currentToken.getType() === TokenType.T_ID || currentToken.getType() === TokenType.T_DIGIT) {
+				if(currentToken.getType() === TokenType.T_ID) {
 
-					Logger.log("Adding token to symbol table");
+					Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
 					symbolTable.insert(currentToken);
 				}
 
