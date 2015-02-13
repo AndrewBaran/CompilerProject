@@ -26,11 +26,13 @@ var Compiler;
             }
 
             if (tokenList.length > 0 && lexResult) {
-                if (this.debugMode) {
-                    _Compiler.Control.debugCreateTokenDiv(tokenList);
-                }
+                if (!this.testMode) {
+                    if (this.debugMode) {
+                        _Compiler.Control.debugCreateTokenDiv(tokenList);
+                    }
 
-                _Compiler.Control.debugCreateSymbolTableDiv(this.symbolTable);
+                    _Compiler.Control.debugCreateSymbolTableDiv(this.symbolTable);
+                }
 
                 if (this.parseMode) {
                     try  {
@@ -60,6 +62,10 @@ var Compiler;
 
             var checkboxParse = document.getElementById("checkboxParse");
             this.parseMode = checkboxParse.checked;
+        };
+
+        Compiler.setTestMode = function (isTestMode) {
+            this.testMode = isTestMode;
         };
         return Compiler;
     })();

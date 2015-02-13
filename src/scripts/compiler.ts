@@ -6,6 +6,7 @@ module Compiler {
 
 		private static debugMode: boolean;
 		private static parseMode: boolean;
+		private static testMode: boolean;
 
 		public static compile(codeToCompile: string): boolean {
 
@@ -38,12 +39,15 @@ module Compiler {
 
 			if(tokenList.length > 0 && lexResult) {
 
-				if(this.debugMode) {
+				if(!this.testMode) {
 
-					Control.debugCreateTokenDiv(tokenList);
+					if(this.debugMode) {
+
+						Control.debugCreateTokenDiv(tokenList);
+					}
+
+					Control.debugCreateSymbolTableDiv(this.symbolTable);
 				}
-
-				Control.debugCreateSymbolTableDiv(this.symbolTable);
 				
 				if(this.parseMode) {
 
@@ -79,6 +83,11 @@ module Compiler {
 
 			var checkboxParse = <HTMLInputElement> document.getElementById("checkboxParse");
 			this.parseMode = checkboxParse.checked;
+		}
+
+		public static setTestMode(isTestMode: boolean): void {
+
+			this.testMode = isTestMode;
 		}
 
 	}

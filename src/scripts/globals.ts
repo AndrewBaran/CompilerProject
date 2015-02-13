@@ -18,7 +18,7 @@ var _testCodeList = [
 	{name: "If and Increment", code: "{\n\tint i\n\ti = 0\n\n\tprint(i)\n\n\tif (i == 0) {\n\t\ti = 1 + i\n\t}\n\n\tprint(i)\n} $"},
     {name: "If and If", code: "{\n\tif true {\n\t\tprint(\"this will print\")\n\t}\n\n\tif false {\n\t\tprint(\"this will not print\")\n\t}\n} $"},
     {name: "While", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $"},
-    {name: "Tokens", code: "{\n\t{ } ( )\n\twhile if print\n\t\" \" 1 2 3 4 5 a b c d e\n\tint string boolean\n\t== != = +\n\tfalse true\n} $"},
+    {name: "Tokens", code: "{\n\t{ } ( )\n\twhile if print\n\t\"test string\" 1 2 3 4 5 a b c d e\n\tint string boolean\n\t== != = +\n\tfalse true\n} $"},
     {name: "Boolean", code: "{\n\tif (true) {\n\t\tprint(\"true\")\n\t}\n\n\tif true {\n\t\tprint(\"still true\")\n\t}\n} $"}
 ];
 

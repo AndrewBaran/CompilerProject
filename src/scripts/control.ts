@@ -6,28 +6,43 @@ module Compiler {
 		public static clearData(): void {
 
 			// Clear textboxes of any content
-			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = "";
-			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+			this.clearInputCode();
+			this.clearLog();
 
 			// Reset selections on compiler flags
 			// TODO: Checked for now (debugging) 
 			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = true;
 			(<HTMLInputElement> document.getElementById("checkboxParse")).checked = false;
 
-			// Reset compile button
+			this.enableButtons();
+		}
+
+		private static clearInputCode(): void {
+			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = "";
+		}
+
+		private static clearLog(): void {
+			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+		}
+
+		private static enableButtons(): void {
+
 			document.getElementById("buttonCompile").disabled = false;
+			document.getElementById("buttonTest").disabled = false;
+		}
+
+		private static disableButtons(): void {
+
+			document.getElementById("buttonCompile").disabled = true;
+			document.getElementById("buttonTest").disabled = true;
 		}
 
 		// Starts the compilation process using the input code
 		public static buttonCompileClick(button): void {
 
-			// Disable buttons
-			document.getElementById("buttonCompile").disabled = true;
-			document.getElementById("buttonTest").disabled = true;
+			this.disableButtons();
 
-			// TODO: Refactor into individual functions for clearing specific portions of textboxes / checkboxes
-			// Clear the previous log
-			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+			this.clearLog();
 
 			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
 			this.removeDivs(divsToRemove)
@@ -37,9 +52,7 @@ module Compiler {
 
 			var compileResult: boolean = Compiler.compile(code);
 
-			// Enable buttons
-			document.getElementById("buttonCompile").disabled = false;
-			document.getElementById("buttonTest").disabled = false;
+			this.enableButtons();
 
 			// TODO: Make use of the boolean result of the compilation
 			// TODO: Make it show error messages and stuff
@@ -47,24 +60,15 @@ module Compiler {
 
 		public static buttonTestClick(): void {
 
-			Logger.log("Running unit tests");
-
-			// Disable buttons
-			document.getElementById("buttonCompile").disabled = true;
-			document.getElementById("buttonTest").disabled = true;
-
-			// Clear the previous log
-			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = "";
-			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+			this.disableButtons();
+			this.clearLog();
 
 			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
 			this.removeDivs(divsToRemove)
 
 			this.runTests();
 
-			// Enable buttons
-			document.getElementById("buttonCompile").disabled = false;
-			document.getElementById("buttonTest").disabled = false;
+			this.enableButtons();
 		}
 
 		// Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled when clicked
@@ -156,15 +160,16 @@ module Compiler {
 			}
 		}
 
-		// TODO: Make it so it doesn't show normal log text
-		// TODO: Make it so it doesn't show symbol table and token debug table
 		// Executes each unit test and displays the result
 		private static runTests(): void {
 
-			Logger.log("Running the unit tests");
-
 			var unitTestsPassed: number = 0;
-			var totalUnitTests: number = _testCodeList.length;
+			var unitTestCount: number = _testCodeList.length;
+
+			var failedTests: string [] = [];
+
+			// Set up compiler appropriately
+			Compiler.setTestMode(true);
 
 			for(var i: number = 0; i < _testCodeList.length; i++) {
 
@@ -173,21 +178,37 @@ module Compiler {
 
 				var testResult: boolean = Compiler.compile(code);
 
+				this.clearLog();
+
 				if(testResult) {
 
-					Logger.log("Program " + codeName + " passed.");
 					unitTestsPassed++;
 				}
 
 				else {
-
-					Logger.log("Program " + codeName + " did not pass.");
+					failedTests.push(codeName);
 				}
 			}
 
+			Compiler.setTestMode(false);
+
+			var sectionTextDelimiter: string = "-------------------------";
+
 			Logger.log("Unit test summary");
-			Logger.log("-------------------------");
-			Logger.log(unitTestsPassed + " / " + totalUnitTests + " passed.");
+			Logger.log(sectionTextDelimiter);
+			Logger.log(unitTestsPassed + " / " + unitTestCount + " passed.");
+
+			if(failedTests.length > 0) {
+
+				Logger.log("");
+				Logger.log("Failing tests");
+				Logger.log(sectionTextDelimiter);
+
+				for(var i: number = 0; i < failedTests.length; i++) {
+					Logger.log(failedTests[i]);
+				}
+			}
+
 		}
 
 	}
