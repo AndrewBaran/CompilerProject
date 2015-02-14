@@ -374,10 +374,6 @@ module Compiler {
 					this.parseExpression();
 				}
 
-				// TODO Debug
-				else {
-					Logger.log(this.getToken().getTokenName() + " was not an int operator.");
-				}
 			}
 
 			else {

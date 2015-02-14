@@ -6,9 +6,7 @@ module Compiler {
 		private static tokenPatterns; 
 
 		// TODO: Be able to lex strings
-		// TODO: If EOF cuts off a lexeme mid way (ex: in$), fix that
 		// TODO: This is also a problem with "ab" (two ids instead of lexeme error)
-		// TODO: Count number of newlines between tokens so parsing has some context
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
 
@@ -120,29 +118,22 @@ module Compiler {
 					}
 				}
 
-				// TODO: Do final token processing here (when currentIndex === inputCode.length)
+				// Final token processing
+				if(currentIndex === inputCode.length) {
 
-			}
+					if(currentToken.getType() !== TokenType.T_DEFAULT && currentToken.getType() !== TokenType.T_WHITE_SPACE && !isPrefix) {
 
-			// TODO: Refactor into while loop
-			// Extract last token from lex
-			if(currentToken.getType() !== TokenType.T_DEFAULT && currentToken.getType() !== TokenType.T_WHITE_SPACE) {
+						// Disregard prefixes
+						Logger.log("Producing token: " + currentToken.getTokenName());
+						tokenList.push(currentToken);
+					}
 
-				// Disregard prefixes
-				Logger.log("Producing token: " + currentToken.getTokenName());
-				tokenList.push(currentToken);
-				
-				if(currentToken.getType() === TokenType.T_ID) {
-
-					Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
-					symbolTable.insert(currentToken);
+					if(currentToken.getType() === TokenType.T_EOF) {
+						eofFound = true;
+					}
 				}
 
-				if(currentToken.getType() === TokenType.T_EOF) {
-					eofFound = true;
-				}
 			}
-
 
 			if(eofFound) {
 

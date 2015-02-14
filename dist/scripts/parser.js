@@ -302,8 +302,6 @@ var Compiler;
 
                 if (intOpExisted) {
                     this.parseExpression();
-                } else {
-                    Compiler.Logger.log(this.getToken().getTokenName() + " was not an int operator.");
                 }
             } else {
                 var errorMessage = "Error! Expected a digit, but got a " + token.getTokenName();
