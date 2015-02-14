@@ -13,7 +13,8 @@ var _testCodeList = [
 	{name: "Declaration", code: "{\n\tint x\n} $"},
 	{name: "Assignment", code: "{\n\tint a\n\ta = 1\n\tprint(a)\n} $"},
 	{name: "Print", code: "{\n\tprint(1)\n} $"},
-	{name: "String", code: "{\n\tstring s\n\ts = \"this is a string\"\n\tprint(s)\n} $"},
+	{name: "Normal String", code: "{\n\tstring s\n\ts = \"abcde\"\n} $"},
+	{name: "String with Spaces", code: "{\n\tstring s\n\ts = \"a b c d e\"\n} $"},
 	{name: "Addition", code: "{\n\tint a\n\ta = 4\n\n\tint b\n\tb = 2 + a\n\n\tprint(b)\n} $"},
 	{name: "If and Increment", code: "{\n\tint i\n\ti = 0\n\n\tprint(i)\n\n\tif (i == 0) {\n\t\ti = 1 + i\n\t}\n\n\tprint(i)\n} $"},
     {name: "If and If", code: "{\n\tif true {\n\t\tprint(\"this will print\")\n\t}\n\n\tif false {\n\t\tprint(\"this will not print\")\n\t}\n} $"},
@@ -37,6 +38,7 @@ enum TokenType {
 	T_IF, // if
 	T_DIGIT, // 0-9
 	T_ID, // a-z
+	T_CHAR,
 	T_PLUS, // +
 	T_SPACE, // ' '
 	T_INT, // int

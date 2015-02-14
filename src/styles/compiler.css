@@ -50,7 +50,10 @@ body
 #divTestPrograms
 {
 	float: left;
-	width: 100px;
+	width: 120px;
+	height: 200px;
+
+	overflow: auto;
 }
 
 #divDebugToken

@@ -3,7 +3,6 @@ var Compiler;
     var Lexer = (function () {
         function Lexer() {
         }
-        // TODO: Be able to lex strings
         // TODO: This is also a problem with "ab" (two ids instead of lexeme error)
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
@@ -23,14 +22,13 @@ var Compiler;
             var logCurrentLine = 1;
             var logWarningCount = 0;
 
+            var stringMode = false;
             var isPrefix = false;
             var eofFound = false;
 
             while (currentIndex != inputCode.length && !eofFound) {
                 currentChar = inputCode[currentIndex];
                 currentIndex++;
-
-                logCurrentLetter++;
 
                 currentWord += currentChar;
 
@@ -51,6 +49,40 @@ var Compiler;
                 if (tokenMatched.isMatch) {
                     Compiler.Logger.log("Token found: " + currentToken.getTokenName());
 
+                    if (currentToken.getType() === 6 /* T_QUOTE */) {
+                        if (!stringMode) {
+                            stringMode = true;
+
+                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
+                            tokenList.push(currentToken);
+
+                            currentToken = new Compiler.Token();
+                            currentWord = "";
+                        } else {
+                            stringMode = false;
+                        }
+                    }
+
+                    if (stringMode && currentToken.getType() !== 1 /* T_DEFAULT */) {
+                        // T_ID shares same regex as T_CHAR, so convert on the spot
+                        if (currentToken.getType() === 12 /* T_ID */) {
+                            currentToken.setType(13 /* T_CHAR */);
+                        }
+
+                        if (currentToken.getType() === 13 /* T_CHAR */ || currentToken.getType() === 24 /* T_WHITE_SPACE */) {
+                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
+                            tokenList.push(currentToken);
+                        } else {
+                            var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid string character";
+
+                            Compiler.Logger.log(errorMessage);
+                            throw errorMessage;
+                        }
+
+                        currentToken = new Compiler.Token();
+                        currentWord = "";
+                    }
+
                     isPrefix = false;
                 } else {
                     // Didn't match a pattern
@@ -63,7 +95,7 @@ var Compiler;
                             }
 
                             // Discard whitespace tokens
-                            if (currentToken.getType() !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
+                            if (currentToken.getType() !== 24 /* T_WHITE_SPACE */ && !isPrefix) {
                                 Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                                 tokenList.push(currentToken);
 
@@ -94,7 +126,7 @@ var Compiler;
 
                 // Final token processing
                 if (currentIndex === inputCode.length) {
-                    if (currentToken.getType() !== 1 /* T_DEFAULT */ && currentToken.getType() !== 23 /* T_WHITE_SPACE */ && !isPrefix) {
+                    if (currentToken.getType() !== 1 /* T_DEFAULT */ && currentToken.getType() !== 24 /* T_WHITE_SPACE */ && !isPrefix) {
                         // Disregard prefixes
                         Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                         tokenList.push(currentToken);
@@ -104,6 +136,8 @@ var Compiler;
                         eofFound = true;
                     }
                 }
+
+                logCurrentLetter++;
             }
 
             if (eofFound) {
@@ -162,27 +196,27 @@ var Compiler;
 
         Lexer.setupTokenPatterns = function () {
             this.tokenPatterns = [
-                { regex: /^while$/g, type: 9 /* T_WHILE */ },
-                { regex: /^if$/g, type: 10 /* T_IF */ },
-                { regex: /^true$/g, type: 22 /* T_TRUE */ },
-                { regex: /^false$/g, type: 21 /* T_FALSE */ },
-                { regex: /^int$/g, type: 15 /* T_INT */ },
-                { regex: /^string$/g, type: 16 /* T_STRING */ },
-                { regex: /^boolean$/g, type: 17 /* T_BOOLEAN */ },
-                { regex: /^print$/g, type: 7 /* T_PRINT */ },
-                { regex: /^\($/g, type: 2 /* T_LPAREN */ },
-                { regex: /^\)$/g, type: 3 /* T_RPAREN */ },
-                { regex: /^\{$/g, type: 4 /* T_LBRACE */ },
-                { regex: /^\}$/g, type: 5 /* T_RBRACE */ },
-                { regex: /^"$/g, type: 6 /* T_QUOTE */ },
-                { regex: /^[a-z]$/g, type: 12 /* T_ID */ },
-                { regex: /^[0-9]$/g, type: 11 /* T_DIGIT */ },
-                { regex: /^\+$/g, type: 13 /* T_PLUS */ },
-                { regex: /^\$$/g, type: 8 /* T_EOF */ },
-                { regex: /^=$/g, type: 18 /* T_SINGLE_EQUALS */ },
-                { regex: /^==$/g, type: 19 /* T_DOUBLE_EQUALS */ },
-                { regex: /^!=$/g, type: 20 /* T_NOT_EQUALS */ },
-                { regex: /^[\s|\n]+$/g, type: 23 /* T_WHITE_SPACE */ }
+                { regex: /^while$/, type: 9 /* T_WHILE */ },
+                { regex: /^if$/, type: 10 /* T_IF */ },
+                { regex: /^true$/, type: 23 /* T_TRUE */ },
+                { regex: /^false$/, type: 22 /* T_FALSE */ },
+                { regex: /^int$/, type: 16 /* T_INT */ },
+                { regex: /^string$/, type: 17 /* T_STRING */ },
+                { regex: /^boolean$/, type: 18 /* T_BOOLEAN */ },
+                { regex: /^print$/, type: 7 /* T_PRINT */ },
+                { regex: /^\($/, type: 2 /* T_LPAREN */ },
+                { regex: /^\)$/, type: 3 /* T_RPAREN */ },
+                { regex: /^\{$/, type: 4 /* T_LBRACE */ },
+                { regex: /^\}$/, type: 5 /* T_RBRACE */ },
+                { regex: /^"$/, type: 6 /* T_QUOTE */ },
+                { regex: /^[a-z]$/, type: 12 /* T_ID */ },
+                { regex: /^[0-9]$/, type: 11 /* T_DIGIT */ },
+                { regex: /^\+$/, type: 14 /* T_PLUS */ },
+                { regex: /^\$$/, type: 8 /* T_EOF */ },
+                { regex: /^=$/, type: 19 /* T_SINGLE_EQUALS */ },
+                { regex: /^==$/, type: 20 /* T_DOUBLE_EQUALS */ },
+                { regex: /^!=$/, type: 21 /* T_NOT_EQUALS */ },
+                { regex: /^[\s|\n]+$/, type: 24 /* T_WHITE_SPACE */ }
             ];
         };
         return Lexer;

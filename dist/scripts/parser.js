@@ -106,9 +106,9 @@ var Compiler;
                     this.parseAssignmentStatement();
                     break;
 
-                case 15 /* T_INT */:
-                case 16 /* T_STRING */:
-                case 17 /* T_BOOLEAN */:
+                case 16 /* T_INT */:
+                case 17 /* T_STRING */:
+                case 18 /* T_BOOLEAN */:
                     this.parseVariableDeclaration();
                     break;
 
@@ -189,7 +189,7 @@ var Compiler;
             var token = this.getToken();
             Compiler.Logger.log("Expecting an = ");
 
-            if (token.getType() === 18 /* T_SINGLE_EQUALS */) {
+            if (token.getType() === 19 /* T_SINGLE_EQUALS */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a = !");
 
@@ -268,8 +268,8 @@ var Compiler;
                     break;
 
                 case 2 /* T_LPAREN */:
-                case 20 /* T_NOT_EQUALS */:
-                case 19 /* T_DOUBLE_EQUALS */:
+                case 21 /* T_NOT_EQUALS */:
+                case 20 /* T_DOUBLE_EQUALS */:
                     this.parseBooleanExpression();
                     break;
 
@@ -346,13 +346,13 @@ var Compiler;
 
                     break;
 
-                case 22 /* T_TRUE */:
+                case 23 /* T_TRUE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a true!");
 
                     break;
 
-                case 21 /* T_FALSE */:
+                case 22 /* T_FALSE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a false!");
 
@@ -376,19 +376,19 @@ var Compiler;
             Compiler.Logger.log("Expecting a type");
 
             switch (token.getType()) {
-                case 15 /* T_INT */:
+                case 16 /* T_INT */:
                     this.consumeToken();
                     Compiler.Logger.log("Got an int type!");
 
                     break;
 
-                case 16 /* T_STRING */:
+                case 17 /* T_STRING */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a string type!");
 
                     break;
 
-                case 17 /* T_BOOLEAN */:
+                case 18 /* T_BOOLEAN */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a boolean type!");
 
@@ -433,7 +433,7 @@ var Compiler;
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a plus operator");
 
-            if (token.getType() === 13 /* T_PLUS */) {
+            if (token.getType() === 14 /* T_PLUS */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a plus operator!");
 
@@ -449,13 +449,13 @@ var Compiler;
             var token = this.getToken();
 
             switch (token.getType()) {
-                case 19 /* T_DOUBLE_EQUALS */:
+                case 20 /* T_DOUBLE_EQUALS */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a double equals!");
 
                     break;
 
-                case 20 /* T_NOT_EQUALS */:
+                case 21 /* T_NOT_EQUALS */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a not equals!");
 

@@ -5,7 +5,6 @@ module Compiler {
 		// TODO: Give this a type eventually
 		private static tokenPatterns; 
 
-		// TODO: Be able to lex strings
 		// TODO: This is also a problem with "ab" (two ids instead of lexeme error)
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
@@ -26,6 +25,7 @@ module Compiler {
 			var logCurrentLine: number = 1;
 			var logWarningCount: number = 0;
 
+			var stringMode: boolean = false;
 			var isPrefix: boolean = false;
 			var eofFound: boolean = false;
 
@@ -35,7 +35,6 @@ module Compiler {
 				currentChar = inputCode[currentIndex];
 				currentIndex++;
 
-				logCurrentLetter++;
 
 				currentWord += currentChar;
 
@@ -57,6 +56,50 @@ module Compiler {
 				if(tokenMatched.isMatch) {
 
 					Logger.log("Token found: " + currentToken.getTokenName());
+
+					if(currentToken.getType() === TokenType.T_QUOTE) {
+
+						if(!stringMode) {
+
+							stringMode = true;
+
+							Logger.log("Producing token: " + currentToken.getTokenName());
+							tokenList.push(currentToken);
+
+							currentToken = new Token();
+							currentWord = "";
+						}
+
+						else {
+
+							stringMode = false;
+						}
+					}
+
+					if(stringMode && currentToken.getType() !== TokenType.T_DEFAULT) {
+
+						// T_ID shares same regex as T_CHAR, so convert on the spot
+						if(currentToken.getType() === TokenType.T_ID) {
+							currentToken.setType(TokenType.T_CHAR);
+						}
+
+						if(currentToken.getType() === TokenType.T_CHAR || currentToken.getType() === TokenType.T_WHITE_SPACE) {
+
+							Logger.log("Producing token: " + currentToken.getTokenName());
+							tokenList.push(currentToken);
+						}
+
+						else {
+
+							var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid string character";
+
+							Logger.log(errorMessage);
+							throw errorMessage;
+						}
+
+						currentToken = new Token();
+						currentWord = "";
+					}
 
 					isPrefix = false;
 				}
@@ -133,6 +176,7 @@ module Compiler {
 					}
 				}
 
+				logCurrentLetter++;
 			}
 
 			if(eofFound) {
@@ -202,27 +246,27 @@ module Compiler {
 		private static setupTokenPatterns(): void {
 
 			this.tokenPatterns = [
-				{regex: /^while$/g, type: TokenType.T_WHILE},
-				{regex: /^if$/g, type: TokenType.T_IF},
-				{regex: /^true$/g, type: TokenType.T_TRUE},
-				{regex: /^false$/g, type: TokenType.T_FALSE},
-				{regex: /^int$/g, type: TokenType.T_INT},
-				{regex: /^string$/g, type: TokenType.T_STRING},
-				{regex: /^boolean$/g, type: TokenType.T_BOOLEAN},
-				{regex: /^print$/g, type: TokenType.T_PRINT},
-				{regex: /^\($/g, type: TokenType.T_LPAREN},
-				{regex: /^\)$/g, type: TokenType.T_RPAREN},
-				{regex: /^\{$/g, type: TokenType.T_LBRACE},
-				{regex: /^\}$/g, type: TokenType.T_RBRACE},
-				{regex: /^"$/g, type: TokenType.T_QUOTE},
-				{regex: /^[a-z]$/g, type: TokenType.T_ID},
-				{regex: /^[0-9]$/g, type: TokenType.T_DIGIT},
-				{regex: /^\+$/g, type: TokenType.T_PLUS},
-				{regex: /^\$$/g, type: TokenType.T_EOF},
-				{regex: /^=$/g, type: TokenType.T_SINGLE_EQUALS},
-				{regex: /^==$/g, type: TokenType.T_DOUBLE_EQUALS},
-				{regex: /^!=$/g, type: TokenType.T_NOT_EQUALS},
-				{regex: /^[\s|\n]+$/g, type: TokenType.T_WHITE_SPACE},
+				{regex: /^while$/, type: TokenType.T_WHILE},
+				{regex: /^if$/, type: TokenType.T_IF},
+				{regex: /^true$/, type: TokenType.T_TRUE},
+				{regex: /^false$/, type: TokenType.T_FALSE},
+				{regex: /^int$/, type: TokenType.T_INT},
+				{regex: /^string$/, type: TokenType.T_STRING},
+				{regex: /^boolean$/, type: TokenType.T_BOOLEAN},
+				{regex: /^print$/, type: TokenType.T_PRINT},
+				{regex: /^\($/, type: TokenType.T_LPAREN},
+				{regex: /^\)$/, type: TokenType.T_RPAREN},
+				{regex: /^\{$/, type: TokenType.T_LBRACE},
+				{regex: /^\}$/, type: TokenType.T_RBRACE},
+				{regex: /^"$/, type: TokenType.T_QUOTE},
+				{regex: /^[a-z]$/, type: TokenType.T_ID},
+				{regex: /^[0-9]$/, type: TokenType.T_DIGIT},
+				{regex: /^\+$/, type: TokenType.T_PLUS},
+				{regex: /^\$$/, type: TokenType.T_EOF},
+				{regex: /^=$/, type: TokenType.T_SINGLE_EQUALS},
+				{regex: /^==$/, type: TokenType.T_DOUBLE_EQUALS},
+				{regex: /^!=$/, type: TokenType.T_NOT_EQUALS},
+				{regex: /^[\s|\n]+$/, type: TokenType.T_WHITE_SPACE},
 			];
 
 		}
