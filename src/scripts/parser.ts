@@ -1,3 +1,7 @@
+// TODO: Make error message function, something like
+// private static errorExpectedActual(expected: TokenType, actual: TokenType): void
+// private static errorInvalidStart(tokenName: TokenType): void
+
 module Compiler {
 	
 	export class Parser {
@@ -98,7 +102,10 @@ module Compiler {
 
 			else {
 
-				Logger.log("Error! Expected an EOF, but got a " + token.getTokenName());
+				var errorMessage: string = "Error! Expected an EOF, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
 			}
 		}
 
@@ -333,8 +340,8 @@ module Compiler {
 					break;
 
 				case TokenType.T_LPAREN:
-				case TokenType.T_NOT_EQUALS:
-				case TokenType.T_DOUBLE_EQUALS:
+				case TokenType.T_TRUE:
+				case TokenType.T_FALSE:
 
 					this.parseBooleanExpression();
 					break;
@@ -389,6 +396,43 @@ module Compiler {
 		private static parseStringExpression(): void {
 
 			Logger.log("Parsing StringExpression");
+
+			var token: Token = this.getToken();
+			Logger.log("Expecting a quotation mark");
+
+			if(token.getType() === TokenType.T_QUOTE) {
+
+				this.consumeToken();
+				Logger.log("Got a quotation mark!");
+
+				this.parseCharList();
+
+				token = this.getToken();
+				Logger.log("Expecting a quotation mark");
+
+				if(token.getType() === TokenType.T_QUOTE) {
+
+					this.consumeToken();
+					Logger.log("Got a quotation mark!");
+				}
+
+				else {
+
+					var errorMessage: string = "Error! Expected a quotation mark, but got a " + token.getTokenName();
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+				}
+			}
+
+			else {
+
+				var errorMessage: string = "Error! Expected a quotation mark, but got a " + token.getTokenName();
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
+
 		}
 
 		// BooleanExpr: ( Expr boolop Expr ) | boolval
@@ -397,6 +441,7 @@ module Compiler {
 			Logger.log("Parsing BooleanExpression");
 
 			var token: Token = this.getToken();
+			Logger.log("Potentially expecting a left paren or true or false");
 
 			switch(token.getType()) {
 
@@ -523,6 +568,17 @@ module Compiler {
 		private static parseCharList(): void {
 
 			Logger.log("Parsing CharList");
+
+			var token: Token = this.getToken();
+			Logger.log("Potentially expecting a string character");
+
+			if(token.getType() === TokenType.T_CHAR || token.getType() === TokenType.T_WHITE_SPACE) {
+
+				this.consumeToken();
+				Logger.log("Got a string character!");
+
+				this.parseCharList();
+			}
 		}
 
 		private static parseIntOperator(): boolean {
@@ -583,9 +639,7 @@ module Compiler {
 		private static getToken(): Token {
 
 			var token: Token = this.tokenList[this.currentTokenIndex];
-
-			Logger.log("Current token: " + token.getTokenName());
-			return this.tokenList[this.currentTokenIndex];
+			return token; 
 		}
 
 		private static consumeToken(): void {

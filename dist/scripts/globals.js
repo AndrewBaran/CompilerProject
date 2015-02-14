@@ -11,14 +11,18 @@ var _testCodeList = [
     { name: "Declaration", code: "{\n\tint x\n} $" },
     { name: "Assignment", code: "{\n\tint a\n\ta = 1\n\tprint(a)\n} $" },
     { name: "Print", code: "{\n\tprint(1)\n} $" },
-    { name: "Normal String", code: "{\n\tstring s\n\ts = \"abcde\"\n} $" },
-    { name: "String with Spaces", code: "{\n\tstring s\n\ts = \"a b c d e\"\n} $" },
-    { name: "Addition", code: "{\n\tint a\n\ta = 4\n\n\tint b\n\tb = 2 + a\n\n\tprint(b)\n} $" },
-    { name: "If and Increment", code: "{\n\tint i\n\ti = 0\n\n\tprint(i)\n\n\tif (i == 0) {\n\t\ti = 1 + i\n\t}\n\n\tprint(i)\n} $" },
-    { name: "If and If", code: "{\n\tif true {\n\t\tprint(\"this will print\")\n\t}\n\n\tif false {\n\t\tprint(\"this will not print\")\n\t}\n} $" },
-    { name: "While", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $" },
-    { name: "Tokens", code: "{\n\t{ } ( )\n\twhile if print\n\t\"test string\" 1 2 3 4 5 a b c d e\n\tint string boolean\n\t== != = +\n\tfalse true\n} $" },
-    { name: "Boolean", code: "{\n\tif (true) {\n\t\tprint(\"true\")\n\t}\n\n\tif true {\n\t\tprint(\"still true\")\n\t}\n} $" }
+    { name: "String 1", code: "{\n\tstring s\n\ts = \"abcde\"\n} $" },
+    { name: "String 2", code: "{\n\tstring s\n\ts = \"a b c d e\"\n} $" },
+    { name: "String 3", code: "{\n\tstring s\n\ts = \"\"\n} $" },
+    { name: "Addition 1", code: "{\n\tint a\n\ta = 4\n\n\tint b\n\tb = 2 + a\n} $" },
+    { name: "Addition 2", code: "{\n\tint a\n\ta = 1 + 2 + 3 + 4 + 5\n} $" },
+    { name: "If 1", code: "{\n\tif true {\n\t\tint a\n\t\ta = 1\n\t}\n} $" },
+    { name: "If 2", code: "{\n\tif (1 == 1) {\n\t\tint a\n\t\ta = 1\n\t}\n} $" },
+    { name: "If 3", code: "{\n\tif (1 != 2) {\n\t\tint a\n\t\ta = 1\n\t}\n} $" },
+    { name: "While 1", code: "{\n\tint x\n\tx = 0\n\n\twhile false {\n\t\tx = 1 + x\n\t}\n} $" },
+    { name: "While 2", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tx = 1 + x\n\t}\n} $" },
+    { name: "Boolean 1", code: "{\n\tboolean b\n\tb = true\n\tb = false\n} $" },
+    { name: "Boolean 2", code: "{\n\tboolean b\n\tb = (true == true)\n\tb = (false != false)\n} $" }
 ];
 
 // Types of each token that the lexer can identify

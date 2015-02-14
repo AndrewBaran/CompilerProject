@@ -173,7 +173,7 @@ module Compiler {
 
 			for(var i: number = 0; i < _testCodeList.length; i++) {
 
-				var codeName: string = _testCodeList[i].name;
+				var programName: string = _testCodeList[i].name;
 				var code: string = _testCodeList[i].code;
 
 				var testResult: boolean = Compiler.compile(code);
@@ -186,7 +186,7 @@ module Compiler {
 				}
 
 				else {
-					failedTests.push(codeName);
+					failedTests.push(programName);
 				}
 			}
 
@@ -196,7 +196,7 @@ module Compiler {
 
 			Logger.log("Unit test summary");
 			Logger.log(sectionTextDelimiter);
-			Logger.log(unitTestsPassed + " / " + unitTestCount + " passed.");
+			Logger.log(unitTestsPassed + " / " + unitTestCount + " tests passed.");
 
 			if(failedTests.length > 0) {
 

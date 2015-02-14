@@ -1,3 +1,6 @@
+// TODO: Make error message function, something like
+// private static errorExpectedActual(expected: TokenType, actual: TokenType): void
+// private static errorInvalidStart(tokenName: TokenType): void
 var Compiler;
 (function (Compiler) {
     var Parser = (function () {
@@ -74,7 +77,10 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got an EOF!");
             } else {
-                Compiler.Logger.log("Error! Expected an EOF, but got a " + token.getTokenName());
+                var errorMessage = "Error! Expected an EOF, but got a " + token.getTokenName();
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             }
         };
 
@@ -268,8 +274,8 @@ var Compiler;
                     break;
 
                 case 2 /* T_LPAREN */:
-                case 21 /* T_NOT_EQUALS */:
-                case 20 /* T_DOUBLE_EQUALS */:
+                case 23 /* T_TRUE */:
+                case 22 /* T_FALSE */:
                     this.parseBooleanExpression();
                     break;
 
@@ -314,6 +320,34 @@ var Compiler;
         // StringExpr: " CharList "
         Parser.parseStringExpression = function () {
             Compiler.Logger.log("Parsing StringExpression");
+
+            var token = this.getToken();
+            Compiler.Logger.log("Expecting a quotation mark");
+
+            if (token.getType() === 6 /* T_QUOTE */) {
+                this.consumeToken();
+                Compiler.Logger.log("Got a quotation mark!");
+
+                this.parseCharList();
+
+                token = this.getToken();
+                Compiler.Logger.log("Expecting a quotation mark");
+
+                if (token.getType() === 6 /* T_QUOTE */) {
+                    this.consumeToken();
+                    Compiler.Logger.log("Got a quotation mark!");
+                } else {
+                    var errorMessage = "Error! Expected a quotation mark, but got a " + token.getTokenName();
+
+                    Compiler.Logger.log(errorMessage);
+                    throw errorMessage;
+                }
+            } else {
+                var errorMessage = "Error! Expected a quotation mark, but got a " + token.getTokenName();
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            }
         };
 
         // BooleanExpr: ( Expr boolop Expr ) | boolval
@@ -321,6 +355,7 @@ var Compiler;
             Compiler.Logger.log("Parsing BooleanExpression");
 
             var token = this.getToken();
+            Compiler.Logger.log("Potentially expecting a left paren or true or false");
 
             switch (token.getType()) {
                 case 2 /* T_LPAREN */:
@@ -425,6 +460,16 @@ var Compiler;
         // CharList: char CharList | space CharList | ""
         Parser.parseCharList = function () {
             Compiler.Logger.log("Parsing CharList");
+
+            var token = this.getToken();
+            Compiler.Logger.log("Potentially expecting a string character");
+
+            if (token.getType() === 13 /* T_CHAR */ || token.getType() === 24 /* T_WHITE_SPACE */) {
+                this.consumeToken();
+                Compiler.Logger.log("Got a string character!");
+
+                this.parseCharList();
+            }
         };
 
         Parser.parseIntOperator = function () {
@@ -473,9 +518,7 @@ var Compiler;
 
         Parser.getToken = function () {
             var token = this.tokenList[this.currentTokenIndex];
-
-            Compiler.Logger.log("Current token: " + token.getTokenName());
-            return this.tokenList[this.currentTokenIndex];
+            return token;
         };
 
         Parser.consumeToken = function () {

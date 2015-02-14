@@ -155,7 +155,7 @@ var Compiler;
             Compiler.Compiler.setTestMode(true);
 
             for (var i = 0; i < _testCodeList.length; i++) {
-                var codeName = _testCodeList[i].name;
+                var programName = _testCodeList[i].name;
                 var code = _testCodeList[i].code;
 
                 var testResult = Compiler.Compiler.compile(code);
@@ -165,7 +165,7 @@ var Compiler;
                 if (testResult) {
                     unitTestsPassed++;
                 } else {
-                    failedTests.push(codeName);
+                    failedTests.push(programName);
                 }
             }
 
@@ -175,7 +175,7 @@ var Compiler;
 
             Compiler.Logger.log("Unit test summary");
             Compiler.Logger.log(sectionTextDelimiter);
-            Compiler.Logger.log(unitTestsPassed + " / " + unitTestCount + " passed.");
+            Compiler.Logger.log(unitTestsPassed + " / " + unitTestCount + " tests passed.");
 
             if (failedTests.length > 0) {
                 Compiler.Logger.log("");
