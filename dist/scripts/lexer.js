@@ -69,7 +69,7 @@ var Compiler;
                             currentToken.setType(13 /* T_CHAR */);
                         }
 
-                        if (currentToken.getType() === 13 /* T_CHAR */ || currentToken.getType() === 24 /* T_WHITE_SPACE */) {
+                        if (currentToken.getType() === 13 /* T_CHAR */ || currentToken.getType() === 25 /* T_WHITE_SPACE */) {
                             Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                             tokenList.push(currentToken);
                         } else {
@@ -95,7 +95,7 @@ var Compiler;
                             }
 
                             // Discard whitespace tokens
-                            if (currentToken.getType() !== 24 /* T_WHITE_SPACE */ && !isPrefix) {
+                            if (currentToken.getType() !== 25 /* T_WHITE_SPACE */ && !isPrefix) {
                                 Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                                 tokenList.push(currentToken);
 
@@ -126,7 +126,7 @@ var Compiler;
 
                 // Final token processing
                 if (currentIndex === inputCode.length) {
-                    if (currentToken.getType() !== 1 /* T_DEFAULT */ && currentToken.getType() !== 24 /* T_WHITE_SPACE */ && !isPrefix) {
+                    if (currentToken.getType() !== 1 /* T_DEFAULT */ && currentToken.getType() !== 25 /* T_WHITE_SPACE */ && !isPrefix) {
                         // Disregard prefixes
                         Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                         tokenList.push(currentToken);
@@ -198,11 +198,11 @@ var Compiler;
             this.tokenPatterns = [
                 { regex: /^while$/, type: 9 /* T_WHILE */ },
                 { regex: /^if$/, type: 10 /* T_IF */ },
-                { regex: /^true$/, type: 23 /* T_TRUE */ },
-                { regex: /^false$/, type: 22 /* T_FALSE */ },
-                { regex: /^int$/, type: 16 /* T_INT */ },
-                { regex: /^string$/, type: 17 /* T_STRING */ },
-                { regex: /^boolean$/, type: 18 /* T_BOOLEAN */ },
+                { regex: /^true$/, type: 24 /* T_TRUE */ },
+                { regex: /^false$/, type: 23 /* T_FALSE */ },
+                { regex: /^int$/, type: 17 /* T_INT */ },
+                { regex: /^string$/, type: 18 /* T_STRING */ },
+                { regex: /^boolean$/, type: 19 /* T_BOOLEAN */ },
                 { regex: /^print$/, type: 7 /* T_PRINT */ },
                 { regex: /^\($/, type: 2 /* T_LPAREN */ },
                 { regex: /^\)$/, type: 3 /* T_RPAREN */ },
@@ -213,10 +213,10 @@ var Compiler;
                 { regex: /^[0-9]$/, type: 11 /* T_DIGIT */ },
                 { regex: /^\+$/, type: 14 /* T_PLUS */ },
                 { regex: /^\$$/, type: 8 /* T_EOF */ },
-                { regex: /^=$/, type: 19 /* T_SINGLE_EQUALS */ },
-                { regex: /^==$/, type: 20 /* T_DOUBLE_EQUALS */ },
-                { regex: /^!=$/, type: 21 /* T_NOT_EQUALS */ },
-                { regex: /^[\s|\n]+$/, type: 24 /* T_WHITE_SPACE */ }
+                { regex: /^=$/, type: 20 /* T_SINGLE_EQUALS */ },
+                { regex: /^==$/, type: 21 /* T_DOUBLE_EQUALS */ },
+                { regex: /^!=$/, type: 22 /* T_NOT_EQUALS */ },
+                { regex: /^[\s|\n]+$/, type: 25 /* T_WHITE_SPACE */ }
             ];
         };
         return Lexer;

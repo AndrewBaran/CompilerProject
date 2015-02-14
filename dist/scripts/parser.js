@@ -1,6 +1,3 @@
-// TODO: Make error message function, something like
-// private static errorExpectedActual(expected: TokenType, actual: TokenType): void
-// private static errorInvalidStart(tokenName: TokenType): void
 var Compiler;
 (function (Compiler) {
     var Parser = (function () {
@@ -53,16 +50,10 @@ var Compiler;
                     this.consumeToken();
                     Compiler.Logger.log("Got a right brace!");
                 } else {
-                    var errorMessage = "Error! Expected a right brace, but got a " + token.getTokenName();
-
-                    Compiler.Logger.log(errorMessage);
-                    throw errorMessage;
+                    this.errorExpectedActual(5 /* T_RBRACE */, token.getType());
                 }
             } else {
-                var errorMessage = "Error! Expected a left brace, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(4 /* T_LBRACE */, token.getType());
             }
         };
 
@@ -77,10 +68,7 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got an EOF!");
             } else {
-                var errorMessage = "Error! Expected an EOF, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(8 /* T_EOF */, token.getType());
             }
         };
 
@@ -112,9 +100,9 @@ var Compiler;
                     this.parseAssignmentStatement();
                     break;
 
-                case 16 /* T_INT */:
-                case 17 /* T_STRING */:
-                case 18 /* T_BOOLEAN */:
+                case 17 /* T_INT */:
+                case 18 /* T_STRING */:
+                case 19 /* T_BOOLEAN */:
                     this.parseVariableDeclaration();
                     break;
 
@@ -167,22 +155,13 @@ var Compiler;
                         this.consumeToken();
                         Compiler.Logger.log("Got a right paren!");
                     } else {
-                        var errorMessage = "Error! Expected a right paren, but got a " + token.getTokenName();
-
-                        Compiler.Logger.log(errorMessage);
-                        throw errorMessage;
+                        this.errorExpectedActual(3 /* T_RPAREN */, token.getType());
                     }
                 } else {
-                    var errorMessage = "Error! Expected a left paren, but got a " + token.getTokenName();
-
-                    Compiler.Logger.log(errorMessage);
-                    throw errorMessage;
+                    this.errorExpectedActual(2 /* T_LPAREN */, token.getType());
                 }
             } else {
-                var errorMessage = "Error! Expected a print, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(7 /* T_PRINT */, token.getType());
             }
         };
 
@@ -195,16 +174,13 @@ var Compiler;
             var token = this.getToken();
             Compiler.Logger.log("Expecting an = ");
 
-            if (token.getType() === 19 /* T_SINGLE_EQUALS */) {
+            if (token.getType() === 20 /* T_SINGLE_EQUALS */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a = !");
 
                 this.parseExpression();
             } else {
-                var errorMessage = "Error! Expected an =, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(20 /* T_SINGLE_EQUALS */, token.getType());
             }
         };
 
@@ -230,10 +206,7 @@ var Compiler;
                 this.parseBooleanExpression();
                 this.parseBlock();
             } else {
-                var errorMessage = "Error! Expected a while, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(9 /* T_WHILE */, token.getType());
             }
         };
 
@@ -251,10 +224,7 @@ var Compiler;
                 this.parseBooleanExpression();
                 this.parseBlock();
             } else {
-                var errorMessage = "Error! Expected an if, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(10 /* T_IF */, token.getType());
             }
         };
 
@@ -274,8 +244,8 @@ var Compiler;
                     break;
 
                 case 2 /* T_LPAREN */:
-                case 23 /* T_TRUE */:
-                case 22 /* T_FALSE */:
+                case 24 /* T_TRUE */:
+                case 23 /* T_FALSE */:
                     this.parseBooleanExpression();
                     break;
 
@@ -310,10 +280,7 @@ var Compiler;
                     this.parseExpression();
                 }
             } else {
-                var errorMessage = "Error! Expected a digit, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(11 /* T_DIGIT */, token.getType());
             }
         };
 
@@ -337,16 +304,10 @@ var Compiler;
                     this.consumeToken();
                     Compiler.Logger.log("Got a quotation mark!");
                 } else {
-                    var errorMessage = "Error! Expected a quotation mark, but got a " + token.getTokenName();
-
-                    Compiler.Logger.log(errorMessage);
-                    throw errorMessage;
+                    this.errorExpectedActual(6 /* T_QUOTE */, token.getType());
                 }
             } else {
-                var errorMessage = "Error! Expected a quotation mark, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(6 /* T_QUOTE */, token.getType());
             }
         };
 
@@ -373,21 +334,18 @@ var Compiler;
                         this.consumeToken();
                         Compiler.Logger.log("Got a right paren!");
                     } else {
-                        var errorMessage = "Error! Expected a right paren, but got a " + token.getTokenName();
-
-                        Compiler.Logger.log(errorMessage);
-                        throw errorMessage;
+                        this.errorExpectedActual(3 /* T_RPAREN */, token.getType());
                     }
 
                     break;
 
-                case 23 /* T_TRUE */:
+                case 24 /* T_TRUE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a true!");
 
                     break;
 
-                case 22 /* T_FALSE */:
+                case 23 /* T_FALSE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a false!");
 
@@ -411,30 +369,26 @@ var Compiler;
             Compiler.Logger.log("Expecting a type");
 
             switch (token.getType()) {
-                case 16 /* T_INT */:
+                case 17 /* T_INT */:
                     this.consumeToken();
                     Compiler.Logger.log("Got an int type!");
 
                     break;
 
-                case 17 /* T_STRING */:
+                case 18 /* T_STRING */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a string type!");
 
                     break;
 
-                case 18 /* T_BOOLEAN */:
+                case 19 /* T_BOOLEAN */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a boolean type!");
 
                     break;
 
                 default:
-                    var errorMessage = "Error! Expected a type, but got a " + token.getTokenName();
-
-                    Compiler.Logger.log(errorMessage);
-                    throw errorMessage;
-
+                    this.errorExpectedActual(16 /* T_TYPE */, token.getType());
                     break;
             }
         };
@@ -450,10 +404,7 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got an id!");
             } else {
-                var errorMessage = "Error! Expected an id, but got a " + token.getTokenName();
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
+                this.errorExpectedActual(12 /* T_ID */, token.getType());
             }
         };
 
@@ -464,7 +415,7 @@ var Compiler;
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a string character");
 
-            if (token.getType() === 13 /* T_CHAR */ || token.getType() === 24 /* T_WHITE_SPACE */) {
+            if (token.getType() === 13 /* T_CHAR */ || token.getType() === 25 /* T_WHITE_SPACE */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a string character!");
 
@@ -494,13 +445,13 @@ var Compiler;
             var token = this.getToken();
 
             switch (token.getType()) {
-                case 20 /* T_DOUBLE_EQUALS */:
+                case 21 /* T_DOUBLE_EQUALS */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a double equals!");
 
                     break;
 
-                case 21 /* T_NOT_EQUALS */:
+                case 22 /* T_NOT_EQUALS */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a not equals!");
 
@@ -523,6 +474,13 @@ var Compiler;
 
         Parser.consumeToken = function () {
             this.currentTokenIndex++;
+        };
+
+        Parser.errorExpectedActual = function (expectedType, actualType) {
+            var errorMessage = "Error! Expected " + TokenType[expectedType] + ", but got " + TokenType[actualType];
+
+            Compiler.Logger.log(errorMessage);
+            throw errorMessage;
         };
         return Parser;
     })();

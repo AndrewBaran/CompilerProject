@@ -45,6 +45,7 @@ enum TokenType {
 	T_CHAR,
 	T_PLUS, // +
 	T_SPACE, // ' '
+	T_TYPE,
 	T_INT, // int
 	T_STRING, // string
 	T_BOOLEAN, // bool

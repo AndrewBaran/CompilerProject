@@ -1,7 +1,3 @@
-// TODO: Make error message function, something like
-// private static errorExpectedActual(expected: TokenType, actual: TokenType): void
-// private static errorInvalidStart(tokenName: TokenType): void
-
 module Compiler {
 	
 	export class Parser {
@@ -68,20 +64,12 @@ module Compiler {
 				}
 
 				else {
-
-					var errorMessage: string = "Error! Expected a right brace, but got a " + token.getTokenName();
-
-					Logger.log(errorMessage);
-					throw errorMessage;
+					this.errorExpectedActual(TokenType.T_RBRACE, token.getType());
 				}
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected a left brace, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_LBRACE, token.getType());
 			}
 
 		}
@@ -101,11 +89,7 @@ module Compiler {
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected an EOF, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_EOF, token.getType());
 			}
 		}
 
@@ -204,29 +188,17 @@ module Compiler {
 					}
 
 					else {
-
-						var errorMessage: string = "Error! Expected a right paren, but got a " + token.getTokenName();
-
-						Logger.log(errorMessage);
-						throw errorMessage;
+						this.errorExpectedActual(TokenType.T_RPAREN, token.getType());
 					}
 				}
 
 				else {
-
-					var errorMessage: string = "Error! Expected a left paren, but got a " + token.getTokenName();
-
-					Logger.log(errorMessage);
-					throw errorMessage;
+					this.errorExpectedActual(TokenType.T_LPAREN, token.getType());
 				}
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected a print, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_PRINT, token.getType());
 			}
 
 		}
@@ -250,11 +222,7 @@ module Compiler {
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected an =, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_SINGLE_EQUALS, token.getType());
 			}
 
 		}
@@ -286,11 +254,7 @@ module Compiler {
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected a while, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_WHILE, token.getType());
 			}
 		}
 
@@ -312,11 +276,7 @@ module Compiler {
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected an if, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_IF, token.getType());
 			}
 		}
 
@@ -384,11 +344,7 @@ module Compiler {
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected a digit, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_DIGIT, token.getType());
 			}
 		}
 
@@ -417,20 +373,12 @@ module Compiler {
 				}
 
 				else {
-
-					var errorMessage: string = "Error! Expected a quotation mark, but got a " + token.getTokenName();
-
-					Logger.log(errorMessage);
-					throw errorMessage;
+					this.errorExpectedActual(TokenType.T_QUOTE, token.getType());
 				}
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected a quotation mark, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_QUOTE, token.getType());
 			}
 
 		}
@@ -464,11 +412,7 @@ module Compiler {
 					}
 
 					else {
-
-						var errorMessage: string = "Error! Expected a right paren, but got a " + token.getTokenName();
-
-						Logger.log(errorMessage);
-						throw errorMessage;
+						this.errorExpectedActual(TokenType.T_RPAREN, token.getType());
 					}
 
 					break;
@@ -532,11 +476,7 @@ module Compiler {
 
 				default:
 
-					var errorMessage: string = "Error! Expected a type, but got a " + token.getTokenName();
-
-					Logger.log(errorMessage);
-					throw errorMessage;
-
+					this.errorExpectedActual(TokenType.T_TYPE, token.getType());
 					break;
 			}
 		}
@@ -556,11 +496,7 @@ module Compiler {
 			}
 
 			else {
-
-				var errorMessage: string = "Error! Expected an id, but got a " + token.getTokenName();
-
-				Logger.log(errorMessage);
-				throw errorMessage;
+				this.errorExpectedActual(TokenType.T_ID, token.getType());
 			}
 		}
 
@@ -645,6 +581,14 @@ module Compiler {
 		private static consumeToken(): void {
 
 			this.currentTokenIndex++;
+		}
+
+		private static errorExpectedActual(expectedType: TokenType, actualType: TokenType): void {
+
+			var errorMessage: string = "Error! Expected " + TokenType[expectedType] + ", but got " + TokenType[actualType];
+
+			Logger.log(errorMessage);
+			throw errorMessage;
 		}
 	}
 }
