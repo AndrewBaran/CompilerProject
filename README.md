@@ -20,9 +20,9 @@ Project 1 Checklist
 
 - [ ] Write a complete lexer
 - [ ] Write a complete parser
-	- [ ] Include verbose output functionality that traces the stages of the parser
-- [ ] Create several test programs that cause as many different types of errors as you can
-- [ ] Provide both errors and warnings
+	- [x] Include verbose output functionality that traces the stages of the parser
+- [x] Create several test programs that cause as many different types of errors as you can
+- [x] Provide both errors and warnings
 
 Project 2 Checklist
 ===================

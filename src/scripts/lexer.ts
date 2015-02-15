@@ -135,6 +135,7 @@ module Compiler {
 							Logger.log("Producing token: " + currentToken.getTokenName());
 							tokenList.push(currentToken);
 
+							// TODO: Remove when doing project 2?
 							if(currentToken.getType() === TokenType.T_ID) {
 
 								Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
@@ -278,7 +279,7 @@ module Compiler {
 		}
 	}
 
-	export class TokenMatch {
+	class TokenMatch {
 
 		public token: Token;
 		public isMatch: boolean;

@@ -97,6 +97,7 @@ var Compiler;
                             Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                             tokenList.push(currentToken);
 
+                            // TODO: Remove when doing project 2?
                             if (currentToken.getType() === 12 /* T_ID */) {
                                 Compiler.Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
                                 symbolTable.insert(currentToken);
@@ -232,5 +233,4 @@ var Compiler;
         }
         return TokenMatch;
     })();
-    Compiler.TokenMatch = TokenMatch;
 })(Compiler || (Compiler = {}));
