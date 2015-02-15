@@ -61,6 +61,7 @@ var Compiler;
             this.tokenValue = "";
             this.isReservedWord = false;
             this.scopeLevel = 0;
+            this.identifierType = "";
         }
         SymbolTableEntry.prototype.toString = function () {
             var token = new Compiler.Token();

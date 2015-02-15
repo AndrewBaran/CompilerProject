@@ -75,6 +75,7 @@ module Compiler {
 		public tokenValue: string;
 		public isReservedWord: boolean;
 		public scopeLevel: number;
+		public identifierType: string;
 
 		constructor() {
 
@@ -83,6 +84,7 @@ module Compiler {
 			this.tokenValue = "";
 			this.isReservedWord = false;
 			this.scopeLevel = 0;
+			this.identifierType = "";
 		}
 
 		public toString(): string {

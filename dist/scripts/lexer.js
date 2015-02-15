@@ -84,43 +84,42 @@ var Compiler;
                     }
 
                     isPrefix = false;
+                } else if (symbolTable.hasReservedWordPrefix(currentWord)) {
+                    isPrefix = true;
                 } else {
-                    // Didn't match a pattern
-                    if (symbolTable.hasReservedWordPrefix(currentWord)) {
-                        isPrefix = true;
-                    } else {
-                        if (currentToken.getType() !== 1 /* T_DEFAULT */) {
-                            if (currentToken.getType() === 8 /* T_EOF */) {
-                                eofFound = true;
-                            }
-
-                            // Discard whitespace tokens
-                            if (currentToken.getType() !== 25 /* T_WHITE_SPACE */ && !isPrefix) {
-                                Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
-                                tokenList.push(currentToken);
-
-                                if (currentToken.getType() === 12 /* T_ID */) {
-                                    Compiler.Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
-                                    symbolTable.insert(currentToken);
-                                }
-                            }
-
-                            currentWord = "";
-                            currentToken = new Compiler.Token();
-
-                            // Back up and re-lex the current character
-                            currentIndex--;
-                            logCurrentLetter--;
-
-                            if (currentChar === "\n") {
-                                logCurrentLine--;
-                            }
-                        } else {
-                            var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
-
-                            Compiler.Logger.log(errorMessage);
-                            throw errorMessage;
+                    if (currentToken.getType() !== 1 /* T_DEFAULT */) {
+                        if (currentToken.getType() === 8 /* T_EOF */) {
+                            eofFound = true;
                         }
+
+                        // Discard whitespace tokens
+                        if (currentToken.getType() !== 25 /* T_WHITE_SPACE */ && !isPrefix) {
+                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
+                            tokenList.push(currentToken);
+
+                            if (currentToken.getType() === 12 /* T_ID */) {
+                                Compiler.Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
+                                symbolTable.insert(currentToken);
+                            }
+                        }
+
+                        currentWord = "";
+                        currentToken = new Compiler.Token();
+
+                        // Back up and re-lex the current character
+                        currentIndex--;
+                        logCurrentLetter--;
+
+                        if (currentChar === "\n") {
+                            logCurrentLine--;
+                        }
+
+                        isPrefix = false;
+                    } else {
+                        var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
+
+                        Compiler.Logger.log(errorMessage);
+                        throw errorMessage;
                     }
                 }
 
@@ -218,6 +217,8 @@ var Compiler;
                 { regex: /^!=$/, type: 22 /* T_NOT_EQUALS */ },
                 { regex: /^[\s|\n]+$/, type: 25 /* T_WHITE_SPACE */ }
             ];
+
+            this.charToBreakOn = /^[\s\n\{\}\(\_\)\$0-9!=+]$/;
         };
         return Lexer;
     })();

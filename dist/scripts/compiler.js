@@ -47,7 +47,7 @@ var Compiler;
                 // TOOD: Semantic analysis
             }
 
-            // TODO: Make it return the boolean and of all the result flags
+            // TODO: Return the AND of each compilation result
             return lexResult && parseResult;
         };
 

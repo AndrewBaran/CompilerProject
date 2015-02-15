@@ -3,7 +3,8 @@ module Compiler {
 	export class Lexer {
 
 		// TODO: Give this a type eventually
-		private static tokenPatterns; 
+		private static tokenPatterns;
+		private static charToBreakOn: RegExp;
 
 		// TODO: This is also a problem with "ab" (two ids instead of lexeme error)
 		// Separates the input code into a list of tokens and returns that list
@@ -104,60 +105,64 @@ module Compiler {
 					isPrefix = false;
 				}
 
-				// TODO: Make this else if
-				else {
+				else if(symbolTable.hasReservedWordPrefix(currentWord)) {
 
-					// Didn't match a pattern
-					if(symbolTable.hasReservedWordPrefix(currentWord)) {
-
-						isPrefix = true;
-					}
+					isPrefix = true;
+				}
 
 				// TODO: Add else if to check for line delimiter
 				//			If doesnt exist, add to current word and reset char
 				//			If it does, do normal else statement
+/*
+				else if(!this.charToBreakOn.test(currentChar)) {
 
+					Logger.log("\"" + currentChar + "\" is not a char we break on");
+					currentToken = new Token();
+				}
+*/
+
+				else {
+
+					if(currentToken.getType() !== TokenType.T_DEFAULT) {
+
+						if(currentToken.getType() === TokenType.T_EOF) {
+							eofFound = true;
+						}
+
+						// Discard whitespace tokens
+						if(currentToken.getType() !== TokenType.T_WHITE_SPACE && !isPrefix) {
+
+							Logger.log("Producing token: " + currentToken.getTokenName());
+							tokenList.push(currentToken);
+
+							if(currentToken.getType() === TokenType.T_ID) {
+
+								Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
+								symbolTable.insert(currentToken);
+							}
+						}
+
+						currentWord = "";
+						currentToken = new Token();
+
+						// Back up and re-lex the current character
+						currentIndex--;
+						logCurrentLetter--;
+
+						if(currentChar === "\n") {
+							logCurrentLine--;
+						}
+
+						isPrefix = false;
+					}
+
+					// Not a valid lexeme 
 					else {
 
-						if(currentToken.getType() !== TokenType.T_DEFAULT) {
+						var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
 
-							if(currentToken.getType() === TokenType.T_EOF) {
-								eofFound = true;
-							}
-
-							// Discard whitespace tokens
-							if(currentToken.getType() !== TokenType.T_WHITE_SPACE && !isPrefix) {
-
-								Logger.log("Producing token: " + currentToken.getTokenName());
-								tokenList.push(currentToken);
-
-								if(currentToken.getType() === TokenType.T_ID) {
-
-									Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
-									symbolTable.insert(currentToken);
-								}
-							}
-
-							currentWord = "";
-							currentToken = new Token();
-
-							// Back up and re-lex the current character
-							currentIndex--;
-							logCurrentLetter--;
-
-							if(currentChar === "\n") {
-								logCurrentLine--;
-							}
-						}
-
-						// Not a valid lexeme 
-						else {
-
-							var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
-
-							Logger.log(errorMessage);
-							throw errorMessage;
-						}
+						Logger.log(errorMessage);
+						throw errorMessage;
 					}
 				}
 
@@ -269,6 +274,7 @@ module Compiler {
 				{regex: /^[\s|\n]+$/, type: TokenType.T_WHITE_SPACE},
 			];
 
+			this.charToBreakOn = /^[\s\n\{\}\(\_\)\$0-9!=+]$/;
 		}
 	}
 

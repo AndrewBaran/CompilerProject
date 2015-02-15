@@ -50,8 +50,7 @@ var Compiler;
             var compileResult = Compiler.Compiler.compile(code);
 
             this.enableButtons();
-            // TODO: Make use of the boolean result of the compilation
-            // TODO: Make it show error messages and stuff
+            // TODO: Make use of the boolean result of the compilation by showing error signs or something
         };
 
         Control.buttonTestClick = function () {
