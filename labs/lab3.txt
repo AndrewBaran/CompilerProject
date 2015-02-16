@@ -9,15 +9,118 @@ Crafting a Compiler:
 
 4.7:
 
+a. Leftmost derivation
+
+Start
+E $
+T plus E $
+F plus E $
+num plus E $
+num plus T plus E $
+num plus T times F plus E $
+num plus F times F plus E $
+num plus num times F plus E $
+num plus num times num plus E $
+num plus num times num plus T $
+num plus num times num plus F $
+num plus num times num plus num $
+
+b. Rightmost derivation
+
+Start
+E $
+T plus E $
+T plus T plus E $
+T plus T plus T $
+T plus T plus T times F $
+T plus T plus T times num $
+T plus T plus F times num $
+T plus T plus num times num $
+T plus T plus num times num $
+T plus F plus num times num $
+T plus num plus num times num $
+F plus num plus num times num $
+num plus num plus num times num $
+
+c.
+
+This grammar structures expressions such that it groups expressions within parenthesis, so that expressions within these are evaluated first before being multiplies with other expressions.
+
 5.2c (Pseudo-code only):
+
+parseStart():
+	parseValue();
+	parseEOF();
+
+parseValue():
+	token = getToken();
+	if(token == num):
+		consumeToken();
+
+	else if(token == lparen):
+
+		consumeToken();
+		parseExpr();
+
+		token = getToken();
+		if(token == rparen):
+			consumeToken();
+		else:
+			error();
+	else:
+		error();
+
+parseExpr():
+	token = getToken();
+	if(token == plus):
+
+		consomeToken();
+		parseValue();
+		parseValue();
+	
+	else if(token == prod):
+
+		consumeToken();
+		parseValues();
+
+	else:
+		error();
+
+parseValues():
+	token = getToken();
+	if(token == Value):
+		parseValue();
+		parseValues();
 
 
 Dragon:
 
 4.2.1:
 
-a.
+a. Leftmost derivation
 
-b.
+S
+S S *
+S S + S *
+a S + S *
+a a + S *
+a a + a *
 
-c.
+b. Rightmost derivation
+
+S
+S S *
+S a *
+S S + a *
+S a + a *
+a a + a *
+
+c. Parse tree
+
+				S
+			/	|	\
+		S		S		*
+	  /	| \		|	
+	S	S	+	a
+	|	|
+	a	a
