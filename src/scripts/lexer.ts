@@ -7,6 +7,7 @@ module Compiler {
 		private static charToBreakOn: RegExp;
 
 		// TODO: This is also a problem with "ab" (two ids instead of lexeme error)
+		// TODO: Fix by using flag to see if char was a char to break on, then do that last only if that flag is true
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
 
@@ -35,7 +36,6 @@ module Compiler {
 
 				currentChar = inputCode[currentIndex];
 				currentIndex++;
-
 
 				currentWord += currentChar;
 
@@ -77,7 +77,13 @@ module Compiler {
 							currentToken.setType(TokenType.T_CHAR);
 						}
 
-						if(currentToken.getType() === TokenType.T_CHAR || currentToken.getType() === TokenType.T_WHITE_SPACE) {
+						if(currentToken.getType() === TokenType.T_CHAR) {
+
+							Logger.log("Producing token: " + currentToken.getTokenName());
+							tokenList.push(currentToken);
+						}
+
+						else if(currentToken.getType() === TokenType.T_WHITE_SPACE && currentToken.getValue() === " ") {
 
 							Logger.log("Producing token: " + currentToken.getTokenName());
 							tokenList.push(currentToken);
@@ -99,7 +105,6 @@ module Compiler {
 				}
 
 				else if(symbolTable.hasReservedWordPrefix(currentWord)) {
-
 					isPrefix = true;
 				}
 
@@ -278,7 +283,7 @@ module Compiler {
 				{regex: /^=$/, type: TokenType.T_SINGLE_EQUALS},
 				{regex: /^==$/, type: TokenType.T_DOUBLE_EQUALS},
 				{regex: /^!=$/, type: TokenType.T_NOT_EQUALS},
-				{regex: /^[\s|\n]+$/, type: TokenType.T_WHITE_SPACE},
+				{regex: /^[\s|\n]$/, type: TokenType.T_WHITE_SPACE},
 			];
 
 			this.charToBreakOn = /^[\s\n\{\}\(\_\)\$0-9!=+]$/;

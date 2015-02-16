@@ -4,6 +4,7 @@ var Compiler;
         function Lexer() {
         }
         // TODO: This is also a problem with "ab" (two ids instead of lexeme error)
+        // TODO: Fix by using flag to see if char was a char to break on, then do that last only if that flag is true
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();
@@ -63,7 +64,10 @@ var Compiler;
                             currentToken.setType(13 /* T_CHAR */);
                         }
 
-                        if (currentToken.getType() === 13 /* T_CHAR */ || currentToken.getType() === 25 /* T_WHITE_SPACE */) {
+                        if (currentToken.getType() === 13 /* T_CHAR */) {
+                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
+                            tokenList.push(currentToken);
+                        } else if (currentToken.getType() === 25 /* T_WHITE_SPACE */ && currentToken.getValue() === " ") {
                             Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
                             tokenList.push(currentToken);
                         } else {
@@ -222,7 +226,7 @@ var Compiler;
                 { regex: /^=$/, type: 20 /* T_SINGLE_EQUALS */ },
                 { regex: /^==$/, type: 21 /* T_DOUBLE_EQUALS */ },
                 { regex: /^!=$/, type: 22 /* T_NOT_EQUALS */ },
-                { regex: /^[\s|\n]+$/, type: 25 /* T_WHITE_SPACE */ }
+                { regex: /^[\s|\n]$/, type: 25 /* T_WHITE_SPACE */ }
             ];
 
             this.charToBreakOn = /^[\s\n\{\}\(\_\)\$0-9!=+]$/;
