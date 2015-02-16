@@ -5,7 +5,6 @@ module Compiler {
 		private static symbolTable: SymbolTable;
 
 		private static debugMode: boolean;
-		private static parseMode: boolean;
 		private static testMode: boolean;
 
 		public static compile(codeToCompile: string): boolean {
@@ -13,9 +12,8 @@ module Compiler {
 			this.symbolTable = new SymbolTable();
 			this.setCompilerFlags();
 
-			var lexResult: boolean = true;
-			var parseResult: boolean = true;
-			var compileResult: boolean = true;
+			var lexResult: boolean = false;
+			var parseResult: boolean = false;
 
 			var tokenList: Token[] = [];
 			var concreteSyntaxTree: ConcreteSyntaxTree = null;
@@ -29,7 +27,9 @@ module Compiler {
 			else {
 
 				try {
+
 					tokenList = Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+					lexResult = true;
 				}
 
 				catch(exception) {
@@ -49,17 +49,15 @@ module Compiler {
 					Control.debugCreateSymbolTableDiv(this.symbolTable);
 				}
 				
-				if(this.parseMode) {
+				try {
 
-					try {
-						concreteSyntaxTree = Parser.parseCode(tokenList, this.symbolTable);
-					}
-
-					catch(exception) {
-						parseResult = false;
-					}
+					concreteSyntaxTree = Parser.parseCode(tokenList, this.symbolTable);
+					parseResult = true;
 				}
 
+				catch(exception) {
+					parseResult = false;
+				}
 			}
 
 			if(parseResult) {
@@ -80,9 +78,6 @@ module Compiler {
 			if(this.debugMode) {
 				Logger.log("Debug mode enabled");
 			}
-
-			var checkboxParse = <HTMLInputElement> document.getElementById("checkboxParse");
-			this.parseMode = checkboxParse.checked;
 		}
 
 		public static setTestMode(isTestMode: boolean): void {

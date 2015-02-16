@@ -12,7 +12,6 @@ module Compiler {
 			// Reset selections on compiler flags
 			// TODO: Checked for now (debugging) 
 			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = true;
-			(<HTMLInputElement> document.getElementById("checkboxParse")).checked = false;
 
 			this.enableButtons();
 		}
@@ -193,7 +192,7 @@ module Compiler {
 
 			var sectionTextDelimiter: string = "-------------------------";
 
-			Logger.log("Unit test summary");
+			Logger.log("Unit Test Summary");
 			Logger.log(sectionTextDelimiter);
 			Logger.log(unitTestsPassed + " / " + unitTestCount + " tests passed.");
 
@@ -209,6 +208,5 @@ module Compiler {
 			}
 
 		}
-
 	}
 }

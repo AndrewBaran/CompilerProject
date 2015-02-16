@@ -12,7 +12,6 @@ var Compiler;
             // Reset selections on compiler flags
             // TODO: Checked for now (debugging)
             document.getElementById("checkboxDebug").checked = true;
-            document.getElementById("checkboxParse").checked = false;
 
             this.enableButtons();
         };
@@ -172,7 +171,7 @@ var Compiler;
 
             var sectionTextDelimiter = "-------------------------";
 
-            Compiler.Logger.log("Unit test summary");
+            Compiler.Logger.log("Unit Test Summary");
             Compiler.Logger.log(sectionTextDelimiter);
             Compiler.Logger.log(unitTestsPassed + " / " + unitTestCount + " tests passed.");
 

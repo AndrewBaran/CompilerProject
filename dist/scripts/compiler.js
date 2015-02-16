@@ -7,9 +7,8 @@ var Compiler;
             this.symbolTable = new _Compiler.SymbolTable();
             this.setCompilerFlags();
 
-            var lexResult = true;
-            var parseResult = true;
-            var compileResult = true;
+            var lexResult = false;
+            var parseResult = false;
 
             var tokenList = [];
             var concreteSyntaxTree = null;
@@ -20,6 +19,7 @@ var Compiler;
             } else {
                 try  {
                     tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+                    lexResult = true;
                 } catch (exception) {
                     lexResult = false;
                 }
@@ -34,12 +34,11 @@ var Compiler;
                     _Compiler.Control.debugCreateSymbolTableDiv(this.symbolTable);
                 }
 
-                if (this.parseMode) {
-                    try  {
-                        concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList, this.symbolTable);
-                    } catch (exception) {
-                        parseResult = false;
-                    }
+                try  {
+                    concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList, this.symbolTable);
+                    parseResult = true;
+                } catch (exception) {
+                    parseResult = false;
                 }
             }
 
@@ -59,9 +58,6 @@ var Compiler;
             if (this.debugMode) {
                 _Compiler.Logger.log("Debug mode enabled");
             }
-
-            var checkboxParse = document.getElementById("checkboxParse");
-            this.parseMode = checkboxParse.checked;
         };
 
         Compiler.setTestMode = function (isTestMode) {
