@@ -46,6 +46,10 @@ var Compiler;
                 // TOOD: Semantic analysis
             }
 
+            if (!this.testMode) {
+                _Compiler.Control.displayCompilerResults(lexResult, parseResult);
+            }
+
             // TODO: Return the AND of each compilation result
             return lexResult && parseResult;
         };

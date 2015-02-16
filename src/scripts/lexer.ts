@@ -39,13 +39,6 @@ module Compiler {
 
 				currentWord += currentChar;
 
-				// For error reporting
-				if(currentChar === "\n") {
-
-					logCurrentLine++;
-					logCurrentLetter = 0;
-				}
-
 				// Attempt to find match for token
 				var tokenMatched: TokenMatch = this.matchesTokenPattern(currentWord);
 
@@ -183,6 +176,12 @@ module Compiler {
 				}
 
 				logCurrentLetter++;
+
+				if(currentChar === "\n") {
+
+					logCurrentLine++;
+					logCurrentLetter = 0;
+				}
 			}
 
 			if(eofFound) {
@@ -196,10 +195,17 @@ module Compiler {
 
 					if(!(whitespaceRegex.test(currentChar))) {
 
-						Logger.log("Warning! Input found after EOF character");
+						Logger.log("Warning on line " + logCurrentLine + ", character " + logCurrentLetter + ": Input found after EOF character");
 						logWarningCount++;
 
 						break;
+					}
+
+					logCurrentLetter++;
+
+					if(currentChar === "\n") {
+						logCurrentLetter = 0;
+						logCurrentLine++;
 					}
 				}
 			}

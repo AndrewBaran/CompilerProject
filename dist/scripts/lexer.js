@@ -32,12 +32,6 @@ var Compiler;
 
                 currentWord += currentChar;
 
-                // For error reporting
-                if (currentChar === "\n") {
-                    logCurrentLine++;
-                    logCurrentLetter = 0;
-                }
-
                 // Attempt to find match for token
                 var tokenMatched = this.matchesTokenPattern(currentWord);
 
@@ -138,6 +132,11 @@ var Compiler;
                 }
 
                 logCurrentLetter++;
+
+                if (currentChar === "\n") {
+                    logCurrentLine++;
+                    logCurrentLetter = 0;
+                }
             }
 
             if (eofFound) {
@@ -148,10 +147,17 @@ var Compiler;
                     currentChar = inputCode[currentIndex];
 
                     if (!(whitespaceRegex.test(currentChar))) {
-                        Compiler.Logger.log("Warning! Input found after EOF character");
+                        Compiler.Logger.log("Warning on line " + logCurrentLine + ", character " + logCurrentLetter + ": Input found after EOF character");
                         logWarningCount++;
 
                         break;
+                    }
+
+                    logCurrentLetter++;
+
+                    if (currentChar === "\n") {
+                        logCurrentLetter = 0;
+                        logCurrentLine++;
                     }
                 }
             } else {

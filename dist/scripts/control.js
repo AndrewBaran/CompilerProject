@@ -5,9 +5,10 @@ var Compiler;
         }
         // Clears out the code and log textboxes when the page is loaded
         Control.clearData = function () {
-            // Clear textboxes of any content
+            // Clear textboxes and divs of any content
             this.clearInputCode();
             this.clearLog();
+            this.clearCompilerResults();
 
             // Reset selections on compiler flags
             // TODO: Checked for now (debugging)
@@ -22,6 +23,10 @@ var Compiler;
 
         Control.clearLog = function () {
             document.getElementById("textboxLog").value = "";
+        };
+
+        Control.clearCompilerResults = function () {
+            document.getElementById("divCompilerResults").innerHTML = "";
         };
 
         Control.enableButtons = function () {
@@ -39,6 +44,7 @@ var Compiler;
             this.disableButtons();
 
             this.clearLog();
+            this.clearCompilerResults();
 
             var divsToRemove = ["divDebugToken", "divDebugSymbolTable"];
             this.removeDivs(divsToRemove);
@@ -54,7 +60,9 @@ var Compiler;
 
         Control.buttonTestClick = function () {
             this.disableButtons();
+
             this.clearLog();
+            this.clearCompilerResults();
 
             var divsToRemove = ["divDebugToken", "divDebugSymbolTable"];
             this.removeDivs(divsToRemove);
@@ -114,7 +122,7 @@ var Compiler;
             var divSymbolTable = document.createElement("div");
             divSymbolTable.id = "divDebugSymbolTable";
 
-            var stringBody = "Symbol table: <hr />";
+            var stringBody = "Symbol Table: <hr />";
 
             for (var i = 0; i < symbolTable.getSize(); i++) {
                 var currentEntry = symbolTable.getEntry(i);
@@ -184,6 +192,21 @@ var Compiler;
                     Compiler.Logger.log(failedTests[i]);
                 }
             }
+        };
+
+        Control.displayCompilerResults = function (lex, parse) {
+            var resultDiv = document.getElementById("divCompilerResults");
+
+            var results = "Compilation Results <br />";
+
+            results += "Lex: ";
+            results += lex ? "<b>Passed</b>" : "<b>Failed</b>";
+            results += " | ";
+
+            results += "Parse: ";
+            results += parse ? "<b>Passed</b>" : "<b>Failed</b>";
+
+            resultDiv.innerHTML = results;
         };
         return Control;
     })();

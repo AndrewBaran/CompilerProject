@@ -5,9 +5,10 @@ module Compiler {
 		// Clears out the code and log textboxes when the page is loaded
 		public static clearData(): void {
 
-			// Clear textboxes of any content
+			// Clear textboxes and divs of any content
 			this.clearInputCode();
 			this.clearLog();
+			this.clearCompilerResults();
 
 			// Reset selections on compiler flags
 			// TODO: Checked for now (debugging) 
@@ -22,6 +23,10 @@ module Compiler {
 
 		private static clearLog(): void {
 			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+		}
+
+		private static clearCompilerResults(): void {
+			document.getElementById("divCompilerResults").innerHTML = "";
 		}
 
 		private static enableButtons(): void {
@@ -42,6 +47,7 @@ module Compiler {
 			this.disableButtons();
 
 			this.clearLog();
+			this.clearCompilerResults();
 
 			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
 			this.removeDivs(divsToRemove)
@@ -59,7 +65,9 @@ module Compiler {
 		public static buttonTestClick(): void {
 
 			this.disableButtons();
+
 			this.clearLog();
+			this.clearCompilerResults();
 
 			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
 			this.removeDivs(divsToRemove)
@@ -125,7 +133,7 @@ module Compiler {
 			var divSymbolTable = document.createElement("div");
 			divSymbolTable.id = "divDebugSymbolTable";
 
-			var stringBody: string = "Symbol table: <hr />";
+			var stringBody: string = "Symbol Table: <hr />";
 
 			for(var i: number = 0; i < symbolTable.getSize(); i++) {
 
@@ -207,6 +215,22 @@ module Compiler {
 				}
 			}
 
+		}
+
+		public static displayCompilerResults(lex: boolean, parse: boolean): void {
+
+			var resultDiv = document.getElementById("divCompilerResults");
+
+			var results: string = "Compilation Results <br />";
+
+			results += "Lex: ";
+			results += lex ? "<b>Passed</b>" : "<b>Failed</b>";
+			results += " | ";
+
+			results += "Parse: ";
+			results += parse ? "<b>Passed</b>" : "<b>Failed</b>";
+
+			resultDiv.innerHTML = results;
 		}
 	}
 }
