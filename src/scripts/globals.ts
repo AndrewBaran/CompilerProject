@@ -10,8 +10,9 @@ function onDocumentLoad(): void {
 // Used to dynamically set up the test code in the form of buttons
 var _testCodeList = [
 	{name: "Minimal", code: "{ } $"},
-	{name: "Declaration", code: "{\n\tint x\n} $"},
-	{name: "Assignment", code: "{\n\tint a\n\ta = 1\n\tprint(a)\n} $"},
+	{name: "Declarations", code: "{\n\tint x\n\tstring s\n\tboolean b\n} $"},
+	{name: "Assignment 1", code: "{\n\tint a\n\ta = 1\n} $"},
+	{name: "Assignment 2", code: "{\n\tint a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\ta = b\n\tb = a\n} $"},
 	{name: "Print 1", code: "{\n\tprint(1)\n} $"},
 	{name: "Print 2", code: "{\n\tprint(\"hello world\")\n} $"},
 	{name: "Print 3", code: "{\n\tprint(true)\n} $"},
@@ -30,7 +31,8 @@ var _testCodeList = [
     {name: "While 2", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tx = 1 + x\n\t}\n} $"},
     {name: "Boolean 1", code: "{\n\tboolean b\n\tb = true\n\tb = false\n} $"},
     {name: "Boolean 2", code: "{\n\tboolean b\n\tb = (true == true)\n\tb = (false != false)\n} $"},
-    {name: "Scope 1", code: "{\n\tint a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\t{\n\t\tint c\n\n\t\tc = 3\n\t\ta = 8\n\t\tb = 9\n\t}\n} $"}
+    {name: "Scope 1", code: "{\n\tint a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\t{\n\t\tint c\n\n\t\tc = 3\n\t\ta = 8\n\t\tb = 9\n\t}\n} $"},
+    {name: "Scope 2", code: "{\n\tint x\n\tx = 1\n\n\t{\n\n\t\tint x\n\t\tx = 2\n\n\t\t{\n\t\t\tx = 5\n\t\t}\n\n\t\tprint(x)\n\t}\n\n\tprint(x)\n} $"}
 ];
 
 // Types of each token that the lexer can identify
