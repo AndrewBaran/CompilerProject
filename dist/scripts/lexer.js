@@ -3,8 +3,23 @@ var Compiler;
     var Lexer = (function () {
         function Lexer() {
         }
-        // TODO: This is also a problem with "ab" (two ids instead of lexeme error)
-        // TODO: Fix by using flag to see if char was a char to break on, then do that last only if that flag is true
+        /*
+        TODO: Game plan
+        
+        Split inputCode on spaces and newline
+        while loop over each word in the list
+        if word matches regex
+        submit to stream
+        else if word contains delimiter chars
+        Find index of first delimiter
+        make current index substring up to, but not including delimiter
+        add string from delimiter on to list after current index
+        relex the current word
+        else
+        error?
+        
+        */
+        // TODO: Remove log messages when finished
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();
