@@ -21,6 +21,8 @@ module Compiler {
 			else
 				error?
 
+			Need to combine strings with spaces somehow
+
 		*/
 
 		// TODO: Remove log messages when finished
@@ -46,6 +48,78 @@ module Compiler {
 			var stringMode: boolean = false;
 			var isPrefix: boolean = false;
 			var eofFound: boolean = false;
+
+			var testing: boolean = true;
+			if(testing) {
+
+				// Split on whitespace
+				var splitInputCode: string [] = inputCode.split(/[\s|\n]+/);
+
+				var delimiterFound: boolean = false;
+
+				var wordIndex: number = 0;
+				while(wordIndex !== splitInputCode.length) {
+
+					var word: string = splitInputCode[wordIndex];
+
+					Logger.log("\"" + word + "\"");
+
+					for(var j: number = 0; j !== word.length; j++) {
+
+						if(this.charToBreakOn.test(word.charAt(j))) {
+
+							var beforeIndex: number = 0;
+							var afterIndex: number = 0;
+
+							if(j === 0) {
+								beforeIndex = j + 1;
+								afterIndex = j + 1;
+							}
+
+							else {
+								beforeIndex = j;
+								afterIndex = j;
+							}
+
+							var subStringBefore: string = word.substring(0, beforeIndex);
+							var substringAfter: string = word.substring(afterIndex, word.length);
+
+							Logger.log("Before: " + subStringBefore);
+							Logger.log("After: " + substringAfter);
+
+							if(subStringBefore.length !== 0) {
+
+								// Replace current word in array
+								splitInputCode[wordIndex] = subStringBefore;
+								Logger.log("Inserted before");
+							}
+
+							if(substringAfter.length !== 0) {
+
+								splitInputCode.splice(wordIndex + 1, 0, substringAfter);
+								Logger.log("Inserted after");
+							}
+
+							delimiterFound = true;
+							break;
+						}
+					}
+
+					if(!delimiterFound || word.length === 1) {
+						wordIndex++;
+					}
+
+					delimiterFound = false;
+
+				}
+
+				Logger.log("Code");
+				for(var i = 0; i < splitInputCode.length; i++) {
+					Logger.log(splitInputCode[i]);
+				}
+
+			}
+
 
 			// Lex the code
 			while(currentIndex != inputCode.length && !eofFound) {

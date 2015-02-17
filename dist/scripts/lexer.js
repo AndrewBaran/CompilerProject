@@ -18,6 +18,8 @@ var Compiler;
         else
         error?
         
+        Need to combine strings with spaces somehow
+        
         */
         // TODO: Remove log messages when finished
         // Separates the input code into a list of tokens and returns that list
@@ -41,6 +43,67 @@ var Compiler;
             var stringMode = false;
             var isPrefix = false;
             var eofFound = false;
+
+            var testing = true;
+            if (testing) {
+                // Split on whitespace
+                var splitInputCode = inputCode.split(/[\s|\n]+/);
+
+                var delimiterFound = false;
+
+                var wordIndex = 0;
+                while (wordIndex !== splitInputCode.length) {
+                    var word = splitInputCode[wordIndex];
+
+                    Compiler.Logger.log("\"" + word + "\"");
+
+                    for (var j = 0; j !== word.length; j++) {
+                        if (this.charToBreakOn.test(word.charAt(j))) {
+                            var beforeIndex = 0;
+                            var afterIndex = 0;
+
+                            if (j === 0) {
+                                beforeIndex = j + 1;
+                                afterIndex = j + 1;
+                            } else {
+                                beforeIndex = j;
+                                afterIndex = j;
+                            }
+
+                            var subStringBefore = word.substring(0, beforeIndex);
+                            var substringAfter = word.substring(afterIndex, word.length);
+
+                            Compiler.Logger.log("Before: " + subStringBefore);
+                            Compiler.Logger.log("After: " + substringAfter);
+
+                            if (subStringBefore.length !== 0) {
+                                // Replace current word in array
+                                splitInputCode[wordIndex] = subStringBefore;
+                                Compiler.Logger.log("Inserted before");
+                            }
+
+                            if (substringAfter.length !== 0) {
+                                splitInputCode.splice(wordIndex + 1, 0, substringAfter);
+                                Compiler.Logger.log("Inserted after");
+                            }
+
+                            delimiterFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!delimiterFound || word.length === 1) {
+                        wordIndex++;
+                    }
+
+                    delimiterFound = false;
+                }
+
+                Compiler.Logger.log("Code");
+                for (var i = 0; i < splitInputCode.length; i++) {
+                    Compiler.Logger.log(splitInputCode[i]);
+                }
+            }
 
             while (currentIndex != inputCode.length && !eofFound) {
                 currentChar = inputCode[currentIndex];
