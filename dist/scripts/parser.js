@@ -7,8 +7,12 @@ var Compiler;
             this.setupParsingEnvironment(tokenList, symbolTable);
 
             Compiler.Logger.log("Parsing the code");
+            Compiler.Logger.log("");
+
             this.parseProgram();
+
             Compiler.Logger.log("Parsing done");
+            Compiler.Logger.log("");
 
             return this.concreteSyntaxTree;
         };
@@ -24,16 +28,12 @@ var Compiler;
 
         // Program: Block $
         Parser.parseProgram = function () {
-            Compiler.Logger.log("Parsing Program");
-
             this.parseBlock();
             this.parseEOF();
         };
 
         // Block: { StatementList }
         Parser.parseBlock = function () {
-            Compiler.Logger.log("Parsing Block");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting a left brace");
 
@@ -59,8 +59,6 @@ var Compiler;
 
         // EOF: $
         Parser.parseEOF = function () {
-            Compiler.Logger.log("Parsing EOF");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting an EOF");
 
@@ -74,8 +72,6 @@ var Compiler;
 
         // StatementList: Statement StatementList | ""
         Parser.parseStatementList = function () {
-            Compiler.Logger.log("Parsing StatementList");
-
             var token = this.getToken();
 
             // Check for start of statement
@@ -87,8 +83,6 @@ var Compiler;
 
         // Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
         Parser.parseStatement = function () {
-            Compiler.Logger.log("Parsing Statement");
-
             var token = this.getToken();
 
             switch (token.getType()) {
@@ -130,8 +124,6 @@ var Compiler;
 
         // PrintStatement: print ( Expr )
         Parser.parsePrintStatement = function () {
-            Compiler.Logger.log("Parsing PrintStatement");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting a print");
 
@@ -167,8 +159,6 @@ var Compiler;
 
         // AssignmentStatement: Id = Expr
         Parser.parseAssignmentStatement = function () {
-            Compiler.Logger.log("Parsing AssignmentStatement");
-
             this.parseId();
 
             var token = this.getToken();
@@ -186,16 +176,12 @@ var Compiler;
 
         // VarDecl: type Id
         Parser.parseVariableDeclaration = function () {
-            Compiler.Logger.log("Parsing VariableDeclaration");
-
             this.parseType();
             this.parseId();
         };
 
         // WhileStatement: while BooleanExpr Block
         Parser.parseWhileStatement = function () {
-            Compiler.Logger.log("Parsing WhileStatement");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting a while");
 
@@ -212,8 +198,6 @@ var Compiler;
 
         // IfStatement: if BooleanExpr Block
         Parser.parseIfStatement = function () {
-            Compiler.Logger.log("Parsing IfStatement");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting an if");
 
@@ -230,8 +214,6 @@ var Compiler;
 
         // Expr: IntExpr | String Expr | BooleanExpr | Id
         Parser.parseExpression = function () {
-            Compiler.Logger.log("Parsing Expression");
-
             var token = this.getToken();
 
             switch (token.getType()) {
@@ -265,8 +247,6 @@ var Compiler;
 
         // IntExpr: digit intop Expr | digit
         Parser.parseIntExpression = function () {
-            Compiler.Logger.log("Parsing IntExpression");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting a digit");
 
@@ -286,8 +266,6 @@ var Compiler;
 
         // StringExpr: " CharList "
         Parser.parseStringExpression = function () {
-            Compiler.Logger.log("Parsing StringExpression");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting a quotation mark");
 
@@ -313,10 +291,8 @@ var Compiler;
 
         // BooleanExpr: ( Expr boolop Expr ) | boolval
         Parser.parseBooleanExpression = function () {
-            Compiler.Logger.log("Parsing BooleanExpression");
-
             var token = this.getToken();
-            Compiler.Logger.log("Potentially expecting a left paren or true or false");
+            Compiler.Logger.log("Potentially expecting a left paren, true, or false");
 
             switch (token.getType()) {
                 case 2 /* T_LPAREN */:
@@ -363,8 +339,6 @@ var Compiler;
 
         // int | string | boolean
         Parser.parseType = function () {
-            Compiler.Logger.log("Parsing Type");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting a type");
 
@@ -395,8 +369,6 @@ var Compiler;
 
         // Id: char
         Parser.parseId = function () {
-            Compiler.Logger.log("Parsing Id");
-
             var token = this.getToken();
             Compiler.Logger.log("Expecting an id");
 
@@ -410,8 +382,6 @@ var Compiler;
 
         // CharList: char CharList | space CharList | ""
         Parser.parseCharList = function () {
-            Compiler.Logger.log("Parsing CharList");
-
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a string character");
 
@@ -424,8 +394,6 @@ var Compiler;
         };
 
         Parser.parseIntOperator = function () {
-            Compiler.Logger.log("Parsing IntOperator");
-
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a plus operator");
 
@@ -440,8 +408,6 @@ var Compiler;
         };
 
         Parser.parseBooleanOperator = function () {
-            Compiler.Logger.log("Parsing BooleanOperator");
-
             var token = this.getToken();
 
             switch (token.getType()) {

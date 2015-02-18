@@ -1,4 +1,4 @@
-// Global, constants, and other functions used in the compiler
+// Globals, constants, and other functions used by the compiler
 
 // Sets up the browser environment for the compiler when the page is loaded
 function onDocumentLoad(): void {

@@ -3,7 +3,6 @@ var Compiler;
     var Lexer = (function () {
         function Lexer() {
         }
-        // TODO: Remove log messages when finished
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();

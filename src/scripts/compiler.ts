@@ -20,7 +20,6 @@ module Compiler {
 
 			// No available code to lex
 			if(codeToCompile.length == 0) {
-
 				Logger.log("Error! No code present to compile");
 			}
 
@@ -87,7 +86,6 @@ module Compiler {
 		}
 
 		public static setTestMode(isTestMode: boolean): void {
-
 			this.testMode = isTestMode;
 		}
 

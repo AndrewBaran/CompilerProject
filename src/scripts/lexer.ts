@@ -6,7 +6,7 @@ module Compiler {
 		private static tokenPatterns;
 		private static delimiterChars: RegExp;
 
-		// TODO: Remove log messages when finished
+
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
 

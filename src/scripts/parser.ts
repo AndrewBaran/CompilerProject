@@ -14,8 +14,12 @@ module Compiler {
 			this.setupParsingEnvironment(tokenList, symbolTable);
 
 			Logger.log("Parsing the code");
+			Logger.log("");
+
 			this.parseProgram();
+
 			Logger.log("Parsing done");
+			Logger.log("");
 
 			return this.concreteSyntaxTree;
 		}
@@ -33,16 +37,12 @@ module Compiler {
 		// Program: Block $
 		private static parseProgram(): void {
 
-			Logger.log("Parsing Program");
-
 			this.parseBlock();
 			this.parseEOF();
 		}
 
 		// Block: { StatementList }
 		private static parseBlock(): void {
-
-			Logger.log("Parsing Block");
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a left brace");
@@ -77,8 +77,6 @@ module Compiler {
 		// EOF: $
 		private static parseEOF(): void {
 
-			Logger.log("Parsing EOF");
-
 			var token: Token = this.getToken();
 			Logger.log("Expecting an EOF");
 
@@ -96,8 +94,6 @@ module Compiler {
 		// StatementList: Statement StatementList | ""
 		private static parseStatementList(): void {
 
-			Logger.log("Parsing StatementList");
-
 			var token: Token = this.getToken();
 
 			// Check for start of statement
@@ -111,36 +107,40 @@ module Compiler {
 		// Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
 		private static parseStatement(): void {
 
-			Logger.log("Parsing Statement");
-
 			var token: Token = this.getToken();
 
 			// Look at current token and see if it matches a statement
 			switch(token.getType()) {
 
 				case TokenType.T_PRINT:
+
 					this.parsePrintStatement();
 					break;
 
 				case TokenType.T_ID:
+
 					this.parseAssignmentStatement();
 					break;
 
 				case TokenType.T_INT:
 				case TokenType.T_STRING:
 				case TokenType.T_BOOLEAN:
+
 					this.parseVariableDeclaration();
 					break;
 
 				case TokenType.T_WHILE:
+
 					this.parseWhileStatement();
 					break;
 
 				case TokenType.T_IF:
+
 					this.parseIfStatement();
 					break;
 
 				case TokenType.T_LBRACE:
+
 					this.parseBlock();
 					break;
 
@@ -157,8 +157,6 @@ module Compiler {
 
 		// PrintStatement: print ( Expr )
 		private static parsePrintStatement(): void {
-
-			Logger.log("Parsing PrintStatement");
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a print");
@@ -206,8 +204,6 @@ module Compiler {
 		// AssignmentStatement: Id = Expr
 		private static parseAssignmentStatement(): void {
 
-			Logger.log("Parsing AssignmentStatement");
-
 			this.parseId();
 
 			var token: Token = this.getToken();
@@ -230,16 +226,12 @@ module Compiler {
 		// VarDecl: type Id
 		private static parseVariableDeclaration(): void {
 
-			Logger.log("Parsing VariableDeclaration");
-
 			this.parseType();
 			this.parseId();
 		}
 
 		// WhileStatement: while BooleanExpr Block
 		private static parseWhileStatement(): void {
-
-			Logger.log("Parsing WhileStatement");
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a while");
@@ -261,8 +253,6 @@ module Compiler {
 		// IfStatement: if BooleanExpr Block
 		private static parseIfStatement(): void {
 
-			Logger.log("Parsing IfStatement");
-
 			var token: Token = this.getToken();
 			Logger.log("Expecting an if");
 
@@ -282,8 +272,6 @@ module Compiler {
 
 		// Expr: IntExpr | String Expr | BooleanExpr | Id
 		private static parseExpression(): void {
-
-			Logger.log("Parsing Expression");
 
 			var token: Token = this.getToken();
 
@@ -325,8 +313,6 @@ module Compiler {
 		// IntExpr: digit intop Expr | digit
 		private static parseIntExpression(): void {
 
-			Logger.log("Parsing IntExpression");
-
 			var token: Token = this.getToken();
 			Logger.log("Expecting a digit");
 
@@ -350,8 +336,6 @@ module Compiler {
 
 		// StringExpr: " CharList "
 		private static parseStringExpression(): void {
-
-			Logger.log("Parsing StringExpression");
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a quotation mark");
@@ -386,10 +370,8 @@ module Compiler {
 		// BooleanExpr: ( Expr boolop Expr ) | boolval
 		private static parseBooleanExpression(): void {
 
-			Logger.log("Parsing BooleanExpression");
-
 			var token: Token = this.getToken();
-			Logger.log("Potentially expecting a left paren or true or false");
+			Logger.log("Potentially expecting a left paren, true, or false");
 
 			switch(token.getType()) {
 
@@ -446,8 +428,6 @@ module Compiler {
 		// int | string | boolean
 		private static parseType(): void {
 
-			Logger.log("Parsing Type");
-
 			var token: Token = this.getToken();
 			Logger.log("Expecting a type");
 
@@ -484,8 +464,6 @@ module Compiler {
 		// Id: char
 		private static parseId(): void {
 
-			Logger.log("Parsing Id");
-
 			var token: Token = this.getToken();
 			Logger.log("Expecting an id");
 
@@ -503,8 +481,6 @@ module Compiler {
 		// CharList: char CharList | space CharList | ""
 		private static parseCharList(): void {
 
-			Logger.log("Parsing CharList");
-
 			var token: Token = this.getToken();
 			Logger.log("Potentially expecting a string character");
 
@@ -518,8 +494,6 @@ module Compiler {
 		}
 
 		private static parseIntOperator(): boolean {
-
-			Logger.log("Parsing IntOperator");
 
 			var token: Token = this.getToken();
 			Logger.log("Potentially expecting a plus operator");
@@ -540,8 +514,6 @@ module Compiler {
 		}
 
 		private static parseBooleanOperator(): void {
-
-			Logger.log("Parsing BooleanOperator");
 
 			var token: Token = this.getToken();
 

@@ -18,8 +18,8 @@ This is a compiler, written in TypeScript, that takes an input source file in th
 Project 1 Checklist
 ===================
 
-- [ ] Write a complete lexer
-- [ ] Write a complete parser
+- [x] Write a complete lexer
+- [x] Write a complete parser
 	- [x] Include verbose output functionality that traces the stages of the parser
 - [x] Create several test programs that cause as many different types of errors as you can
 - [x] Provide both errors and warnings
