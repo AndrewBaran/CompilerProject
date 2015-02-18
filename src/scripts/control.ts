@@ -166,6 +166,7 @@ module Compiler {
 			}
 		}
 
+		// TODO: Display which phase of compilation failed
 		// Executes each unit test and displays the result
 		private static runTests(): void {
 

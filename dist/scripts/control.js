@@ -150,6 +150,7 @@ var Compiler;
             }
         };
 
+        // TODO: Display which phase of compilation failed
         // Executes each unit test and displays the result
         Control.runTests = function () {
             var unitTestsPassed = 0;

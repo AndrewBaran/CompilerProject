@@ -4,7 +4,7 @@ module Compiler {
 
 		// TODO: Give this a type eventually
 		private static tokenPatterns;
-		private static charToBreakOn: RegExp;
+		private static delimiterChars: RegExp;
 
 		/*
 			TODO: Game plan
@@ -33,7 +33,6 @@ module Compiler {
 
 			Logger.log("Performing lexical analysis");
 
-			var tokenList: Token[] = [];
 			var currentToken: Token = new Token();
 
 			var currentChar: string = "";
@@ -45,81 +44,160 @@ module Compiler {
 			var logCurrentLine: number = 1;
 			var logWarningCount: number = 0;
 
-			var stringMode: boolean = false;
 			var isPrefix: boolean = false;
+
+
+			// TODO: Remove above this eventually
+
+
+			var tokenList: Token[] = [];
+
+			var stringMode: boolean = false;
 			var eofFound: boolean = false;
 
-			var testing: boolean = true;
-			if(testing) {
+			var splitCodeList: string [] = this.splitCodeOnSpaces(inputCode);
 
-				// Split on whitespace
-				var splitInputCode: string [] = inputCode.split(/[\s|\n]+/);
+			var delimiterFound: boolean = false;
 
-				var delimiterFound: boolean = false;
+			var word: string = "";
+			var wordIndex: number = 0;
 
-				var wordIndex: number = 0;
-				while(wordIndex !== splitInputCode.length) {
+			// Further split the code on delimiters
+			while(wordIndex !== splitCodeList.length) {
 
-					var word: string = splitInputCode[wordIndex];
+				word = splitCodeList[wordIndex];
 
-					Logger.log("\"" + word + "\"");
+				for(var charIndex: number = 0; charIndex !== word.length && word.length !== 1; charIndex++) {
 
-					for(var j: number = 0; j !== word.length; j++) {
+					var currentChar: string = word.charAt(charIndex);
 
-						if(this.charToBreakOn.test(word.charAt(j))) {
+					if(this.delimiterChars.test(currentChar)) {
 
-							var beforeIndex: number = 0;
-							var afterIndex: number = 0;
+						if(currentChar === "\"") {
 
-							if(j === 0) {
-								beforeIndex = j + 1;
-								afterIndex = j + 1;
-							}
-
-							else {
-								beforeIndex = j;
-								afterIndex = j;
-							}
-
-							var subStringBefore: string = word.substring(0, beforeIndex);
-							var substringAfter: string = word.substring(afterIndex, word.length);
-
-							Logger.log("Before: " + subStringBefore);
-							Logger.log("After: " + substringAfter);
-
-							if(subStringBefore.length !== 0) {
-
-								// Replace current word in array
-								splitInputCode[wordIndex] = subStringBefore;
-								Logger.log("Inserted before");
-							}
-
-							if(substringAfter.length !== 0) {
-
-								splitInputCode.splice(wordIndex + 1, 0, substringAfter);
-								Logger.log("Inserted after");
-							}
-
-							delimiterFound = true;
-							break;
+							stringMode = stringMode ? false : true;
 						}
+
+						var beforeIndex: number = 0;
+						var afterIndex: number = 0;
+
+						// Special case: extract first char of the string
+						if(charIndex === 0) {
+
+							beforeIndex = afterIndex = charIndex + 1;
+						}
+
+						else {
+
+							beforeIndex = charIndex;
+							afterIndex = charIndex;
+						}
+
+						var subStringBefore: string = word.substring(0, beforeIndex);
+						var subStringAfter: string = word.substring(afterIndex, word.length);
+
+						if(subStringBefore.length !== 0) {
+
+							splitCodeList[wordIndex] = subStringBefore;
+						}
+
+						// Insert substring after current index
+						if(subStringAfter.length !== 0) {
+
+							splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+						}
+
+						delimiterFound = true;
+						break;
+
 					}
 
-					if(!delimiterFound || word.length === 1) {
-						wordIndex++;
+					else if(stringMode) {
+
+						var subStringBefore: string = currentChar;
+						var subStringAfter: string = word.substring(1, word.length);
+
+						if(subStringBefore.length !== 0) {
+
+							splitCodeList[wordIndex] = subStringBefore;
+						}
+
+						// Insert substring after current index
+						if(subStringAfter.length !== 0) {
+
+							splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+						}
+
+						delimiterFound = true;
+						break;
 					}
-
-					delimiterFound = false;
-
 				}
 
-				Logger.log("Code");
-				for(var i = 0; i < splitInputCode.length; i++) {
-					Logger.log(splitInputCode[i]);
+				if(!delimiterFound) {
+					wordIndex++;
 				}
 
+				delimiterFound = false;
 			}
 
+			// TODO: Remove eventually
+			Logger.log("Code fragments: ");
+			for(var i: number = 0; i < splitCodeList.length; i++) {
+
+				Logger.log("[" + i + "] = " + splitCodeList[i]);
+
+				if(splitCodeList[i] === "\n" || splitCodeList[i] === " ") {
+					Logger.log("Whitespace");
+				}
+			}
+
+			stringMode = false;
+
+			// TODO: Make it so you can combine words (ex: ! and =, = and =)
+			// Tokenize the individual elements of the split up code now
+			var listIndex: number = 0;
+
+			while(listIndex !== splitCodeList.length) {
+
+				word = splitCodeList[listIndex];
+
+				var tokenMatched: TokenMatch = this.matchesTokenPattern(word);
+
+				if(tokenMatched.isMatch) {
+
+					var token: Token = tokenMatched.token;
+
+					if(token.getType() === TokenType.T_QUOTE) {
+
+						stringMode = stringMode ? false : true;
+					}
+
+					// T_ID and T_CHAR share same regex, so swap on the spot
+					if(stringMode && token.getType() === TokenType.T_ID) {
+						token.setType(TokenType.T_CHAR);
+					}
+
+					Logger.log(word + " matched a regex");
+					Logger.log("Type was " + tokenMatched.token.getTokenName());
+
+					tokenList.push(token);
+				}
+
+				else {
+
+					var errorMessage: string = "Error! " + word + " is not a valid lexeme.";
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+				}
+
+				listIndex++;
+			}
+
+			return tokenList;
+
+
+			// TODO: Delete rest of method once new version implemented
 
 			// Lex the code
 			while(currentIndex != inputCode.length && !eofFound) {
@@ -197,17 +275,6 @@ module Compiler {
 				else if(symbolTable.hasReservedWordPrefix(currentWord)) {
 					isPrefix = true;
 				}
-
-				// TODO: Add else if to check for line delimiter
-				//			If doesnt exist, add to current word and reset char
-				//			If it does, do normal else statement
-/*
-				else if(!this.charToBreakOn.test(currentChar)) {
-
-					Logger.log("\"" + currentChar + "\" is not a char we break on");
-					currentToken = new Token();
-				}
-*/
 
 				else {
 
@@ -376,9 +443,64 @@ module Compiler {
 				{regex: /^[\s|\n]$/, type: TokenType.T_WHITE_SPACE},
 			];
 
-			this.charToBreakOn = /^[\s\n\{\}\(\_\)\$0-9!=+]$/;
+			this.delimiterChars = /^[\{\}\(\_\)\$\"0-9!=+]$/;
+		}
+
+		private static splitCodeOnSpaces(inputCode: string): string [] {
+
+			var currentWord: string = "";
+			var charIndex: number = 0;
+
+			var splitCodeList: string [] = [];
+
+			var stringMode: boolean = false;
+			var whitespaceRegex: RegExp = /[\s\n]+/;
+
+			while(charIndex !== inputCode.length) {
+
+				var currentChar: string = inputCode.charAt(charIndex);
+				charIndex++;
+
+				if(!whitespaceRegex.test(currentChar)) {
+					currentWord += currentChar;
+				}
+
+				// Whitespace
+				else {
+
+					if(stringMode) {
+						currentWord += currentChar;
+					}
+
+					else if(currentWord.length > 0) {
+
+						splitCodeList.push(currentWord);
+						currentWord = "";
+					}
+				}
+
+				if(currentChar === "\"") {
+					stringMode = stringMode ? false : true;
+				}
+
+
+				// Last char
+				if(charIndex === inputCode.length) {
+
+					if(currentWord.length > 0) {
+
+						Logger.log("Submitting " + currentWord);
+						splitCodeList.push(currentWord);
+						currentWord = "";
+					}
+				}
+
+			}
+
+			return splitCodeList;
 		}
 	}
+
 
 	class TokenMatch {
 
