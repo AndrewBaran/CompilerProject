@@ -244,8 +244,8 @@ var Compiler;
                     break;
 
                 case 2 /* T_LPAREN */:
-                case 24 /* T_TRUE */:
-                case 23 /* T_FALSE */:
+                case 25 /* T_TRUE */:
+                case 24 /* T_FALSE */:
                     this.parseBooleanExpression();
                     break;
 
@@ -339,13 +339,13 @@ var Compiler;
 
                     break;
 
-                case 24 /* T_TRUE */:
+                case 25 /* T_TRUE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a true!");
 
                     break;
 
-                case 23 /* T_FALSE */:
+                case 24 /* T_FALSE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a false!");
 
@@ -415,7 +415,7 @@ var Compiler;
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a string character");
 
-            if (token.getType() === 13 /* T_CHAR */ || token.getType() === 25 /* T_WHITE_SPACE */) {
+            if (token.getType() === 13 /* T_CHAR */ || token.getType() === 26 /* T_WHITE_SPACE */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a string character!");
 

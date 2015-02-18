@@ -3,24 +3,6 @@ var Compiler;
     var Lexer = (function () {
         function Lexer() {
         }
-        /*
-        TODO: Game plan
-        
-        Split inputCode on spaces and newline
-        while loop over each word in the list
-        if word matches regex
-        submit to stream
-        else if word contains delimiter chars
-        Find index of first delimiter
-        make current index substring up to, but not including delimiter
-        add string from delimiter on to list after current index
-        relex the current word
-        else
-        error?
-        
-        Need to combine strings with spaces somehow
-        
-        */
         // TODO: Remove log messages when finished
         // Separates the input code into a list of tokens and returns that list
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
@@ -28,37 +10,26 @@ var Compiler;
 
             Compiler.Logger.log("Performing lexical analysis");
 
-            var currentToken = new Compiler.Token();
-
-            var currentChar = "";
-            var currentWord = "";
-
-            var currentIndex = 0;
-
             var logCurrentLetter = 1;
             var logCurrentLine = 1;
             var logWarningCount = 0;
 
-            var isPrefix = false;
-
-            // TODO: Remove above this eventually
             var tokenList = [];
 
             var stringMode = false;
             var eofFound = false;
+            var delimiterFound = false;
+
+            var currentWord = "";
+            var wordIndex = 0;
 
             var splitCodeList = this.splitCodeOnSpaces(inputCode);
 
-            var delimiterFound = false;
-
-            var word = "";
-            var wordIndex = 0;
-
             while (wordIndex !== splitCodeList.length) {
-                word = splitCodeList[wordIndex];
+                currentWord = splitCodeList[wordIndex];
 
-                for (var charIndex = 0; charIndex !== word.length && word.length !== 1; charIndex++) {
-                    var currentChar = word.charAt(charIndex);
+                for (var charIndex = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
+                    var currentChar = currentWord.charAt(charIndex);
 
                     if (this.delimiterChars.test(currentChar)) {
                         if (currentChar === "\"") {
@@ -76,8 +47,8 @@ var Compiler;
                             afterIndex = charIndex;
                         }
 
-                        var subStringBefore = word.substring(0, beforeIndex);
-                        var subStringAfter = word.substring(afterIndex, word.length);
+                        var subStringBefore = currentWord.substring(0, beforeIndex);
+                        var subStringAfter = currentWord.substring(afterIndex, currentWord.length);
 
                         if (subStringBefore.length !== 0) {
                             splitCodeList[wordIndex] = subStringBefore;
@@ -92,7 +63,7 @@ var Compiler;
                         break;
                     } else if (stringMode) {
                         var subStringBefore = currentChar;
-                        var subStringAfter = word.substring(1, word.length);
+                        var subStringAfter = currentWord.substring(1, currentWord.length);
 
                         if (subStringBefore.length !== 0) {
                             splitCodeList[wordIndex] = subStringBefore;
@@ -127,33 +98,80 @@ var Compiler;
 
             stringMode = false;
 
-            // TODO: Make it so you can combine words (ex: ! and =, = and =)
+            // TODO: Check for invalid string chars
             // Tokenize the individual elements of the split up code now
             var listIndex = 0;
 
-            while (listIndex !== splitCodeList.length) {
-                word = splitCodeList[listIndex];
+            while (listIndex !== splitCodeList.length && !eofFound) {
+                currentWord = splitCodeList[listIndex];
 
-                var tokenMatched = this.matchesTokenPattern(word);
+                var tokenMatched = this.matchesTokenPattern(currentWord);
 
                 if (tokenMatched.isMatch) {
                     var token = tokenMatched.token;
 
-                    if (token.getType() === 6 /* T_QUOTE */) {
-                        stringMode = stringMode ? false : true;
+                    switch (token.getType()) {
+                        case 6 /* T_QUOTE */:
+                            stringMode = stringMode ? false : true;
+                            break;
+
+                        case 8 /* T_EOF */:
+                            eofFound = true;
+                            break;
+
+                        case 12 /* T_ID */:
+                            // T_ID and T_CHAR share same regex, so swap on the spot
+                            if (stringMode) {
+                                token.setType(13 /* T_CHAR */);
+                            }
+
+                            break;
+
+                        case 20 /* T_SINGLE_EQUALS */:
+                            // Check if next index is a single equals
+                            var nextCodeSegment = splitCodeList[listIndex + 1];
+                            currentWord += nextCodeSegment;
+
+                            tokenMatched = this.matchesTokenPattern(currentWord);
+
+                            // Submit double equals
+                            if (tokenMatched.isMatch) {
+                                token = tokenMatched.token;
+                                listIndex++;
+                            } else {
+                                // TODO: This is only for debugging
+                                currentWord = splitCodeList[listIndex];
+                            }
+
+                            break;
+
+                        case 23 /* T_EXCLAMATION_POINT */:
+                            // Check if next index is a single equals
+                            var nextCodeSegment = splitCodeList[listIndex + 1];
+                            currentWord += nextCodeSegment;
+
+                            tokenMatched = this.matchesTokenPattern(currentWord);
+
+                            if (tokenMatched.isMatch && tokenMatched.token.getType() === 22 /* T_NOT_EQUALS */) {
+                                token = tokenMatched.token;
+                                listIndex++;
+                            } else {
+                                var errorMessage = "Error! " + currentWord + " is not a valid lexeme.";
+
+                                Compiler.Logger.log(errorMessage);
+                                throw errorMessage;
+                            }
+
+                            break;
                     }
 
-                    // T_ID and T_CHAR share same regex, so swap on the spot
-                    if (stringMode && token.getType() === 12 /* T_ID */) {
-                        token.setType(13 /* T_CHAR */);
-                    }
-
-                    Compiler.Logger.log(word + " matched a regex");
-                    Compiler.Logger.log("Type was " + tokenMatched.token.getTokenName());
+                    // TODO: Remove after debugging
+                    Compiler.Logger.log(currentWord + " matched a regex");
+                    Compiler.Logger.log("Type was " + token.getTokenName());
 
                     tokenList.push(token);
                 } else {
-                    var errorMessage = "Error! " + word + " is not a valid lexeme.";
+                    var errorMessage = "Error! " + currentWord + " is not a valid lexeme.";
 
                     Compiler.Logger.log(errorMessage);
                     throw errorMessage;
@@ -162,144 +180,11 @@ var Compiler;
                 listIndex++;
             }
 
-            return tokenList;
-
-            while (currentIndex != inputCode.length && !eofFound) {
-                currentChar = inputCode[currentIndex];
-                currentIndex++;
-
-                currentWord += currentChar;
-
-                // Attempt to find match for token
-                var tokenMatched = this.matchesTokenPattern(currentWord);
-
-                // Disregard old token if new match was found
-                if (tokenMatched.token.getType() !== 0 /* T_NO_MATCH */) {
-                    currentToken = tokenMatched.token;
-                }
-
-                if (tokenMatched.isMatch) {
-                    Compiler.Logger.log("Token found: " + currentToken.getTokenName());
-
-                    if (currentToken.getType() === 6 /* T_QUOTE */) {
-                        if (!stringMode) {
-                            stringMode = true;
-
-                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
-                            tokenList.push(currentToken);
-
-                            currentToken = new Compiler.Token();
-                            currentWord = "";
-                        } else {
-                            stringMode = false;
-                        }
-                    }
-
-                    if (stringMode && currentToken.getType() !== 1 /* T_DEFAULT */) {
-                        // T_ID shares same regex as T_CHAR, so convert on the spot
-                        if (currentToken.getType() === 12 /* T_ID */) {
-                            currentToken.setType(13 /* T_CHAR */);
-                        }
-
-                        if (currentToken.getType() === 13 /* T_CHAR */) {
-                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
-                            tokenList.push(currentToken);
-                        } else if (currentToken.getType() === 25 /* T_WHITE_SPACE */ && currentToken.getValue() === " ") {
-                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
-                            tokenList.push(currentToken);
-                        } else {
-                            var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid string character";
-
-                            Compiler.Logger.log(errorMessage);
-                            throw errorMessage;
-                        }
-
-                        currentToken = new Compiler.Token();
-                        currentWord = "";
-                    }
-
-                    isPrefix = false;
-                } else if (symbolTable.hasReservedWordPrefix(currentWord)) {
-                    isPrefix = true;
-                } else {
-                    if (currentToken.getType() !== 1 /* T_DEFAULT */) {
-                        if (currentToken.getType() === 8 /* T_EOF */) {
-                            eofFound = true;
-                        }
-
-                        // Discard whitespace tokens
-                        if (currentToken.getType() !== 25 /* T_WHITE_SPACE */ && !isPrefix) {
-                            Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
-                            tokenList.push(currentToken);
-
-                            // TODO: Remove when doing project 2?
-                            if (currentToken.getType() === 12 /* T_ID */) {
-                                Compiler.Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
-                                symbolTable.insert(currentToken);
-                            }
-                        }
-
-                        currentWord = "";
-                        currentToken = new Compiler.Token();
-
-                        // Back up and re-lex the current character
-                        currentIndex--;
-                        logCurrentLetter--;
-
-                        if (currentChar === "\n") {
-                            logCurrentLine--;
-                        }
-
-                        isPrefix = false;
-                    } else {
-                        var errorMessage = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
-
-                        Compiler.Logger.log(errorMessage);
-                        throw errorMessage;
-                    }
-                }
-
-                // Final token processing
-                if (currentIndex === inputCode.length) {
-                    if (currentToken.getType() !== 1 /* T_DEFAULT */ && currentToken.getType() !== 25 /* T_WHITE_SPACE */ && !isPrefix) {
-                        // Disregard prefixes
-                        Compiler.Logger.log("Producing token: " + currentToken.getTokenName());
-                        tokenList.push(currentToken);
-                    }
-
-                    if (currentToken.getType() === 8 /* T_EOF */) {
-                        eofFound = true;
-                    }
-                }
-
-                logCurrentLetter++;
-
-                if (currentChar === "\n") {
-                    logCurrentLine++;
-                    logCurrentLetter = 0;
-                }
-            }
-
             if (eofFound) {
-                var whitespaceRegex = /[\s|\n]/;
-                var indexAfterEOF = inputCode.indexOf("$") + 1;
-
-                for (currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
-                    currentChar = inputCode[currentIndex];
-
-                    if (!(whitespaceRegex.test(currentChar))) {
-                        Compiler.Logger.log("Warning on line " + logCurrentLine + ", character " + logCurrentLetter + ": Input found after EOF character");
-                        logWarningCount++;
-
-                        break;
-                    }
-
-                    logCurrentLetter++;
-
-                    if (currentChar === "\n") {
-                        logCurrentLetter = 0;
-                        logCurrentLine++;
-                    }
+                // EOF should be last index in code list
+                if (listIndex !== splitCodeList.length) {
+                    Compiler.Logger.log("Warning! Input found after EOF character");
+                    logWarningCount++;
                 }
             } else {
                 Compiler.Logger.log("Warning! EOF character was not found. Adding it to the list");
@@ -307,6 +192,7 @@ var Compiler;
 
                 var eofToken = new Compiler.Token();
                 eofToken.setType(8 /* T_EOF */);
+                eofToken.setValue("$");
 
                 tokenList.push(eofToken);
             }
@@ -317,7 +203,6 @@ var Compiler;
         };
 
         // Looks for a regex match for the word, and if it does, produces a token of the type to be returned
-        // in the currentToken formal parameter
         Lexer.matchesTokenPattern = function (currentWord) {
             var returnTokenMatch = new TokenMatch();
             var patternMatched = false;
@@ -334,6 +219,8 @@ var Compiler;
                     currentToken.setValue(currentWord);
 
                     returnTokenMatch.token = currentToken;
+
+                    break;
                 }
             }
 
@@ -345,8 +232,8 @@ var Compiler;
             this.tokenPatterns = [
                 { regex: /^while$/, type: 9 /* T_WHILE */ },
                 { regex: /^if$/, type: 10 /* T_IF */ },
-                { regex: /^true$/, type: 24 /* T_TRUE */ },
-                { regex: /^false$/, type: 23 /* T_FALSE */ },
+                { regex: /^true$/, type: 25 /* T_TRUE */ },
+                { regex: /^false$/, type: 24 /* T_FALSE */ },
                 { regex: /^int$/, type: 17 /* T_INT */ },
                 { regex: /^string$/, type: 18 /* T_STRING */ },
                 { regex: /^boolean$/, type: 19 /* T_BOOLEAN */ },
@@ -363,12 +250,14 @@ var Compiler;
                 { regex: /^=$/, type: 20 /* T_SINGLE_EQUALS */ },
                 { regex: /^==$/, type: 21 /* T_DOUBLE_EQUALS */ },
                 { regex: /^!=$/, type: 22 /* T_NOT_EQUALS */ },
-                { regex: /^[\s|\n]$/, type: 25 /* T_WHITE_SPACE */ }
+                { regex: /^!$/, type: 23 /* T_EXCLAMATION_POINT */ },
+                { regex: /^[\s|\n]$/, type: 26 /* T_WHITE_SPACE */ }
             ];
 
-            this.delimiterChars = /^[\{\}\(\_\)\$\"0-9!=+]$/;
+            this.delimiterChars = /^[\{\}\(\_\)\$\"!=+]$/;
         };
 
+        // Preserves spaces within strings
         Lexer.splitCodeOnSpaces = function (inputCode) {
             var currentWord = "";
             var charIndex = 0;
@@ -400,7 +289,6 @@ var Compiler;
                 // Last char
                 if (charIndex === inputCode.length) {
                     if (currentWord.length > 0) {
-                        Compiler.Logger.log("Submitting " + currentWord);
                         splitCodeList.push(currentWord);
                         currentWord = "";
                     }

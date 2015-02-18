@@ -60,6 +60,7 @@ enum TokenType {
 	T_SINGLE_EQUALS, // =
 	T_DOUBLE_EQUALS, // ==
 	T_NOT_EQUALS, // !=
+	T_EXCLAMATION_POINT, // !
 	T_FALSE, // false
 	T_TRUE, // true
 	T_WHITE_SPACE

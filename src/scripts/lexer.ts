@@ -6,25 +6,6 @@ module Compiler {
 		private static tokenPatterns;
 		private static delimiterChars: RegExp;
 
-		/*
-			TODO: Game plan
-
-			Split inputCode on spaces and newline
-			while loop over each word in the list
-			if word matches regex
-				submit to stream
-			else if word contains delimiter chars
-				Find index of first delimiter
-				make current index substring up to, but not including delimiter
-				add string from delimiter on to list after current index
-				relex the current word
-			else
-				error?
-
-			Need to combine strings with spaces somehow
-
-		*/
-
 		// TODO: Remove log messages when finished
 		// Separates the input code into a list of tokens and returns that list
 		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
@@ -33,43 +14,29 @@ module Compiler {
 
 			Logger.log("Performing lexical analysis");
 
-			var currentToken: Token = new Token();
-
-			var currentChar: string = "";
-			var currentWord: string = "";
-
-			var currentIndex: number = 0;
-
 			var logCurrentLetter: number = 1;
 			var logCurrentLine: number = 1;
 			var logWarningCount: number = 0;
 
-			var isPrefix: boolean = false;
-
-
-			// TODO: Remove above this eventually
-
-
-			var tokenList: Token[] = [];
+			var tokenList: Token [] = [];
 
 			var stringMode: boolean = false;
 			var eofFound: boolean = false;
-
-			var splitCodeList: string [] = this.splitCodeOnSpaces(inputCode);
-
 			var delimiterFound: boolean = false;
 
-			var word: string = "";
+			var currentWord: string = "";
 			var wordIndex: number = 0;
+
+			var splitCodeList: string [] = this.splitCodeOnSpaces(inputCode);
 
 			// Further split the code on delimiters
 			while(wordIndex !== splitCodeList.length) {
 
-				word = splitCodeList[wordIndex];
+				currentWord = splitCodeList[wordIndex];
 
-				for(var charIndex: number = 0; charIndex !== word.length && word.length !== 1; charIndex++) {
+				for(var charIndex: number = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
 
-					var currentChar: string = word.charAt(charIndex);
+					var currentChar: string = currentWord.charAt(charIndex);
 
 					if(this.delimiterChars.test(currentChar)) {
 
@@ -93,8 +60,8 @@ module Compiler {
 							afterIndex = charIndex;
 						}
 
-						var subStringBefore: string = word.substring(0, beforeIndex);
-						var subStringAfter: string = word.substring(afterIndex, word.length);
+						var subStringBefore: string = currentWord.substring(0, beforeIndex);
+						var subStringAfter: string = currentWord.substring(afterIndex, currentWord.length);
 
 						if(subStringBefore.length !== 0) {
 
@@ -115,7 +82,7 @@ module Compiler {
 					else if(stringMode) {
 
 						var subStringBefore: string = currentChar;
-						var subStringAfter: string = word.substring(1, word.length);
+						var subStringAfter: string = currentWord.substring(1, currentWord.length);
 
 						if(subStringBefore.length !== 0) {
 
@@ -153,39 +120,101 @@ module Compiler {
 
 			stringMode = false;
 
-			// TODO: Make it so you can combine words (ex: ! and =, = and =)
+			// TODO: Check for invalid string chars
 			// Tokenize the individual elements of the split up code now
 			var listIndex: number = 0;
 
-			while(listIndex !== splitCodeList.length) {
+			while(listIndex !== splitCodeList.length && !eofFound) {
 
-				word = splitCodeList[listIndex];
+				currentWord = splitCodeList[listIndex];
 
-				var tokenMatched: TokenMatch = this.matchesTokenPattern(word);
+				var tokenMatched: TokenMatch = this.matchesTokenPattern(currentWord);
 
 				if(tokenMatched.isMatch) {
 
 					var token: Token = tokenMatched.token;
 
-					if(token.getType() === TokenType.T_QUOTE) {
+					switch(token.getType()) {
 
-						stringMode = stringMode ? false : true;
+						case TokenType.T_QUOTE:
+
+							stringMode = stringMode ? false : true;
+							break;
+
+						case TokenType.T_EOF:
+
+							eofFound = true;
+							break;
+
+						case TokenType.T_ID:
+
+							// T_ID and T_CHAR share same regex, so swap on the spot
+							if(stringMode) {
+								token.setType(TokenType.T_CHAR);
+							}
+
+							break;
+
+						// TODO: Do case where there is no next element
+						case TokenType.T_SINGLE_EQUALS:
+
+							// Check if next index is a single equals
+							var nextCodeSegment: string = splitCodeList[listIndex + 1];
+							currentWord += nextCodeSegment;
+
+							tokenMatched = this.matchesTokenPattern(currentWord);
+
+							// Submit double equals
+							if(tokenMatched.isMatch) {
+
+								token = tokenMatched.token;
+								listIndex++;
+							}
+
+							// Submit single equals
+							else {
+
+								// TODO: This is only for debugging
+								currentWord = splitCodeList[listIndex];
+							}
+
+							break;
+
+						case TokenType.T_EXCLAMATION_POINT:
+
+							// Check if next index is a single equals
+							var nextCodeSegment: string = splitCodeList[listIndex + 1];
+							currentWord += nextCodeSegment;
+
+							tokenMatched = this.matchesTokenPattern(currentWord);
+
+							if(tokenMatched.isMatch && tokenMatched.token.getType() === TokenType.T_NOT_EQUALS) {
+
+								token = tokenMatched.token;
+								listIndex++;
+							}
+
+							else {
+
+								var errorMessage: string = "Error! " + currentWord + " is not a valid lexeme.";
+
+								Logger.log(errorMessage);
+								throw errorMessage;
+							}
+
+							break;
 					}
 
-					// T_ID and T_CHAR share same regex, so swap on the spot
-					if(stringMode && token.getType() === TokenType.T_ID) {
-						token.setType(TokenType.T_CHAR);
-					}
-
-					Logger.log(word + " matched a regex");
-					Logger.log("Type was " + tokenMatched.token.getTokenName());
+					// TODO: Remove after debugging
+					Logger.log(currentWord + " matched a regex");
+					Logger.log("Type was " + token.getTokenName());
 
 					tokenList.push(token);
 				}
 
 				else {
 
-					var errorMessage: string = "Error! " + word + " is not a valid lexeme.";
+					var errorMessage: string = "Error! " + currentWord + " is not a valid lexeme.";
 
 					Logger.log(errorMessage);
 					throw errorMessage;
@@ -194,181 +223,14 @@ module Compiler {
 				listIndex++;
 			}
 
-			return tokenList;
-
-
-			// TODO: Delete rest of method once new version implemented
-
-			// Lex the code
-			while(currentIndex != inputCode.length && !eofFound) {
-
-				currentChar = inputCode[currentIndex];
-				currentIndex++;
-
-				currentWord += currentChar;
-
-				// Attempt to find match for token
-				var tokenMatched: TokenMatch = this.matchesTokenPattern(currentWord);
-
-				// Disregard old token if new match was found 
-				if(tokenMatched.token.getType() !== TokenType.T_NO_MATCH) {
-					currentToken = tokenMatched.token;
-				}
-
-				if(tokenMatched.isMatch) {
-
-					Logger.log("Token found: " + currentToken.getTokenName());
-
-					if(currentToken.getType() === TokenType.T_QUOTE) {
-
-						if(!stringMode) {
-
-							stringMode = true;
-
-							Logger.log("Producing token: " + currentToken.getTokenName());
-							tokenList.push(currentToken);
-
-							currentToken = new Token();
-							currentWord = "";
-						}
-
-						else {
-
-							stringMode = false;
-						}
-					}
-
-					if(stringMode && currentToken.getType() !== TokenType.T_DEFAULT) {
-
-						// T_ID shares same regex as T_CHAR, so convert on the spot
-						if(currentToken.getType() === TokenType.T_ID) {
-							currentToken.setType(TokenType.T_CHAR);
-						}
-
-						if(currentToken.getType() === TokenType.T_CHAR) {
-
-							Logger.log("Producing token: " + currentToken.getTokenName());
-							tokenList.push(currentToken);
-						}
-
-						else if(currentToken.getType() === TokenType.T_WHITE_SPACE && currentToken.getValue() === " ") {
-
-							Logger.log("Producing token: " + currentToken.getTokenName());
-							tokenList.push(currentToken);
-						}
-
-						else {
-
-							var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid string character";
-
-							Logger.log(errorMessage);
-							throw errorMessage;
-						}
-
-						currentToken = new Token();
-						currentWord = "";
-					}
-
-					isPrefix = false;
-				}
-
-				else if(symbolTable.hasReservedWordPrefix(currentWord)) {
-					isPrefix = true;
-				}
-
-				else {
-
-					if(currentToken.getType() !== TokenType.T_DEFAULT) {
-
-						if(currentToken.getType() === TokenType.T_EOF) {
-							eofFound = true;
-						}
-
-						// Discard whitespace tokens
-						if(currentToken.getType() !== TokenType.T_WHITE_SPACE && !isPrefix) {
-
-							Logger.log("Producing token: " + currentToken.getTokenName());
-							tokenList.push(currentToken);
-
-							// TODO: Remove when doing project 2?
-							if(currentToken.getType() === TokenType.T_ID) {
-
-								Logger.log("Adding " + currentToken.getTokenName() + " to the symbol table");
-								symbolTable.insert(currentToken);
-							}
-						}
-
-						currentWord = "";
-						currentToken = new Token();
-
-						// Back up and re-lex the current character
-						currentIndex--;
-						logCurrentLetter--;
-
-						if(currentChar === "\n") {
-							logCurrentLine--;
-						}
-
-						isPrefix = false;
-					}
-
-					// Not a valid lexeme 
-					else {
-
-						var errorMessage: string = "Error on line " + logCurrentLine + ", character " + logCurrentLetter + ": " + currentWord + " is a not valid lexeme";
-
-						Logger.log(errorMessage);
-						throw errorMessage;
-					}
-				}
-
-				// Final token processing
-				if(currentIndex === inputCode.length) {
-
-					if(currentToken.getType() !== TokenType.T_DEFAULT && currentToken.getType() !== TokenType.T_WHITE_SPACE && !isPrefix) {
-
-						// Disregard prefixes
-						Logger.log("Producing token: " + currentToken.getTokenName());
-						tokenList.push(currentToken);
-					}
-
-					if(currentToken.getType() === TokenType.T_EOF) {
-						eofFound = true;
-					}
-				}
-
-				logCurrentLetter++;
-
-				if(currentChar === "\n") {
-
-					logCurrentLine++;
-					logCurrentLetter = 0;
-				}
-			}
 
 			if(eofFound) {
 
-				var whitespaceRegex: RegExp = /[\s|\n]/;
-				var indexAfterEOF: number = inputCode.indexOf("$") + 1;
+				// EOF should be last index in code list
+				if(listIndex !== splitCodeList.length) {
 
-				for(currentIndex = indexAfterEOF; currentIndex < inputCode.length; currentIndex++) {
-
-					currentChar = inputCode[currentIndex];
-
-					if(!(whitespaceRegex.test(currentChar))) {
-
-						Logger.log("Warning on line " + logCurrentLine + ", character " + logCurrentLetter + ": Input found after EOF character");
-						logWarningCount++;
-
-						break;
-					}
-
-					logCurrentLetter++;
-
-					if(currentChar === "\n") {
-						logCurrentLetter = 0;
-						logCurrentLine++;
-					}
+					Logger.log("Warning! Input found after EOF character");
+					logWarningCount++;
 				}
 			}
 
@@ -379,6 +241,7 @@ module Compiler {
 
 				var eofToken: Token = new Token();
 				eofToken.setType(TokenType.T_EOF);
+				eofToken.setValue("$");
 
 				tokenList.push(eofToken);
 			}
@@ -389,13 +252,11 @@ module Compiler {
 		}
 
 		// Looks for a regex match for the word, and if it does, produces a token of the type to be returned
-		// in the currentToken formal parameter
 		private static matchesTokenPattern(currentWord: string): TokenMatch {
 
 			var returnTokenMatch: TokenMatch = new TokenMatch();
 			var patternMatched: boolean = false;
 
-			// Check if currentWord matches any regex for a token
 			for(var i: number = 0; i < this.tokenPatterns.length && !patternMatched; i++) {
 
 				var tokenRegex: RegExp = this.tokenPatterns[i].regex;
@@ -410,6 +271,8 @@ module Compiler {
 					currentToken.setValue(currentWord);
 
 					returnTokenMatch.token = currentToken;
+
+					break;
 				}
 			}
 
@@ -440,12 +303,14 @@ module Compiler {
 				{regex: /^=$/, type: TokenType.T_SINGLE_EQUALS},
 				{regex: /^==$/, type: TokenType.T_DOUBLE_EQUALS},
 				{regex: /^!=$/, type: TokenType.T_NOT_EQUALS},
-				{regex: /^[\s|\n]$/, type: TokenType.T_WHITE_SPACE},
+				{regex: /^!$/, type: TokenType.T_EXCLAMATION_POINT},
+				{regex: /^[\s|\n]$/, type: TokenType.T_WHITE_SPACE}
 			];
 
-			this.delimiterChars = /^[\{\}\(\_\)\$\"0-9!=+]$/;
+			this.delimiterChars = /^[\{\}\(\_\)\$\"!=+]$/;
 		}
 
+		// Preserves spaces within strings
 		private static splitCodeOnSpaces(inputCode: string): string [] {
 
 			var currentWord: string = "";
@@ -465,7 +330,6 @@ module Compiler {
 					currentWord += currentChar;
 				}
 
-				// Whitespace
 				else {
 
 					if(stringMode) {
@@ -483,13 +347,11 @@ module Compiler {
 					stringMode = stringMode ? false : true;
 				}
 
-
 				// Last char
 				if(charIndex === inputCode.length) {
 
 					if(currentWord.length > 0) {
 
-						Logger.log("Submitting " + currentWord);
 						splitCodeList.push(currentWord);
 						currentWord = "";
 					}
