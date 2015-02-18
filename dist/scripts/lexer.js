@@ -173,6 +173,7 @@ var Compiler;
             return returnTokenMatch;
         };
 
+        // Associate each regex with corresponding token
         Lexer.setupTokenPatterns = function () {
             this.tokenPatterns = [
                 { regex: /^while$/, type: 9 /* T_WHILE */ },

@@ -2,7 +2,6 @@ module Compiler {
 	
 	export class Lexer {
 
-		// TODO: Give this a type eventually
 		private static tokenPatterns;
 		private static delimiterChars: RegExp;
 
@@ -214,6 +213,7 @@ module Compiler {
 
 		} // matchesTokenPattern()
 
+		// Associate each regex with corresponding token
 		private static setupTokenPatterns(): void {
 
 			this.tokenPatterns = [
