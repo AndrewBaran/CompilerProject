@@ -1,13 +1,56 @@
 Andrew Baran
 Professor Labouseur
 Design of Compilers
-February 15, 2015
+February 18, 2015
 
-Lab 2:
+Lab 4:
 
 Crafting a Compiler:
 
 8.1:
+	Binary Search Tree:
+		Advantage:
+			Each node is a stack of scopes declaring that name, so searching for the appropriate scope level is quick
+			Easy to implement
+			
+		Disadvantage:
+			O(log n) access time at best
+			O(n) access time at worst
+			Additional memory used linking each parent with its children
+				No correlation should exist between nodes, so it's a waste
+
+	Hash table:
+		Advantage:
+			O(1) insertion and retrieval times usually
+			Easy to implement, as it is just an array
+		Disadvantage:
+			O(n) retrieval time when everything hashes to one location / bucket
+			Hard to pick a perfect hash function to reduce collisions
+			Implementations that use a hash table per scope means more time spent searching for a given element
+
 
 8.3:
+	Two alternative approaches to handling multiple scopes in a symbol table are:
+		All scopes in one symbol table:
+			Each entry in the symbol table has a field that has its scope and a link to its ancestor declaration (declaration of the same ID in a containing scope). When looking up for the declaration to use, you can follow the chain of ancestoral links until you find what you want
+	
+			To open scope:
+				Find start of block
+				Increment currentScopeLevel
 
+			To close scope:
+				Find end of block
+				Decrement currentScopeLevel
+
+		One symbol table per scope:
+
+			For each new scope that is entered, a new symbol table will be created an placed at the top of a stack containing symbol tables. Thus, the nearest / most local scope is the one at the top of the stack. To find a declaration, you will look through the stack from the top through each symbol table until you find the declaration.
+
+			To open scope:
+				Find start of a block
+				Create new symbolTable
+				Push symbolTable onto stack
+
+			To close scope:
+				Find end of a block
+				Pop the symbolTable at the top of the stack off
