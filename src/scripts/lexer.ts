@@ -22,103 +22,19 @@ module Compiler {
 
 			var stringMode: boolean = false;
 			var eofFound: boolean = false;
-			var delimiterFound: boolean = false;
 
 			var currentWord: string = "";
-			var wordIndex: number = 0;
 
+			// Split source code into token-looking fragments
 			var splitCodeList: string [] = this.splitCodeOnSpaces(inputCode);
-
-			// Further split the code on delimiters
-			while(wordIndex !== splitCodeList.length) {
-
-				currentWord = splitCodeList[wordIndex];
-
-				for(var charIndex: number = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
-
-					var currentChar: string = currentWord.charAt(charIndex);
-
-					if(this.delimiterChars.test(currentChar)) {
-
-						if(currentChar === "\"") {
-
-							stringMode = stringMode ? false : true;
-						}
-
-						var beforeIndex: number = 0;
-						var afterIndex: number = 0;
-
-						// Special case: extract first char of the string
-						if(charIndex === 0) {
-
-							beforeIndex = afterIndex = charIndex + 1;
-						}
-
-						else {
-
-							beforeIndex = charIndex;
-							afterIndex = charIndex;
-						}
-
-						var subStringBefore: string = currentWord.substring(0, beforeIndex);
-						var subStringAfter: string = currentWord.substring(afterIndex, currentWord.length);
-
-						if(subStringBefore.length !== 0) {
-
-							splitCodeList[wordIndex] = subStringBefore;
-						}
-
-						// Insert substring after current index
-						if(subStringAfter.length !== 0) {
-
-							splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
-						}
-
-						delimiterFound = true;
-						break;
-
-					}
-
-					else if(stringMode) {
-
-						var subStringBefore: string = currentChar;
-						var subStringAfter: string = currentWord.substring(1, currentWord.length);
-
-						if(subStringBefore.length !== 0) {
-
-							splitCodeList[wordIndex] = subStringBefore;
-						}
-
-						// Insert substring after current index
-						if(subStringAfter.length !== 0) {
-
-							splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
-						}
-
-						delimiterFound = true;
-						break;
-					}
-				}
-
-				if(!delimiterFound) {
-					wordIndex++;
-				}
-
-				delimiterFound = false;
-			}
+			splitCodeList = this.splitCodeOnDelimiters(splitCodeList);
 
 			// TODO: Remove eventually
 			Logger.log("Code fragments: ");
+			
 			for(var i: number = 0; i < splitCodeList.length; i++) {
-
 				Logger.log("[" + i + "] = " + splitCodeList[i]);
-
-				if(splitCodeList[i] === "\n" || splitCodeList[i] === " ") {
-					Logger.log("Whitespace");
-				}
 			}
-
-			stringMode = false;
 
 			// TODO: Check for invalid string chars
 			// Tokenize the individual elements of the split up code now
@@ -171,10 +87,9 @@ module Compiler {
 								listIndex++;
 							}
 
+							// TODO: This is only for debugging
 							// Submit single equals
 							else {
-
-								// TODO: This is only for debugging
 								currentWord = splitCodeList[listIndex];
 							}
 
@@ -226,7 +141,7 @@ module Compiler {
 
 			if(eofFound) {
 
-				// EOF should be last index in code list
+				// EOF should be last element in code list
 				if(listIndex !== splitCodeList.length) {
 
 					Logger.log("Warning! Input found after EOF character");
@@ -249,7 +164,8 @@ module Compiler {
 			Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");
 
 			return tokenList;
-		}
+
+		} // tokenizeCode()
 
 		// Looks for a regex match for the word, and if it does, produces a token of the type to be returned
 		private static matchesTokenPattern(currentWord: string): TokenMatch {
@@ -278,7 +194,8 @@ module Compiler {
 
 			returnTokenMatch.isMatch = patternMatched;
 			return returnTokenMatch;
-		}
+
+		} // matchesTokenPattern()
 
 		private static setupTokenPatterns(): void {
 
@@ -308,7 +225,8 @@ module Compiler {
 			];
 
 			this.delimiterChars = /^[\{\}\(\_\)\$\"!=+]$/;
-		}
+
+		} // setupTokenPatterns()
 
 		// Preserves spaces within strings
 		private static splitCodeOnSpaces(inputCode: string): string [] {
@@ -360,8 +278,91 @@ module Compiler {
 			}
 
 			return splitCodeList;
-		}
-	}
+
+		} // splitCodeOnSpaces()
+
+		private static splitCodeOnDelimiters(splitCodeList: string []): string [] {
+
+			var stringMode: boolean = false;
+			var delimiterFound: boolean = false;
+
+			var currentWord: string = "";
+			var wordIndex: number = 0
+
+			while(wordIndex !== splitCodeList.length) {
+
+				currentWord = splitCodeList[wordIndex];
+
+				for(var charIndex: number = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
+
+					var currentChar: string = currentWord.charAt(charIndex);
+
+					if(this.delimiterChars.test(currentChar)) {
+
+						if(currentChar === "\"") {
+							stringMode = stringMode ? false : true;
+						}
+
+						var beforeIndex: number = 0;
+						var afterIndex: number = 0;
+
+						// Special case: extract first char of the string
+						if(charIndex === 0) {
+							beforeIndex = afterIndex = charIndex + 1;
+						}
+
+						else {
+							beforeIndex = afterIndex = charIndex;
+						}
+
+						var subStringBefore: string = currentWord.substring(0, beforeIndex);
+						var subStringAfter: string = currentWord.substring(afterIndex, currentWord.length);
+
+						if(subStringBefore.length !== 0) {
+							splitCodeList[wordIndex] = subStringBefore;
+						}
+
+						// Insert substring after current index
+						if(subStringAfter.length !== 0) {
+							splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+						}
+
+						delimiterFound = true;
+						break;
+
+					}
+
+					else if(stringMode) {
+
+						var subStringBefore: string = currentChar;
+						var subStringAfter: string = currentWord.substring(1, currentWord.length);
+
+						if(subStringBefore.length !== 0) {
+							splitCodeList[wordIndex] = subStringBefore;
+						}
+
+						// Insert substring after current index
+						if(subStringAfter.length !== 0) {
+							splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+						}
+
+						delimiterFound = true;
+						break;
+					}
+				}
+
+				if(!delimiterFound) {
+					wordIndex++;
+				}
+
+				delimiterFound = false;
+			}
+
+			return splitCodeList;
+
+		} // splitCodeOnDelimiters()
+
+	} // Lexer
 
 
 	class TokenMatch {

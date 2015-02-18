@@ -18,85 +18,19 @@ var Compiler;
 
             var stringMode = false;
             var eofFound = false;
-            var delimiterFound = false;
 
             var currentWord = "";
-            var wordIndex = 0;
 
+            // Split source code into token-looking fragments
             var splitCodeList = this.splitCodeOnSpaces(inputCode);
-
-            while (wordIndex !== splitCodeList.length) {
-                currentWord = splitCodeList[wordIndex];
-
-                for (var charIndex = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
-                    var currentChar = currentWord.charAt(charIndex);
-
-                    if (this.delimiterChars.test(currentChar)) {
-                        if (currentChar === "\"") {
-                            stringMode = stringMode ? false : true;
-                        }
-
-                        var beforeIndex = 0;
-                        var afterIndex = 0;
-
-                        // Special case: extract first char of the string
-                        if (charIndex === 0) {
-                            beforeIndex = afterIndex = charIndex + 1;
-                        } else {
-                            beforeIndex = charIndex;
-                            afterIndex = charIndex;
-                        }
-
-                        var subStringBefore = currentWord.substring(0, beforeIndex);
-                        var subStringAfter = currentWord.substring(afterIndex, currentWord.length);
-
-                        if (subStringBefore.length !== 0) {
-                            splitCodeList[wordIndex] = subStringBefore;
-                        }
-
-                        // Insert substring after current index
-                        if (subStringAfter.length !== 0) {
-                            splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
-                        }
-
-                        delimiterFound = true;
-                        break;
-                    } else if (stringMode) {
-                        var subStringBefore = currentChar;
-                        var subStringAfter = currentWord.substring(1, currentWord.length);
-
-                        if (subStringBefore.length !== 0) {
-                            splitCodeList[wordIndex] = subStringBefore;
-                        }
-
-                        // Insert substring after current index
-                        if (subStringAfter.length !== 0) {
-                            splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
-                        }
-
-                        delimiterFound = true;
-                        break;
-                    }
-                }
-
-                if (!delimiterFound) {
-                    wordIndex++;
-                }
-
-                delimiterFound = false;
-            }
+            splitCodeList = this.splitCodeOnDelimiters(splitCodeList);
 
             // TODO: Remove eventually
             Compiler.Logger.log("Code fragments: ");
+
             for (var i = 0; i < splitCodeList.length; i++) {
                 Compiler.Logger.log("[" + i + "] = " + splitCodeList[i]);
-
-                if (splitCodeList[i] === "\n" || splitCodeList[i] === " ") {
-                    Compiler.Logger.log("Whitespace");
-                }
             }
-
-            stringMode = false;
 
             // TODO: Check for invalid string chars
             // Tokenize the individual elements of the split up code now
@@ -139,7 +73,6 @@ var Compiler;
                                 token = tokenMatched.token;
                                 listIndex++;
                             } else {
-                                // TODO: This is only for debugging
                                 currentWord = splitCodeList[listIndex];
                             }
 
@@ -181,7 +114,7 @@ var Compiler;
             }
 
             if (eofFound) {
-                // EOF should be last index in code list
+                // EOF should be last element in code list
                 if (listIndex !== splitCodeList.length) {
                     Compiler.Logger.log("Warning! Input found after EOF character");
                     logWarningCount++;
@@ -293,6 +226,76 @@ var Compiler;
                         currentWord = "";
                     }
                 }
+            }
+
+            return splitCodeList;
+        };
+
+        Lexer.splitCodeOnDelimiters = function (splitCodeList) {
+            var stringMode = false;
+            var delimiterFound = false;
+
+            var currentWord = "";
+            var wordIndex = 0;
+
+            while (wordIndex !== splitCodeList.length) {
+                currentWord = splitCodeList[wordIndex];
+
+                for (var charIndex = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
+                    var currentChar = currentWord.charAt(charIndex);
+
+                    if (this.delimiterChars.test(currentChar)) {
+                        if (currentChar === "\"") {
+                            stringMode = stringMode ? false : true;
+                        }
+
+                        var beforeIndex = 0;
+                        var afterIndex = 0;
+
+                        // Special case: extract first char of the string
+                        if (charIndex === 0) {
+                            beforeIndex = afterIndex = charIndex + 1;
+                        } else {
+                            beforeIndex = afterIndex = charIndex;
+                        }
+
+                        var subStringBefore = currentWord.substring(0, beforeIndex);
+                        var subStringAfter = currentWord.substring(afterIndex, currentWord.length);
+
+                        if (subStringBefore.length !== 0) {
+                            splitCodeList[wordIndex] = subStringBefore;
+                        }
+
+                        // Insert substring after current index
+                        if (subStringAfter.length !== 0) {
+                            splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+                        }
+
+                        delimiterFound = true;
+                        break;
+                    } else if (stringMode) {
+                        var subStringBefore = currentChar;
+                        var subStringAfter = currentWord.substring(1, currentWord.length);
+
+                        if (subStringBefore.length !== 0) {
+                            splitCodeList[wordIndex] = subStringBefore;
+                        }
+
+                        // Insert substring after current index
+                        if (subStringAfter.length !== 0) {
+                            splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+                        }
+
+                        delimiterFound = true;
+                        break;
+                    }
+                }
+
+                if (!delimiterFound) {
+                    wordIndex++;
+                }
+
+                delimiterFound = false;
             }
 
             return splitCodeList;
