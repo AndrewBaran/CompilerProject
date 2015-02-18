@@ -23,23 +23,14 @@ module Compiler {
 			var stringMode: boolean = false;
 			var eofFound: boolean = false;
 
-			var currentWord: string = "";
-
 			// Split source code into token-looking fragments
 			var splitCodeList: string [] = this.splitCodeOnSpaces(inputCode);
 			splitCodeList = this.splitCodeOnDelimiters(splitCodeList);
 
-			// TODO: Remove eventually
-			Logger.log("Code fragments: ");
-			
-			for(var i: number = 0; i < splitCodeList.length; i++) {
-				Logger.log("[" + i + "] = " + splitCodeList[i]);
-			}
-
-			// TODO: Check for invalid string chars
-			// Tokenize the individual elements of the split up code now
 			var listIndex: number = 0;
+			var currentWord: string = "";
 
+			// Tokenize the individual elements of the split up code now
 			while(listIndex !== splitCodeList.length && !eofFound) {
 
 				currentWord = splitCodeList[listIndex];
@@ -71,7 +62,33 @@ module Compiler {
 
 							break;
 
-						// TODO: Do case where there is no next element
+						case TokenType.T_DIGIT:
+
+							if(stringMode) {
+
+								var errorMessage: string = "Error! " + currentWord + " is not a valid string character";
+
+								Logger.log(errorMessage);
+								throw errorMessage;
+							}
+
+							break;
+
+						case TokenType.T_WHITE_SPACE:
+
+							if(stringMode) {
+
+								if(currentWord === "\n") {
+
+									var errorMessage: string = "Error! Newline is not a valid string character";
+
+									Logger.log(errorMessage);
+									throw errorMessage;
+								}
+							}
+
+							break;
+
 						case TokenType.T_SINGLE_EQUALS:
 
 							// Check if next index is a single equals
@@ -87,17 +104,21 @@ module Compiler {
 								listIndex++;
 							}
 
-							// TODO: This is only for debugging
-							// Submit single equals
-							else {
-								currentWord = splitCodeList[listIndex];
-							}
+							// Submit single equals otherwise
 
 							break;
 
 						case TokenType.T_EXCLAMATION_POINT:
 
-							// Check if next index is a single equals
+							// No more code follows
+							if((listIndex + 1) === splitCodeList.length) {
+
+								var errorMessage: string = "Error! " + currentWord + " is not a valid lexeme.";
+
+								Logger.log(errorMessage);
+								throw errorMessage;
+							}
+
 							var nextCodeSegment: string = splitCodeList[listIndex + 1];
 							currentWord += nextCodeSegment;
 
@@ -119,10 +140,6 @@ module Compiler {
 
 							break;
 					}
-
-					// TODO: Remove after debugging
-					Logger.log(currentWord + " matched a regex");
-					Logger.log("Type was " + token.getTokenName());
 
 					tokenList.push(token);
 				}
@@ -156,12 +173,12 @@ module Compiler {
 
 				var eofToken: Token = new Token();
 				eofToken.setType(TokenType.T_EOF);
-				eofToken.setValue("$");
 
 				tokenList.push(eofToken);
 			}
 
 			Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");
+			Logger.log("");
 
 			return tokenList;
 

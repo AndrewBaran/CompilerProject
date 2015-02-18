@@ -61,6 +61,7 @@ var Compiler;
 
             if (this.debugMode) {
                 _Compiler.Logger.log("Debug mode enabled");
+                _Compiler.Logger.log("");
             }
         };
 

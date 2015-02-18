@@ -19,22 +19,12 @@ var Compiler;
             var stringMode = false;
             var eofFound = false;
 
-            var currentWord = "";
-
             // Split source code into token-looking fragments
             var splitCodeList = this.splitCodeOnSpaces(inputCode);
             splitCodeList = this.splitCodeOnDelimiters(splitCodeList);
 
-            // TODO: Remove eventually
-            Compiler.Logger.log("Code fragments: ");
-
-            for (var i = 0; i < splitCodeList.length; i++) {
-                Compiler.Logger.log("[" + i + "] = " + splitCodeList[i]);
-            }
-
-            // TODO: Check for invalid string chars
-            // Tokenize the individual elements of the split up code now
             var listIndex = 0;
+            var currentWord = "";
 
             while (listIndex !== splitCodeList.length && !eofFound) {
                 currentWord = splitCodeList[listIndex];
@@ -61,6 +51,28 @@ var Compiler;
 
                             break;
 
+                        case 11 /* T_DIGIT */:
+                            if (stringMode) {
+                                var errorMessage = "Error! " + currentWord + " is not a valid string character";
+
+                                Compiler.Logger.log(errorMessage);
+                                throw errorMessage;
+                            }
+
+                            break;
+
+                        case 26 /* T_WHITE_SPACE */:
+                            if (stringMode) {
+                                if (currentWord === "\n") {
+                                    var errorMessage = "Error! Newline is not a valid string character";
+
+                                    Compiler.Logger.log(errorMessage);
+                                    throw errorMessage;
+                                }
+                            }
+
+                            break;
+
                         case 20 /* T_SINGLE_EQUALS */:
                             // Check if next index is a single equals
                             var nextCodeSegment = splitCodeList[listIndex + 1];
@@ -72,14 +84,19 @@ var Compiler;
                             if (tokenMatched.isMatch) {
                                 token = tokenMatched.token;
                                 listIndex++;
-                            } else {
-                                currentWord = splitCodeList[listIndex];
                             }
 
                             break;
 
                         case 23 /* T_EXCLAMATION_POINT */:
-                            // Check if next index is a single equals
+                            // No more code follows
+                            if ((listIndex + 1) === splitCodeList.length) {
+                                var errorMessage = "Error! " + currentWord + " is not a valid lexeme.";
+
+                                Compiler.Logger.log(errorMessage);
+                                throw errorMessage;
+                            }
+
                             var nextCodeSegment = splitCodeList[listIndex + 1];
                             currentWord += nextCodeSegment;
 
@@ -97,10 +114,6 @@ var Compiler;
 
                             break;
                     }
-
-                    // TODO: Remove after debugging
-                    Compiler.Logger.log(currentWord + " matched a regex");
-                    Compiler.Logger.log("Type was " + token.getTokenName());
 
                     tokenList.push(token);
                 } else {
@@ -125,12 +138,12 @@ var Compiler;
 
                 var eofToken = new Compiler.Token();
                 eofToken.setType(8 /* T_EOF */);
-                eofToken.setValue("$");
 
                 tokenList.push(eofToken);
             }
 
             Compiler.Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");
+            Compiler.Logger.log("");
 
             return tokenList;
         };

@@ -80,7 +80,9 @@ module Compiler {
 			this.debugMode = checkboxDebug.checked;
 
 			if(this.debugMode) {
+
 				Logger.log("Debug mode enabled");
+				Logger.log("");
 			}
 		}
 
