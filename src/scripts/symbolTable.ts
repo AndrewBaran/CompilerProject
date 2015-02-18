@@ -1,6 +1,5 @@
 module Compiler {
 
-
 	export class SymbolTable {
 
 		private table: SymbolTableEntry [];
@@ -17,9 +16,9 @@ module Compiler {
 			for(var i: number = 0; i < reservedWordList.length; i++) {
 
 				var entry: SymbolTableEntry = new SymbolTableEntry();
-				entry.entryNumber = this.nextAvailableIndex++;
-				entry.tokenValue = reservedWordList[i];
-				entry.isReservedWord = true;
+				entry.setEntryNumber(this.nextAvailableIndex++);
+				entry.setTokenValue(reservedWordList[i]);
+				entry.setReservedWord(true);
 
 				this.table.push(entry);
 			}
@@ -28,10 +27,10 @@ module Compiler {
 		public insert(token: Token): void {
 
 			var entry: SymbolTableEntry = new SymbolTableEntry();
-			entry.entryNumber = this.nextAvailableIndex++;
-			entry.tokenType = token.getType();
-			entry.tokenValue = token.getValue();
-			entry.isReservedWord = false;
+			entry.setEntryNumber(this.nextAvailableIndex++);
+			entry.setTokenType(token.getType());
+			entry.setTokenValue(token.getValue());
+			entry.setReservedWord(false);
 
 			this.table.push(entry);
 		}
@@ -41,60 +40,8 @@ module Compiler {
 			return this.table[entryNumber];
 		}
 
-		public hasReservedWordPrefix(inputWord: string): boolean {
-
-			for(var i: number = 0; i < this.table.length; i++) {
-
-				var currentEntry: SymbolTableEntry = this.table[i];
-
-				if(currentEntry.isReservedWord) {
-
-					// Prefix found
-					if(currentEntry.tokenValue.indexOf(inputWord) === 0) {
-
-						return true;
-					}
-				}
-
-			}
-
-			return false;
-		}
-
 		public getSize(): number {
 			return this.nextAvailableIndex;
-		}
-	}
-
-
-	// TODO Place in own file?
-	export class SymbolTableEntry {
-
-		public entryNumber: number;
-		public tokenType: TokenType;
-		public tokenValue: string;
-		public isReservedWord: boolean;
-		public scopeLevel: number;
-		public identifierType: string;
-
-		constructor() {
-
-			this.entryNumber = -1;
-			this.tokenType = TokenType.T_DEFAULT;
-			this.tokenValue = "";
-			this.isReservedWord = false;
-			this.scopeLevel = 0;
-			this.identifierType = "";
-		}
-
-		public toString(): string {
-
-			var token: Token = new Token();
-			token.setType(this.tokenType);
-			token.setValue(this.tokenValue);
-
-			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue() + " | " + this.scopeLevel;
-			return result;
 		}
 
 	}
