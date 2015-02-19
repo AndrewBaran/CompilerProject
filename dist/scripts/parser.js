@@ -1,6 +1,5 @@
 var Compiler;
 (function (Compiler) {
-    // TODO: Add line where token was found
     var Parser = (function () {
         function Parser() {
         }
@@ -75,10 +74,22 @@ var Compiler;
         Parser.parseStatementList = function () {
             var token = this.getToken();
 
-            // Check for start of statement
-            if (token.getType() !== 5 /* T_RBRACE */) {
-                this.parseStatement();
-                this.parseStatementList();
+            switch (token.getType()) {
+                case 7 /* T_PRINT */:
+                case 12 /* T_ID */:
+                case 17 /* T_INT */:
+                case 18 /* T_STRING */:
+                case 19 /* T_BOOLEAN */:
+                case 9 /* T_WHILE */:
+                case 10 /* T_IF */:
+                case 4 /* T_LBRACE */:
+                    this.parseStatement();
+                    this.parseStatementList();
+
+                    break;
+
+                default:
+                    break;
             }
         };
 
@@ -391,6 +402,8 @@ var Compiler;
                 Compiler.Logger.log("Got a string character!");
 
                 this.parseCharList();
+            } else {
+                // Epsilon case
             }
         };
 

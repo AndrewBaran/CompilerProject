@@ -1,6 +1,5 @@
 module Compiler {
 	
-	// TODO: Add line where token was found
 	export class Parser {
 
 		private static tokenList: TokenInfo[];
@@ -97,11 +96,28 @@ module Compiler {
 
 			var token: Token = this.getToken();
 
-			// Check for start of statement
-			if(token.getType() !== TokenType.T_RBRACE) {
+			switch(token.getType()) {
 
-				this.parseStatement();
-				this.parseStatementList();
+				// First set for statements
+				case TokenType.T_PRINT:
+				case TokenType.T_ID:
+				case TokenType.T_INT:
+				case TokenType.T_STRING:
+				case TokenType.T_BOOLEAN:
+				case TokenType.T_WHILE:
+				case TokenType.T_IF:
+				case TokenType.T_LBRACE:
+
+					this.parseStatement();
+					this.parseStatementList();
+
+					break;
+
+				default:
+
+					// Epsilon case
+					break;
+
 			}
 		}
 
@@ -491,6 +507,10 @@ module Compiler {
 				Logger.log("Got a string character!");
 
 				this.parseCharList();
+			}
+
+			else {
+				// Epsilon case
 			}
 		}
 
