@@ -71,4 +71,12 @@ var Compiler;
         return Compiler;
     })();
     _Compiler.Compiler = Compiler;
+
+    // TODO: Move to another file?
+    var TokenInfo = (function () {
+        function TokenInfo() {
+        }
+        return TokenInfo;
+    })();
+    _Compiler.TokenInfo = TokenInfo;
 })(Compiler || (Compiler = {}));

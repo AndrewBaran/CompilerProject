@@ -1,15 +1,16 @@
 module Compiler {
 	
+	// TODO: Add line where token was found
 	export class Parser {
 
-		private static tokenList: Token[];
+		private static tokenList: TokenInfo[];
 		private static currentTokenIndex: number;
 
 		private static symbolTable: SymbolTable;
 
 		private static concreteSyntaxTree: ConcreteSyntaxTree;
 
-		public static parseCode(tokenList: Token[], symbolTable: SymbolTable): ConcreteSyntaxTree {
+		public static parseCode(tokenList: TokenInfo[], symbolTable: SymbolTable): ConcreteSyntaxTree {
 
 			this.setupParsingEnvironment(tokenList, symbolTable);
 
@@ -24,7 +25,7 @@ module Compiler {
 			return this.concreteSyntaxTree;
 		}
 
-		private static setupParsingEnvironment(tokenList: Token[], symbolTable: SymbolTable): void {
+		private static setupParsingEnvironment(tokenList: TokenInfo[], symbolTable: SymbolTable): void {
 
 			this.tokenList = tokenList;
 			this.symbolTable = symbolTable;
@@ -146,7 +147,7 @@ module Compiler {
 
 				default:
 
-					var errorMessage: string = "Error! " + token.getTokenName() + " is not the beginning of any statement";
+					var errorMessage: string = "Error on line " + this.getTokenLineNumber() + ": " + token.getTokenName() + " is not the beginning of any statement";
 
 					Logger.log(errorMessage);
 					throw errorMessage;
@@ -301,7 +302,7 @@ module Compiler {
 
 				default:
 
-					var errorMessage: string = "Error! " + token.getTokenName() + " is not the beginning of any expression";
+					var errorMessage: string = "Error on line " + this.getTokenLineNumber() + ": " + token.getTokenName() + " is not the beginning of any expression";
 
 					Logger.log(errorMessage);
 					throw errorMessage;
@@ -415,7 +416,7 @@ module Compiler {
 
 				default:
 
-					var errorMessage: string = "Error! " + token.getTokenName() + " is not the beginning of any boolean expression";
+					var errorMessage: string = "Error on line " + token.getTokenName() + ": " + token.getTokenName() + " is not the beginning of any boolean expression";
 
 					Logger.log(errorMessage);
 					throw errorMessage;
@@ -537,7 +538,7 @@ module Compiler {
 
 				default:
 
-					var errorMessage: string = "Error! " + token.getTokenName() + " is not a valid boolean operator."; 
+					var errorMessage: string = "Error on line " + this.getTokenLineNumber() + ": " + token.getTokenName() + " is not a valid boolean operator."; 
 
 					Logger.log(errorMessage);
 					throw errorMessage;
@@ -548,7 +549,7 @@ module Compiler {
 
 		private static getToken(): Token {
 
-			var token: Token = this.tokenList[this.currentTokenIndex];
+			var token: Token = this.tokenList[this.currentTokenIndex].token;
 			return token; 
 		}
 
@@ -557,9 +558,15 @@ module Compiler {
 			this.currentTokenIndex++;
 		}
 
+		private static getTokenLineNumber(): number {
+
+			var lineNumber: number = this.tokenList[this.currentTokenIndex].lineFoundOn;
+			return lineNumber;
+		}
+
 		private static errorExpectedActual(expectedType: TokenType, actualType: TokenType): void {
 
-			var errorMessage: string = "Error! Expected " + TokenType[expectedType] + ", but got " + TokenType[actualType];
+			var errorMessage: string = "Error on line " + this.getTokenLineNumber() + ": Expected " + TokenType[expectedType] + ", but got " + TokenType[actualType];
 
 			Logger.log(errorMessage);
 			throw errorMessage;

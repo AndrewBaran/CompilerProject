@@ -15,7 +15,7 @@ module Compiler {
 			var lexResult: boolean = false;
 			var parseResult: boolean = false;
 
-			var tokenList: Token[] = [];
+			var tokenList: TokenInfo [] = [];
 			var concreteSyntaxTree: ConcreteSyntaxTree = null;
 
 			// No available code to lex
@@ -89,5 +89,17 @@ module Compiler {
 			this.testMode = isTestMode;
 		}
 
+	} // Compiler
+
+
+	// TODO: Move to another file?
+	export class TokenInfo {
+
+		public token: Token;
+		public lineFoundOn: number;
+
+		constructor() {
+
+		}
 	}
 }

@@ -1,5 +1,6 @@
 var Compiler;
 (function (Compiler) {
+    // TODO: Add line where token was found
     var Parser = (function () {
         function Parser() {
         }
@@ -113,7 +114,7 @@ var Compiler;
                     break;
 
                 default:
-                    var errorMessage = "Error! " + token.getTokenName() + " is not the beginning of any statement";
+                    var errorMessage = "Error on line " + this.getTokenLineNumber() + ": " + token.getTokenName() + " is not the beginning of any statement";
 
                     Compiler.Logger.log(errorMessage);
                     throw errorMessage;
@@ -236,7 +237,7 @@ var Compiler;
                     break;
 
                 default:
-                    var errorMessage = "Error! " + token.getTokenName() + " is not the beginning of any expression";
+                    var errorMessage = "Error on line " + this.getTokenLineNumber() + ": " + token.getTokenName() + " is not the beginning of any expression";
 
                     Compiler.Logger.log(errorMessage);
                     throw errorMessage;
@@ -328,7 +329,7 @@ var Compiler;
                     break;
 
                 default:
-                    var errorMessage = "Error! " + token.getTokenName() + " is not the beginning of any boolean expression";
+                    var errorMessage = "Error on line " + token.getTokenName() + ": " + token.getTokenName() + " is not the beginning of any boolean expression";
 
                     Compiler.Logger.log(errorMessage);
                     throw errorMessage;
@@ -426,7 +427,7 @@ var Compiler;
                     break;
 
                 default:
-                    var errorMessage = "Error! " + token.getTokenName() + " is not a valid boolean operator.";
+                    var errorMessage = "Error on line " + this.getTokenLineNumber() + ": " + token.getTokenName() + " is not a valid boolean operator.";
 
                     Compiler.Logger.log(errorMessage);
                     throw errorMessage;
@@ -436,7 +437,7 @@ var Compiler;
         };
 
         Parser.getToken = function () {
-            var token = this.tokenList[this.currentTokenIndex];
+            var token = this.tokenList[this.currentTokenIndex].token;
             return token;
         };
 
@@ -444,8 +445,13 @@ var Compiler;
             this.currentTokenIndex++;
         };
 
+        Parser.getTokenLineNumber = function () {
+            var lineNumber = this.tokenList[this.currentTokenIndex].lineFoundOn;
+            return lineNumber;
+        };
+
         Parser.errorExpectedActual = function (expectedType, actualType) {
-            var errorMessage = "Error! Expected " + TokenType[expectedType] + ", but got " + TokenType[actualType];
+            var errorMessage = "Error on line " + this.getTokenLineNumber() + ": Expected " + TokenType[expectedType] + ", but got " + TokenType[actualType];
 
             Compiler.Logger.log(errorMessage);
             throw errorMessage;

@@ -7,13 +7,13 @@ module Compiler {
 
 
 		// Separates the input code into a list of tokens and returns that list
-		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): Token [] {
+		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): TokenInfo [] {
 
 			this.setupTokenPatterns();
 
 			Logger.log("Performing lexical analysis");
 
-			var tokenList: Token [] = [];
+			var tokenList: TokenInfo [] = [];
 
 			var stringMode: boolean = false;
 			var eofFound: boolean = false;
@@ -141,7 +141,11 @@ module Compiler {
 
 					} // switch
 
-					tokenList.push(token);
+					var tokenInfo: TokenInfo = new TokenInfo();
+					tokenInfo.token = token;
+					tokenInfo.lineFoundOn = currentFragment.lineFoundOn;
+
+					tokenList.push(tokenInfo);
 				}
 
 				else {
@@ -176,7 +180,13 @@ module Compiler {
 				var eofToken: Token = new Token();
 				eofToken.setType(TokenType.T_EOF);
 
-				tokenList.push(eofToken);
+				var lastLine: number = tokenList[tokenList.length - 1].lineFoundOn;
+
+				var tokenInfo: TokenInfo = new TokenInfo();
+				tokenInfo.token = eofToken;
+				tokenInfo.lineFoundOn = lastLine;
+
+				tokenList.push(tokenInfo);
 			}
 
 			Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");

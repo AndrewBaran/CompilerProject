@@ -110,7 +110,7 @@ module Compiler {
 		}
 
 		// Displays tokens produced from lex if debug mode is enabled
-		public static debugCreateTokenDiv(tokenList: Token[]): void {
+		public static debugCreateTokenDiv(tokenList: TokenInfo[]): void {
 
 			var divTokenWindow = document.createElement("div");
 			divTokenWindow.id = "divDebugToken";
@@ -119,7 +119,9 @@ module Compiler {
 
 			for(var i: number = 0; i < tokenList.length; i++) {
 
-				stringBody += tokenList[i].toString();
+				var token: Token = tokenList[i].token;
+
+				stringBody += token.toString();
 				stringBody += "<br />";
 			}
 

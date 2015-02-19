@@ -115,7 +115,11 @@ var Compiler;
                             break;
                     }
 
-                    tokenList.push(token);
+                    var tokenInfo = new Compiler.TokenInfo();
+                    tokenInfo.token = token;
+                    tokenInfo.lineFoundOn = currentFragment.lineFoundOn;
+
+                    tokenList.push(tokenInfo);
                 } else {
                     var errorMessage = "Error on line " + currentFragment.lineFoundOn + ": " + currentCode + " is not a valid lexeme.";
 
@@ -141,7 +145,13 @@ var Compiler;
                 var eofToken = new Compiler.Token();
                 eofToken.setType(8 /* T_EOF */);
 
-                tokenList.push(eofToken);
+                var lastLine = tokenList[tokenList.length - 1].lineFoundOn;
+
+                var tokenInfo = new Compiler.TokenInfo();
+                tokenInfo.token = eofToken;
+                tokenInfo.lineFoundOn = lastLine;
+
+                tokenList.push(tokenInfo);
             }
 
             Compiler.Logger.log("Lexical analysis produced 0 errors and " + logWarningCount + " warning(s)");

@@ -109,7 +109,9 @@ var Compiler;
             var stringBody = "Tokens found: <hr />";
 
             for (var i = 0; i < tokenList.length; i++) {
-                stringBody += tokenList[i].toString();
+                var token = tokenList[i].token;
+
+                stringBody += token.toString();
                 stringBody += "<br />";
             }
 
