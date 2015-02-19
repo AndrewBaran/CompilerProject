@@ -493,6 +493,7 @@ module Compiler {
 			}
 		}
 
+		// +
 		private static parseIntOperator(): boolean {
 
 			var token: Token = this.getToken();
@@ -513,6 +514,7 @@ module Compiler {
 
 		}
 
+		// == | !=
 		private static parseBooleanOperator(): void {
 
 			var token: Token = this.getToken();

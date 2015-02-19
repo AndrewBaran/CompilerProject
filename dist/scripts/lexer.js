@@ -9,26 +9,25 @@ var Compiler;
 
             Compiler.Logger.log("Performing lexical analysis");
 
-            var logCurrentLetter = 1;
-            var logCurrentLine = 1;
-            var logWarningCount = 0;
-
             var tokenList = [];
 
             var stringMode = false;
             var eofFound = false;
 
             // Split source code into token-looking fragments
-            var splitCodeList = this.splitCodeOnSpaces(inputCode);
-            splitCodeList = this.splitCodeOnDelimiters(splitCodeList);
+            var codeFragmentList = this.splitCodeOnSpaces(inputCode);
+            codeFragmentList = this.splitCodeOnDelimiters(codeFragmentList);
+
+            var currentFragment = null;
+            var currentCode = "";
 
             var listIndex = 0;
-            var currentWord = "";
 
-            while (listIndex !== splitCodeList.length && !eofFound) {
-                currentWord = splitCodeList[listIndex];
+            while (listIndex !== codeFragmentList.length && !eofFound) {
+                currentFragment = codeFragmentList[listIndex];
+                currentCode = currentFragment.code;
 
-                var tokenMatched = this.matchesTokenPattern(currentWord);
+                var tokenMatched = this.matchesTokenPattern(currentCode);
 
                 if (tokenMatched.isMatch) {
                     var token = tokenMatched.token;
@@ -52,7 +51,7 @@ var Compiler;
 
                         case 11 /* T_DIGIT */:
                             if (stringMode) {
-                                var errorMessage = "Error! " + currentWord + " is not a valid string character";
+                                var errorMessage = "Error on line " + currentFragment.lineFoundOn + ": " + currentCode + " is not a valid string character";
 
                                 Compiler.Logger.log(errorMessage);
                                 throw errorMessage;
@@ -62,8 +61,8 @@ var Compiler;
 
                         case 26 /* T_WHITE_SPACE */:
                             if (stringMode) {
-                                if (currentWord === "\n") {
-                                    var errorMessage = "Error! Newline is not a valid string character";
+                                if (currentCode === "\n") {
+                                    var errorMessage = "Error on line " + currentFragment.lineFoundOn + ": Newline is not a valid string character";
 
                                     Compiler.Logger.log(errorMessage);
                                     throw errorMessage;
@@ -74,10 +73,11 @@ var Compiler;
 
                         case 20 /* T_SINGLE_EQUALS */:
                             // Check if next index is a single equals
-                            var nextCodeSegment = splitCodeList[listIndex + 1];
-                            currentWord += nextCodeSegment;
+                            var nextCodeFragment = codeFragmentList[listIndex + 1];
+                            var nextWord = nextCodeFragment.code;
+                            currentCode += nextWord;
 
-                            tokenMatched = this.matchesTokenPattern(currentWord);
+                            tokenMatched = this.matchesTokenPattern(currentCode);
 
                             // Submit double equals
                             if (tokenMatched.isMatch) {
@@ -89,23 +89,24 @@ var Compiler;
 
                         case 23 /* T_EXCLAMATION_POINT */:
                             // No more code follows
-                            if ((listIndex + 1) === splitCodeList.length) {
-                                var errorMessage = "Error! " + currentWord + " is not a valid lexeme.";
+                            if ((listIndex + 1) === codeFragmentList.length) {
+                                var errorMessage = "Error on line " + currentFragment.lineFoundOn + ": " + currentCode + " is not a valid lexeme.";
 
                                 Compiler.Logger.log(errorMessage);
                                 throw errorMessage;
                             }
 
-                            var nextCodeSegment = splitCodeList[listIndex + 1];
-                            currentWord += nextCodeSegment;
+                            var nextCodeFragment = codeFragmentList[listIndex + 1];
+                            var nextWord = nextCodeFragment.code;
+                            currentCode += nextWord;
 
-                            tokenMatched = this.matchesTokenPattern(currentWord);
+                            tokenMatched = this.matchesTokenPattern(currentCode);
 
                             if (tokenMatched.isMatch && tokenMatched.token.getType() === 22 /* T_NOT_EQUALS */) {
                                 token = tokenMatched.token;
                                 listIndex++;
                             } else {
-                                var errorMessage = "Error! " + currentWord + " is not a valid lexeme.";
+                                var errorMessage = "Error on line " + currentFragment.lineFoundOn + ": " + currentCode + " is not a valid lexeme.";
 
                                 Compiler.Logger.log(errorMessage);
                                 throw errorMessage;
@@ -116,7 +117,7 @@ var Compiler;
 
                     tokenList.push(token);
                 } else {
-                    var errorMessage = "Error! " + currentWord + " is not a valid lexeme.";
+                    var errorMessage = "Error on line " + currentFragment.lineFoundOn + ": " + currentCode + " is not a valid lexeme.";
 
                     Compiler.Logger.log(errorMessage);
                     throw errorMessage;
@@ -125,9 +126,11 @@ var Compiler;
                 listIndex++;
             }
 
+            var logWarningCount = 0;
+
             if (eofFound) {
                 // EOF should be last element in code list
-                if (listIndex !== splitCodeList.length) {
+                if (listIndex !== codeFragmentList.length) {
                     Compiler.Logger.log("Warning! Input found after EOF character");
                     logWarningCount++;
                 }
@@ -148,7 +151,7 @@ var Compiler;
         };
 
         // Looks for a regex match for the word, and if it does, produces a token of the type to be returned
-        Lexer.matchesTokenPattern = function (currentWord) {
+        Lexer.matchesTokenPattern = function (currentCode) {
             var returnTokenMatch = new TokenMatch();
             var patternMatched = false;
 
@@ -156,12 +159,12 @@ var Compiler;
                 var tokenRegex = this.tokenPatterns[i].regex;
                 var tokenType = this.tokenPatterns[i].type;
 
-                if (tokenRegex.test(currentWord)) {
+                if (tokenRegex.test(currentCode)) {
                     patternMatched = true;
 
                     var currentToken = new Compiler.Token();
                     currentToken.setType(tokenType);
-                    currentToken.setValue(currentWord);
+                    currentToken.setValue(currentCode);
 
                     returnTokenMatch.token = currentToken;
 
@@ -205,13 +208,15 @@ var Compiler;
 
         // Preserves spaces within strings
         Lexer.splitCodeOnSpaces = function (inputCode) {
-            var currentWord = "";
-            var charIndex = 0;
+            var codeFragmentList = [];
 
-            var splitCodeList = [];
+            var logCurrentLine = 1;
 
             var stringMode = false;
             var whitespaceRegex = /[\s\n]+/;
+
+            var currentWord = "";
+            var charIndex = 0;
 
             while (charIndex !== inputCode.length) {
                 var currentChar = inputCode.charAt(charIndex);
@@ -223,7 +228,12 @@ var Compiler;
                     if (stringMode) {
                         currentWord += currentChar;
                     } else if (currentWord.length > 0) {
-                        splitCodeList.push(currentWord);
+                        var fragment = new CodeFragment();
+                        fragment.code = currentWord;
+                        fragment.lineFoundOn = logCurrentLine;
+
+                        codeFragmentList.push(fragment);
+
                         currentWord = "";
                     }
                 }
@@ -235,33 +245,49 @@ var Compiler;
                 // Last char
                 if (charIndex === inputCode.length) {
                     if (currentWord.length > 0) {
-                        splitCodeList.push(currentWord);
+                        var fragment = new CodeFragment();
+                        fragment.code = currentWord;
+                        fragment.lineFoundOn = logCurrentLine;
+
+                        codeFragmentList.push(fragment);
+
                         currentWord = "";
                     }
                 }
+
+                if (currentChar === "\n") {
+                    logCurrentLine++;
+                }
             }
 
-            return splitCodeList;
+            return codeFragmentList;
         };
 
-        Lexer.splitCodeOnDelimiters = function (splitCodeList) {
+        Lexer.splitCodeOnDelimiters = function (codeFragmentList) {
             var stringMode = false;
             var delimiterFound = false;
 
-            var currentWord = "";
+            var currentFragment = null;
+            var currentCode = "";
+
             var wordIndex = 0;
 
-            while (wordIndex !== splitCodeList.length) {
-                currentWord = splitCodeList[wordIndex];
+            while (wordIndex !== codeFragmentList.length) {
+                currentFragment = codeFragmentList[wordIndex];
+                currentCode = currentFragment.code;
 
-                for (var charIndex = 0; charIndex !== currentWord.length && currentWord.length !== 1; charIndex++) {
-                    var currentChar = currentWord.charAt(charIndex);
+                for (var charIndex = 0; charIndex !== currentCode.length; charIndex++) {
+                    var currentChar = currentCode.charAt(charIndex);
 
-                    if (this.delimiterChars.test(currentChar)) {
+                    if (currentCode.length === 1) {
                         if (currentChar === "\"") {
                             stringMode = stringMode ? false : true;
                         }
 
+                        continue;
+                    }
+
+                    if (this.delimiterChars.test(currentChar)) {
                         var beforeIndex = 0;
                         var afterIndex = 0;
 
@@ -272,31 +298,41 @@ var Compiler;
                             beforeIndex = afterIndex = charIndex;
                         }
 
-                        var subStringBefore = currentWord.substring(0, beforeIndex);
-                        var subStringAfter = currentWord.substring(afterIndex, currentWord.length);
+                        var subStringBefore = currentCode.substring(0, beforeIndex);
+                        var subStringAfter = currentCode.substring(afterIndex, currentCode.length);
 
                         if (subStringBefore.length !== 0) {
-                            splitCodeList[wordIndex] = subStringBefore;
+                            currentFragment.code = subStringBefore;
+                            codeFragmentList[wordIndex] = currentFragment;
                         }
 
                         // Insert substring after current index
                         if (subStringAfter.length !== 0) {
-                            splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+                            var fragment = new CodeFragment();
+                            fragment.code = subStringAfter;
+                            fragment.lineFoundOn = currentFragment.lineFoundOn;
+
+                            codeFragmentList.splice(wordIndex + 1, 0, fragment);
                         }
 
                         delimiterFound = true;
                         break;
                     } else if (stringMode) {
                         var subStringBefore = currentChar;
-                        var subStringAfter = currentWord.substring(1, currentWord.length);
+                        var subStringAfter = currentCode.substring(1, currentCode.length);
 
                         if (subStringBefore.length !== 0) {
-                            splitCodeList[wordIndex] = subStringBefore;
+                            currentFragment.code = subStringBefore;
+                            codeFragmentList[wordIndex] = currentFragment;
                         }
 
                         // Insert substring after current index
                         if (subStringAfter.length !== 0) {
-                            splitCodeList.splice(wordIndex + 1, 0, subStringAfter);
+                            var fragment = new CodeFragment();
+                            fragment.code = subStringAfter;
+                            fragment.lineFoundOn = currentFragment.lineFoundOn;
+
+                            codeFragmentList.splice(wordIndex + 1, 0, fragment);
                         }
 
                         delimiterFound = true;
@@ -311,11 +347,20 @@ var Compiler;
                 delimiterFound = false;
             }
 
-            return splitCodeList;
+            return codeFragmentList;
         };
         return Lexer;
     })();
     Compiler.Lexer = Lexer;
+
+    // Structs
+    var CodeFragment = (function () {
+        function CodeFragment() {
+            this.code = "";
+            this.lineFoundOn = -1;
+        }
+        return CodeFragment;
+    })();
 
     var TokenMatch = (function () {
         function TokenMatch() {

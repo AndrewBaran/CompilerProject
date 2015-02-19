@@ -393,6 +393,7 @@ var Compiler;
             }
         };
 
+        // +
         Parser.parseIntOperator = function () {
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a plus operator");
@@ -407,6 +408,7 @@ var Compiler;
             }
         };
 
+        // == | !=
         Parser.parseBooleanOperator = function () {
             var token = this.getToken();
 
