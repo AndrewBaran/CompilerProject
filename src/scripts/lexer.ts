@@ -89,21 +89,27 @@ module Compiler {
 
 						case TokenType.T_SINGLE_EQUALS:
 
-							// Check if next index is a single equals
-							var nextCodeFragment: CodeFragment = codeFragmentList[listIndex + 1];
-							var nextWord: string = nextCodeFragment.code;
-							currentCode += nextWord;
+							// Next element is available
+							if(!(listIndex + 1 === codeFragmentList.length)) {
 
-							tokenMatched = this.matchesTokenPattern(currentCode);
+								var nextCodeFragment: CodeFragment = codeFragmentList[listIndex + 1];
+								var nextWord: string = nextCodeFragment.code;
+								currentCode += nextWord;
 
-							// Submit double equals
-							if(tokenMatched.isMatch) {
+								tokenMatched = this.matchesTokenPattern(currentCode);
 
-								token = tokenMatched.token;
-								listIndex++;
+								// Submit double equals
+								if(tokenMatched.isMatch) {
+
+									token = tokenMatched.token;
+									listIndex++;
+								}
 							}
 
-							// Submit single equals otherwise
+							else {
+								// Submit single equals otherwise
+							}
+
 							break;
 
 						case TokenType.T_EXCLAMATION_POINT:

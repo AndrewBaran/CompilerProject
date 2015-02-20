@@ -72,17 +72,21 @@ var Compiler;
                             break;
 
                         case 20 /* T_SINGLE_EQUALS */:
-                            // Check if next index is a single equals
-                            var nextCodeFragment = codeFragmentList[listIndex + 1];
-                            var nextWord = nextCodeFragment.code;
-                            currentCode += nextWord;
+                            // Next element is available
+                            if (!(listIndex + 1 === codeFragmentList.length)) {
+                                var nextCodeFragment = codeFragmentList[listIndex + 1];
+                                var nextWord = nextCodeFragment.code;
+                                currentCode += nextWord;
 
-                            tokenMatched = this.matchesTokenPattern(currentCode);
+                                tokenMatched = this.matchesTokenPattern(currentCode);
 
-                            // Submit double equals
-                            if (tokenMatched.isMatch) {
-                                token = tokenMatched.token;
-                                listIndex++;
+                                // Submit double equals
+                                if (tokenMatched.isMatch) {
+                                    token = tokenMatched.token;
+                                    listIndex++;
+                                }
+                            } else {
+                                // Submit single equals otherwise
                             }
 
                             break;
