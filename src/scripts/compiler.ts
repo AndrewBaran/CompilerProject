@@ -92,7 +92,7 @@ module Compiler {
 	} // Compiler
 
 
-	// TODO: Move to another file?
+	// Structs
 	export class TokenInfo {
 
 		public token: Token;

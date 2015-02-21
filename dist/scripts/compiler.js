@@ -72,7 +72,7 @@ var Compiler;
     })();
     _Compiler.Compiler = Compiler;
 
-    // TODO: Move to another file?
+    // Structs
     var TokenInfo = (function () {
         function TokenInfo() {
         }
