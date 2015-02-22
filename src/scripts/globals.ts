@@ -4,9 +4,7 @@
 function onDocumentLoad(): void {
 
 	Compiler.Control.clearData();
-	
-	// TODO: Commented out for bootstrap testing
-	// Compiler.Control.createTestButtons();
+	Compiler.Control.createTestButtons();
 }
 
 // Used to dynamically set up the test code in the form of buttons

@@ -2,8 +2,7 @@
 // Sets up the browser environment for the compiler when the page is loaded
 function onDocumentLoad() {
     Compiler.Control.clearData();
-    // TODO: Commented out for bootstrap testing
-    // Compiler.Control.createTestButtons();
+    Compiler.Control.createTestButtons();
 }
 
 // Used to dynamically set up the test code in the form of buttons

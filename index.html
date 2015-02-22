@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<meta name="author"             content="Andrew J. Baran" />
+	<meta name="author"             content="Andrew Baran" />
 
     <link rel="stylesheet" href="src/styles/compiler.css" type="text/css">
 
@@ -41,38 +41,45 @@
 
 <div class="container" id="mainBody">
 
-	<div class="row text-center" id="buttonBar">
-		<input type="button"
-				id="buttonCompile"
-				name="buttonCompile"
-				class="btn btn-primary btn-md"
-				value="Compile"
-				onclick="Compiler.Control.buttonCompileClick(this);">
-
-		<input type="button"
-				id="buttonTest"
-				name="buttonTest"
-				class="btn btn-success btn-md"
-				value="Run Tests"
-				onclick="Compiler.Control.buttonTestClick(this);">
+	<div class="col-sm-12 text-center">
 
 			<input type="button"
-					id="testProgramDropDown"
-					name="testProgramDropDown"
-					class="btn btn-info dropdown-toggle"
-					value="Select a Program">
+					id="buttonCompile"
+					name="buttonCompile"
+					class="btn btn-primary btn-md"
+					value="Compile"
+					onclick="Compiler.Control.buttonCompileClick(this);">
 
-		<br />
+			<input type="button"
+					id="buttonTest"
+					name="buttonTest"
+					class="btn btn-success btn-md"
+					value="Run Tests"
+					onclick="Compiler.Control.buttonTestClick(this);">
 
-		<div class="checkbox">
-			<label>
-				<input type="checkbox"
-						id="checkboxDebug"
-						name="checkboxDebug"
-						class="checkbox">
-				Debug
-			</label>
-		</div>
+			<div class="dropdown">
+
+				<input type="button"
+						id="testProgramDropDown"
+						name="testProgramDropDown"
+						class="btn btn-info dropdown-toggle"
+						value="Select a Program"
+						data-toggle="dropdown">
+
+				<ul class="dropdown-menu" id="dropDownPrograms">
+				</ul>
+
+			</div>
+
+			<div class="checkbox">
+				<label>
+					<input type="checkbox"
+							id="checkboxDebug"
+							name="checkboxDebug"
+							class="checkbox">
+					Debug
+				</label>
+			</div>
 
 	</div>
 

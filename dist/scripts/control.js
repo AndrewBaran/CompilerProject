@@ -12,7 +12,7 @@ var Compiler;
 
             // Reset selections on compiler flags
             // TODO: Checked for now (debugging)
-            document.getElementById("checkboxDebug").checked = true;
+            document.getElementById("checkboxDebug").checked = false;
 
             this.enableButtons();
         };
@@ -74,8 +74,8 @@ var Compiler;
 
         // Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled when clicked
         Control.createTestButtons = function () {
-            // Get the div that will contain the buttons
-            var buttonDiv = document.getElementById("divTestPrograms");
+            // Get the dropdown menu that will contain the buttons
+            var dropDropMenu = document.getElementById("dropDownPrograms");
 
             for (var i = 0; i < _testCodeList.length; i++) {
                 var newButton = document.createElement("button");
@@ -89,7 +89,7 @@ var Compiler;
                     Control.loadTestCode(this);
                 };
 
-                buttonDiv.appendChild(newButton);
+                dropDropMenu.appendChild(newButton);
             }
         };
 
