@@ -49,7 +49,7 @@ module Compiler {
 			this.clearLog();
 			this.clearCompilerResults();
 
-			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
+			var divsToRemove: string [] = ["divDebugToken"];
 			this.removeDivs(divsToRemove)
 
 			// Compile the program
@@ -69,7 +69,7 @@ module Compiler {
 			this.clearLog();
 			this.clearCompilerResults();
 
-			var divsToRemove: string [] = ["divDebugToken", "divDebugSymbolTable"];
+			var divsToRemove: string [] = ["divDebugToken"];
 			this.removeDivs(divsToRemove)
 
 			this.runTests();
@@ -114,20 +114,24 @@ module Compiler {
 
 			var divTokenWindow = document.createElement("div");
 			divTokenWindow.id = "divDebugToken";
+			divTokenWindow.className = "col-sm-12 text-center";
 
-			var stringBody: string = "Tokens found: <hr />";
+			var stringBody: string = "Tokens found: <br />";
 
 			for(var i: number = 0; i < tokenList.length; i++) {
 
 				var token: Token = tokenList[i].token;
 
 				stringBody += token.toString();
-				stringBody += "<br />";
+
+				if((i + 1) !== tokenList.length) {
+					stringBody += " | ";
+				}
 			}
 
 			divTokenWindow.innerHTML = stringBody;
 
-			document.getElementById("mainBody").appendChild(divTokenWindow);
+			document.getElementById("rowDebugInfo").appendChild(divTokenWindow);
 		}
 
 		public static debugCreateSymbolTableDiv(symbolTable: SymbolTable): void {
@@ -153,6 +157,7 @@ module Compiler {
 
 			divSymbolTable.innerHTML = stringBody;
 
+			// TODO: Attach symbol table somewhere else
 			document.getElementById("mainBody").appendChild(divSymbolTable);
 		}
 
@@ -160,10 +165,10 @@ module Compiler {
 
 			for(var i: number = 0; i < divList.length; i++) {
 
-				var div = document.getElementById(divList[i]);
+				var divToRemove = document.getElementById(divList[i]);
 
-				if(div !== null) {
-					document.getElementById("mainBody").removeChild(div);
+				if(divToRemove !== null) {
+					document.getElementById("rowDebugInfo").removeChild(divToRemove);
 				}
 			}
 		}

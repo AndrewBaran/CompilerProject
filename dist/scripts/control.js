@@ -46,7 +46,7 @@ var Compiler;
             this.clearLog();
             this.clearCompilerResults();
 
-            var divsToRemove = ["divDebugToken", "divDebugSymbolTable"];
+            var divsToRemove = ["divDebugToken"];
             this.removeDivs(divsToRemove);
 
             // Compile the program
@@ -64,7 +64,7 @@ var Compiler;
             this.clearLog();
             this.clearCompilerResults();
 
-            var divsToRemove = ["divDebugToken", "divDebugSymbolTable"];
+            var divsToRemove = ["divDebugToken"];
             this.removeDivs(divsToRemove);
 
             this.runTests();
@@ -105,19 +105,23 @@ var Compiler;
         Control.debugCreateTokenDiv = function (tokenList) {
             var divTokenWindow = document.createElement("div");
             divTokenWindow.id = "divDebugToken";
+            divTokenWindow.className = "col-sm-12 text-center";
 
-            var stringBody = "Tokens found: <hr />";
+            var stringBody = "Tokens found: <br />";
 
             for (var i = 0; i < tokenList.length; i++) {
                 var token = tokenList[i].token;
 
                 stringBody += token.toString();
-                stringBody += "<br />";
+
+                if ((i + 1) !== tokenList.length) {
+                    stringBody += " | ";
+                }
             }
 
             divTokenWindow.innerHTML = stringBody;
 
-            document.getElementById("mainBody").appendChild(divTokenWindow);
+            document.getElementById("rowDebugInfo").appendChild(divTokenWindow);
         };
 
         Control.debugCreateSymbolTableDiv = function (symbolTable) {
@@ -139,15 +143,16 @@ var Compiler;
 
             divSymbolTable.innerHTML = stringBody;
 
+            // TODO: Attach symbol table somewhere else
             document.getElementById("mainBody").appendChild(divSymbolTable);
         };
 
         Control.removeDivs = function (divList) {
             for (var i = 0; i < divList.length; i++) {
-                var div = document.getElementById(divList[i]);
+                var divToRemove = document.getElementById(divList[i]);
 
-                if (div !== null) {
-                    document.getElementById("mainBody").removeChild(div);
+                if (divToRemove !== null) {
+                    document.getElementById("rowDebugInfo").removeChild(divToRemove);
                 }
             }
         };

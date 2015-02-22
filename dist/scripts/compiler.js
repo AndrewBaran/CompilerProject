@@ -30,8 +30,8 @@ var Compiler;
                     if (this.debugMode) {
                         _Compiler.Control.debugCreateTokenDiv(tokenList);
                     }
-
-                    _Compiler.Control.debugCreateSymbolTableDiv(this.symbolTable);
+                    // TODO: Commented out for Project 1
+                    // Control.debugCreateSymbolTableDiv(this.symbolTable);
                 }
 
                 try  {

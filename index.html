@@ -3,7 +3,15 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<meta name="author"             content="Andrew J. Baran" />
-	<link rel="stylesheet" href="dist/styles/compiler.css" type="text/css" media="screen" />
+
+    <link rel="stylesheet" href="src/styles/compiler.css" type="text/css">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" type="text/css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+
 	<title>
 		Compiler
 	</title>
@@ -25,82 +33,105 @@
 
 <body onload="onDocumentLoad();">
 
-<div id="pageHeader">
+<div class="page-header text-center" id="pageHeader">
 
 	<h4>Compiler</h4>
-	<hr />
 
 </div> 
 
-<div id="mainBody">
+<div class="container" id="mainBody">
 
-	<div id="buttonBar">
+	<div class="row text-center" id="buttonBar">
 		<input type="button"
 				id="buttonCompile"
 				name="buttonCompile"
-				class="bigButton"
+				class="btn btn-primary btn-md"
 				value="Compile"
 				onclick="Compiler.Control.buttonCompileClick(this);">
 
 		<input type="button"
 				id="buttonTest"
 				name="buttonTest"
-				class="bigButton"
+				class="btn btn-success btn-md"
 				value="Run Tests"
 				onclick="Compiler.Control.buttonTestClick(this);">
 
+			<input type="button"
+					id="testProgramDropDown"
+					name="testProgramDropDown"
+					class="btn btn-info dropdown-toggle"
+					value="Select a Program">
+
 		<br />
-		<label for="checkboxDebug">Debug</label>
-		<input type="checkbox"
-				id="checkboxDebug"
-				name="checkboxDebug"
-				class="normalCheckbox">
+
+		<div class="checkbox">
+			<label>
+				<input type="checkbox"
+						id="checkboxDebug"
+						name="checkboxDebug"
+						class="checkbox">
+				Debug
+			</label>
+		</div>
 
 	</div>
 
-	<!-- TODO: Make tab size 4, as the default of 8 is taking up too much space -->
-	<div id="divInputCode">
-		<label>Code</label>
-		<br />
-		
-		<textarea name="textboxInputCode"
-					id="textboxInputCode"
-					rows="20"
-					cols="50"
-					placeholder="Enter your code here..."></textarea>
+	<div class="row">
+
+		<div class="col-sm-6 text-center" id="divInputCode">
+			<label>Code</label>
+			<br />
+			
+			<textarea name="textboxInputCode"
+						class="form-control noResize"
+						id="textboxInputCode"
+						rows="20"
+						cols="30"
+						placeholder="Enter your code here..."></textarea>
+
+		</div>
+
+		<div class="col-sm-6 text-center" id="divLog">
+			<label>Log</label>
+			<br />
+			
+			<textarea name="textboxLog"
+						class="form-control noResize"
+						id="textboxLog"
+						rows="20"
+						cols="30"
+						readonly="readonly"></textarea>
+
+		</div>
 
 	</div>
 
-	<div id="divLog">
-		<label>Log</label>
-		<br />
-		
-		<textarea name="textboxLog"
-					id="textboxLog"
-					rows="20"
-					cols="50"
-					readonly="readonly"></textarea>
-
+	<div class="row" id="rowDebugInfo">
 	</div>
 
-	<!-- Will be dynamically filled with buttons for various test programs on document load -->
-	<div id="divTestPrograms">
-		<label>Test Programs</label>
-		<br />
+	<div class="row">
+		<div class="col-sm-12 text-center" id="divCompilerResults">
+		</div>
 	</div>
 
 </div>
 
-<div id="divCompilerResults">
-</div>
 
-<div id="pageFooter">
+<footer class="footer" id="pageFooter">
+
 	<hr />
-	<br />
-	Copyright &copy; 2015 - 2015 No Rights Reserved.
-	<br />
-	<a href="http://www.labouseur.com/courses/compilers/grammar.pdf">Grammar Supported</a>
-</div>
+	<div class="container text-center">
+
+		<p class="text-muted">
+			<br />
+			Copyright &copy; 2015 - 2015 No Rights Reserved.
+			<br />
+		</p>
+
+		<a href="http://www.labouseur.com/courses/compilers/grammar.pdf">Grammar Supported</a>
+
+	</div>
+</footer>
 
 </body>
 </html>

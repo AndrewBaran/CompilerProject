@@ -45,7 +45,8 @@ module Compiler {
 						Control.debugCreateTokenDiv(tokenList);
 					}
 
-					Control.debugCreateSymbolTableDiv(this.symbolTable);
+					// TODO: Commented out for Project 1
+					// Control.debugCreateSymbolTableDiv(this.symbolTable);
 				}
 				
 				try {
