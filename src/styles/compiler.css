@@ -1,4 +1,15 @@
+#pageHeader
+{
+	margin-top: 15px;
+}
+
 textarea.noResize
 {
 	resize: none;
+}
+
+#pageFooter
+{
+	margin-top: -15px;
+	margin-bottom: 10px;
 }

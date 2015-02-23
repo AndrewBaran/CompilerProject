@@ -43,58 +43,69 @@
 
 	<div class="col-sm-12 text-center">
 
-			<input type="button"
-					id="buttonCompile"
-					name="buttonCompile"
-					class="btn btn-primary btn-md"
-					value="Compile"
-					onclick="Compiler.Control.buttonCompileClick(this);">
+		<input type="button"
+				id="buttonCompile"
+				name="buttonCompile"
+				class="btn btn-primary btn-md"
+				value="Compile"
+				onclick="Compiler.Control.buttonCompileClick(this);">
+
+
+		<span class="dropdown">
 
 			<input type="button"
-					id="buttonTest"
-					name="buttonTest"
-					class="btn btn-success btn-md"
-					value="Run Tests"
-					onclick="Compiler.Control.buttonTestClick(this);">
+					id="testProgramDropDown"
+					name="testProgramDropDown"
+					class="btn btn-info dropdown-toggle btn-md"
+					value="Select a Program"
+					data-toggle="dropdown">
 
-			<div class="dropdown">
+			<ul class="dropdown-menu" id="dropDownPrograms">
+			</ul>
 
-				<input type="button"
-						id="testProgramDropDown"
-						name="testProgramDropDown"
-						class="btn btn-info dropdown-toggle"
-						value="Select a Program"
-						data-toggle="dropdown">
+		</span>
 
-				<ul class="dropdown-menu" id="dropDownPrograms">
-				</ul>
+		<input type="button"
+				id="buttonTest"
+				name="buttonTest"
+				class="btn btn-success btn-md"
+				value="Run Tests"
+				onclick="Compiler.Control.buttonTestClick(this);">
 
-			</div>
+		<span class="dropdown">
 
-			<div class="checkbox">
-				<label>
+			<a class="dropdown-toggle btn btn-warning btn-md" data-toggle="dropdown" href="#">
+				Options
+				<b class="caret"></b>
+			</a>
+
+			<ul class="dropdown-menu dropdown-menu-form" role="menu" id="dropDownOptions">
+				<li>
 					<input type="checkbox"
 							id="checkboxDebug"
 							name="checkboxDebug"
 							class="checkbox">
-					Debug
-				</label>
-			</div>
+					<span class="lbl">Debug</span>
+				</li>
+			</ul>
+
+		</span>
 
 	</div>
 
 	<div class="row">
 
 		<div class="col-sm-6 text-center" id="divInputCode">
+			
 			<label>Code</label>
 			<br />
 			
 			<textarea name="textboxInputCode"
 						class="form-control noResize"
 						id="textboxInputCode"
-						rows="20"
-						cols="30"
-						placeholder="Enter your code here..."></textarea>
+						rows="15"
+						placeholder="Enter your code here..."
+						spellcheck="false"></textarea>
 
 		</div>
 
@@ -105,8 +116,7 @@
 			<textarea name="textboxLog"
 						class="form-control noResize"
 						id="textboxLog"
-						rows="20"
-						cols="30"
+						rows="15"
 						readonly="readonly"></textarea>
 
 		</div>
@@ -115,6 +125,8 @@
 
 	<div class="row" id="rowDebugInfo">
 	</div>
+
+	<br />
 
 	<div class="row">
 		<div class="col-sm-12 text-center" id="divCompilerResults">
@@ -129,15 +141,20 @@
 	<hr />
 	<div class="container text-center">
 
-		<p class="text-muted">
-			<br />
+		<br />
+		<small class="text-muted">
 			Copyright &copy; 2015 - 2015 No Rights Reserved.
 			<br />
-		</p>
+			Made by Andrew Baran
+		</small>
+		<br />
 
-		<a href="http://www.labouseur.com/courses/compilers/grammar.pdf">Grammar Supported</a>
+		<small>
+			<a href="http://www.labouseur.com/courses/compilers/grammar.pdf">Grammar Supported</a>
+		</small>
 
 	</div>
+
 </footer>
 
 </body>

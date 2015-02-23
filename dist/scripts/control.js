@@ -74,7 +74,6 @@ var Compiler;
 
         // Dynamically creates a suite of buttons that will place test code in the code textbox to be compiled when clicked
         Control.createTestButtons = function () {
-            // Get the dropdown menu that will contain the buttons
             var dropDropMenu = document.getElementById("dropDownPrograms");
 
             for (var i = 0; i < _testCodeList.length; i++) {
@@ -84,12 +83,16 @@ var Compiler;
                 newButton.value = i.toString();
                 newButton.innerHTML = _testCodeList[i].name;
 
-                // When button is clicked, button is passed and its value is ued to update the code
+                // When button is clicked, button is passed and its value is used to update the code
                 newButton.onclick = function () {
                     Control.loadTestCode(this);
                 };
 
                 dropDropMenu.appendChild(newButton);
+
+                if (!((i + 1) === _testCodeList.length)) {
+                    dropDropMenu.appendChild(document.createTextNode(" | "));
+                }
             }
         };
 
@@ -101,17 +104,19 @@ var Compiler;
             document.getElementById("textboxInputCode").value = code;
         };
 
+        // TODO: Make pretty
         // Displays tokens produced from lex if debug mode is enabled
         Control.debugCreateTokenDiv = function (tokenList) {
             var divTokenWindow = document.createElement("div");
             divTokenWindow.id = "divDebugToken";
             divTokenWindow.className = "col-sm-12 text-center";
 
-            var stringBody = "Tokens found: <br />";
+            var stringBody = tokenList.length + " Tokens found: <br />";
 
             for (var i = 0; i < tokenList.length; i++) {
                 var token = tokenList[i].token;
 
+                stringBody += i.toString() + ": ";
                 stringBody += token.toString();
 
                 if ((i + 1) !== tokenList.length) {
