@@ -97,9 +97,6 @@ module Compiler {
 
 				dropDropMenu.appendChild(newButton);
 
-				if(!((i + 1) === _testCodeList.length)) {
-					dropDropMenu.appendChild(document.createTextNode(" | "));
-				}
 			}
 		}
 
