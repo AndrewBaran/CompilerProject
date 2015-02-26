@@ -32,9 +32,14 @@ Project 2 Checklist
 - [ ] Write a semantic analyzer that scope-checks and type-checks the CST for our grammar
 	- [ ] Create a display a symbol table with type and scope information
 	- [ ] Create an display the abstract syntax tree (AST)
-	- [ ] Issue warnings about declared but unused identifiers
-	- [ ] Issue warnings about use of uninitialized variables but do not treat them as errors
-	- [ ] Issue verbose output functionality that traces the semantic analysis stages
+- [ ] Type-check the source code using the AST to catch...
+	- [ ] Undeclared identifiers
+	- [ ] Redeclared identifiers in the same scope
+	- [ ] Type Mismatches
+- [ ] Issue warning about:
+	- [ ] Declared but unused identifiers
+	- [ ] Use of uninitialized variables, but do not treat them as errors
+- [ ] Issue verbose output functionality that traces the semantic analysis stages
 	- [ ] When you detect an error, report it in helpful detail including where it was found 
 
 Final Project Checklist
