@@ -173,7 +173,9 @@ module Compiler {
 				// EOF should be last element in code list
 				if(listIndex !== codeFragmentList.length) {
 
-					Logger.log("Warning! Input found after EOF character");
+					var eofLine: number = tokenList[tokenList.length - 1].lineFoundOn;
+
+					Logger.log("Warning! Input found after EOF character, which was on line " + eofLine + ".");
 					logWarningCount++;
 				}
 			}

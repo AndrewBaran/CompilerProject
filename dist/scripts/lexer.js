@@ -139,7 +139,9 @@ var Compiler;
             if (eofFound) {
                 // EOF should be last element in code list
                 if (listIndex !== codeFragmentList.length) {
-                    Compiler.Logger.log("Warning! Input found after EOF character");
+                    var eofLine = tokenList[tokenList.length - 1].lineFoundOn;
+
+                    Compiler.Logger.log("Warning! Input found after EOF character, which was on line " + eofLine + ".");
                     logWarningCount++;
                 }
             } else {
