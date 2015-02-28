@@ -3,8 +3,9 @@ var Compiler;
     var SymbolTableEntry = (function () {
         function SymbolTableEntry() {
             this.entryNumber = -1;
+            this.idName = "";
             this.value = "";
-            this.identifierType = "";
+            this.idType = "";
         }
         SymbolTableEntry.prototype.getEntryNumber = function () {
             return this.entryNumber;
@@ -12,6 +13,14 @@ var Compiler;
 
         SymbolTableEntry.prototype.setEntryNumber = function (entryNumber) {
             this.entryNumber = entryNumber;
+        };
+
+        SymbolTableEntry.prototype.getIdName = function () {
+            return this.idName;
+        };
+
+        SymbolTableEntry.prototype.setIdName = function (idName) {
+            this.idName = idName;
         };
 
         SymbolTableEntry.prototype.getValue = function () {
@@ -22,12 +31,12 @@ var Compiler;
             this.value = value;
         };
 
-        SymbolTableEntry.prototype.getIdentifierType = function () {
-            return this.identifierType;
+        SymbolTableEntry.prototype.getIdType = function () {
+            return this.idType;
         };
 
-        SymbolTableEntry.prototype.setIdentifierType = function (identifierType) {
-            this.identifierType = identifierType;
+        SymbolTableEntry.prototype.setIdType = function (idType) {
+            this.idType = idType;
         };
 
         // TODO: Make this different

@@ -18,8 +18,14 @@ var Compiler;
     */
     var SymbolTable = (function () {
         function SymbolTable() {
-            this.currentScopeTable = null;
+            this.setDefaultScope();
+            this.currentScopeTable = SymbolTable.defaultScopeTable;
         }
+        SymbolTable.prototype.setDefaultScope = function () {
+            SymbolTable.defaultScopeTable = new ScopeTable();
+            SymbolTable.defaultScopeTable.setScopeLevel(-1);
+        };
+
         SymbolTable.prototype.insertEntry = function (token) {
             var result = false;
 
@@ -33,14 +39,25 @@ var Compiler;
             return result;
         };
 
-        // TODO: Implement
         SymbolTable.prototype.openScope = function () {
             Compiler.Logger.log("Opening new scope");
+
+            var newScope = new ScopeTable();
+            newScope.setParent(this.currentScopeTable);
+            newScope.setScopeLevel(this.currentScopeTable.getScopeLevel() + 1);
+
+            this.currentScopeTable.addChildScope(newScope);
+
+            this.currentScopeTable = newScope;
         };
 
         // TODO: Implement
         SymbolTable.prototype.closeScope = function () {
             Compiler.Logger.log("Closing current scope");
+        };
+
+        SymbolTable.prototype.getCurrentScope = function () {
+            return this.currentScopeTable;
         };
         return SymbolTable;
     })();
@@ -54,12 +71,14 @@ var Compiler;
             this.scopeLevel = 0;
 
             this.parentScope = null;
-            this.childrenScopeList = [];
+            this.childScopeList = [];
         }
         ScopeTable.prototype.insertEntry = function (token) {
+            Compiler.Logger.log("Inserting into symbol table");
+
             var entry = new Compiler.SymbolTableEntry();
             entry.setEntryNumber(this.nextAvailableIndex++);
-            entry.setValue(token.getValue());
+            entry.setIdName(token.getValue());
 
             var idType = "";
 
@@ -77,17 +96,22 @@ var Compiler;
                     break;
             }
 
-            entry.setIdentifierType(idType);
+            entry.setIdType(idType);
 
             // See if id already is in table
-            Compiler.Logger.log("ID name: " + entry.getValue());
+            Compiler.Logger.log("ID name: " + entry.getIdName());
 
+            // TODO: Do stuff here
             if (this.entryTable) {
             }
 
             this.entryTable.push(entry);
 
             return true;
+        };
+
+        ScopeTable.prototype.addChildScope = function (child) {
+            this.childScopeList.push(child);
         };
 
         ScopeTable.prototype.getEntry = function (entryNumber) {
@@ -102,9 +126,18 @@ var Compiler;
             return this.scopeLevel;
         };
 
+        ScopeTable.prototype.setScopeLevel = function (scopeLevel) {
+            this.scopeLevel = scopeLevel;
+        };
+
         ScopeTable.prototype.setParent = function (parentScope) {
             this.parentScope = parentScope;
         };
+
+        ScopeTable.prototype.getChildList = function () {
+            return this.childScopeList;
+        };
         return ScopeTable;
     })();
+    Compiler.ScopeTable = ScopeTable;
 })(Compiler || (Compiler = {}));

@@ -20,11 +20,18 @@ module Compiler {
 	export class SymbolTable {
 
 		private currentScopeTable: ScopeTable;
-
+		private static defaultScopeTable: ScopeTable;
 
 		constructor() {
 
-			this.currentScopeTable = null;
+			this.setDefaultScope();
+			this.currentScopeTable = SymbolTable.defaultScopeTable;
+		}
+
+		private setDefaultScope(): void {
+
+			SymbolTable.defaultScopeTable = new ScopeTable();
+			SymbolTable.defaultScopeTable.setScopeLevel(-1);
 		}
 
 		public insertEntry(token: Token): boolean {
@@ -44,10 +51,17 @@ module Compiler {
 			return result;
 		}
 
-		// TODO: Implement
 		public openScope(): void {
 
 			Logger.log("Opening new scope");
+
+			var newScope: ScopeTable = new ScopeTable();
+			newScope.setParent(this.currentScopeTable);
+			newScope.setScopeLevel(this.currentScopeTable.getScopeLevel() + 1);
+
+			this.currentScopeTable.addChildScope(newScope);
+
+			this.currentScopeTable = newScope;
 		}
 
 		// TODO: Implement
@@ -56,12 +70,14 @@ module Compiler {
 			Logger.log("Closing current scope");
 		}
 
-
+		public getCurrentScope(): ScopeTable {
+			return this.currentScopeTable;
+		}
 
 	}
 
 
-	class ScopeTable {
+	export class ScopeTable {
 
 		private entryTable: SymbolTableEntry [];
 		private nextAvailableIndex: number;
@@ -69,7 +85,7 @@ module Compiler {
 		private scopeLevel: number;
 
 		private parentScope: ScopeTable;
-		private childrenScopeList: ScopeTable[];
+		private childScopeList: ScopeTable[];
 
 		constructor() {
 
@@ -79,14 +95,16 @@ module Compiler {
 			this.scopeLevel = 0;
 
 			this.parentScope = null;
-			this.childrenScopeList = [];
+			this.childScopeList = [];
 		}
 
 		public insertEntry(token: Token): boolean {
 
+			Logger.log("Inserting into symbol table");
+
 			var entry: SymbolTableEntry = new SymbolTableEntry();
 			entry.setEntryNumber(this.nextAvailableIndex++);
-			entry.setValue(token.getValue());
+			entry.setIdName(token.getValue());
 
 			var idType: string = "";
 
@@ -108,11 +126,12 @@ module Compiler {
 					break;
 			}
 
-			entry.setIdentifierType(idType);
+			entry.setIdType(idType);
 
 			// See if id already is in table
-			Logger.log("ID name: " + entry.getValue())
+			Logger.log("ID name: " + entry.getIdName())
 
+			// TODO: Do stuff here
 			if(this.entryTable) {
 
 			}
@@ -120,6 +139,10 @@ module Compiler {
 			this.entryTable.push(entry);
 
 			return true;
+		}
+
+		public addChildScope(child: ScopeTable): void {
+			this.childScopeList.push(child);
 		}
 
 		public getEntry(entryNumber: number): SymbolTableEntry {
@@ -135,8 +158,17 @@ module Compiler {
 			return this.scopeLevel;
 		}
 
+		public setScopeLevel(scopeLevel): void {
+			this.scopeLevel = scopeLevel;
+		}
+
 		public setParent(parentScope: ScopeTable): void {
 			this.parentScope = parentScope;
 		}
+
+		public getChildList(): ScopeTable [] {
+			return this.childScopeList;
+		}
+
 	}
 }

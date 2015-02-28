@@ -41,6 +41,8 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got a left brace!");
 
+                this.symbolTable.openScope();
+
                 this.parseStatementList();
 
                 token = this.getToken();
@@ -49,6 +51,8 @@ var Compiler;
                 if (token.getType() === 5 /* T_RBRACE */) {
                     this.consumeToken();
                     Compiler.Logger.log("Got a right brace!");
+
+                    this.symbolTable.closeScope();
                 } else {
                     this.errorExpectedActual(5 /* T_RBRACE */, token.getType());
                 }
@@ -186,10 +190,15 @@ var Compiler;
             }
         };
 
+        // TODO: It's not getting the type of the id
         // VarDecl: type Id
         Parser.parseVariableDeclaration = function () {
             this.parseType();
             this.parseId();
+
+            var previousIDToken = this.getPreviousToken();
+
+            var result = this.symbolTable.insertEntry(previousIDToken);
         };
 
         // WhileStatement: while BooleanExpr Block
@@ -451,6 +460,11 @@ var Compiler;
 
         Parser.getToken = function () {
             var token = this.tokenList[this.currentTokenIndex].token;
+            return token;
+        };
+
+        Parser.getPreviousToken = function () {
+            var token = this.tokenList[this.currentTokenIndex - 1].token;
             return token;
         };
 

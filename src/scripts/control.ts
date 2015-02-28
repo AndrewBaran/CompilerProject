@@ -49,9 +49,6 @@ module Compiler {
 			this.clearLog();
 			this.clearCompilerResults();
 
-			var divsToRemove: string [] = ["divDebugToken"];
-			this.removeDivs(divsToRemove)
-
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
 
@@ -68,9 +65,6 @@ module Compiler {
 
 			this.clearLog();
 			this.clearCompilerResults();
-
-			var divsToRemove: string [] = ["divDebugToken"];
-			this.removeDivs(divsToRemove)
 
 			this.runTests();
 
@@ -136,7 +130,49 @@ module Compiler {
 			var tableName: string = "symbolTable";
 			this.clearTable(tableName);
 
-			var table = <HTMLTableElement> document.getElementById(tableName);
+			var htmlTable = <HTMLTableElement> document.getElementById(tableName);
+
+			var firstScope: ScopeTable = symbolTable.getCurrentScope();
+			this.buildTable(firstScope, htmlTable);
+		}
+
+		private static buildTable(currentScope: ScopeTable, htmlTable: HTMLTableElement): void {
+
+			for(var entryIndex: number = 0; entryIndex < currentScope.getSize(); entryIndex++) {
+
+				var entry: SymbolTableEntry = currentScope.getEntry(entryIndex);
+				Logger.log("Adding " + entry.getIdName() + " to display table");
+
+				var row = <HTMLTableRowElement> htmlTable.insertRow(-1);
+
+				var numberCell = row.insertCell(-1);
+				numberCell.innerHTML = entry.getEntryNumber().toString();
+
+				var idCell = row.insertCell(-1);
+				idCell.innerHTML = entry.getIdName();
+
+				var typeCell = row.insertCell(-1);
+				typeCell.innerHTML = entry.getIdType();
+
+				var valueCell = row.insertCell(-1);
+				valueCell.innerHTML = entry.getValue();
+
+				var scopeCell = row.insertCell(-1);
+				scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+
+			}
+
+			var childScopeList: ScopeTable [] = currentScope.getChildList();
+
+			if(childScopeList.length > 0) {
+
+				for(var childIndex: number = 0; childIndex < childScopeList.length; childIndex++) {
+
+					var childScope: ScopeTable = childScopeList[childIndex];
+					this.buildTable(childScope, htmlTable);
+				}
+			}
+
 		}
 
 		private static clearTable(tableName: string): void {

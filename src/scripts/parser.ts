@@ -52,6 +52,8 @@ module Compiler {
 				this.consumeToken();
 				Logger.log("Got a left brace!");
 
+				this.symbolTable.openScope();
+
 				this.parseStatementList();
 
 				token = this.getToken();
@@ -61,6 +63,8 @@ module Compiler {
 
 					this.consumeToken();
 					Logger.log("Got a right brace!");
+
+					this.symbolTable.closeScope();
 				}
 
 				else {
@@ -240,11 +244,16 @@ module Compiler {
 
 		}
 
+		// TODO: It's not getting the type of the id
 		// VarDecl: type Id
 		private static parseVariableDeclaration(): void {
 
 			this.parseType();
 			this.parseId();
+
+			var previousIDToken: Token = this.getPreviousToken();
+
+			var result: boolean = this.symbolTable.insertEntry(previousIDToken);
 		}
 
 		// WhileStatement: while BooleanExpr Block
@@ -571,6 +580,12 @@ module Compiler {
 
 			var token: Token = this.tokenList[this.currentTokenIndex].token;
 			return token; 
+		}
+
+		private static getPreviousToken(): Token {
+
+			var token: Token = this.tokenList[this.currentTokenIndex - 1].token;
+			return token;
 		}
 
 		private static consumeToken(): void {

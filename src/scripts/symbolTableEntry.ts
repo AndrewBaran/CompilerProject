@@ -3,14 +3,16 @@ module Compiler {
 	export class SymbolTableEntry {
 
 		private entryNumber: number;
+		private idName: string;
 		private value: string;
-		private identifierType: string;
+		private idType: string;
 
 		constructor() {
 
 			this.entryNumber = -1;
+			this.idName = "";
 			this.value = "";
-			this.identifierType = "";
+			this.idType = "";
 		}
 
 		public getEntryNumber(): number {
@@ -21,6 +23,14 @@ module Compiler {
 			this.entryNumber = entryNumber;
 		}
 
+		public getIdName(): string {
+			return this.idName;
+		}
+
+		public setIdName(idName: string): void {
+			this.idName = idName;
+		}
+
 		public getValue(): string {
 			return this.value;
 		}
@@ -29,12 +39,12 @@ module Compiler {
 			this.value = value;
 		}
 
-		public getIdentifierType(): string {
-			return this.identifierType;
+		public getIdType(): string {
+			return this.idType;
 		}
 
-		public setIdentifierType(identifierType: string): void {
-			this.identifierType = identifierType;
+		public setIdType(idType: string): void {
+			this.idType = idType;
 		}
 
 		// TODO: Make this different

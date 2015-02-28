@@ -46,9 +46,6 @@ var Compiler;
             this.clearLog();
             this.clearCompilerResults();
 
-            var divsToRemove = ["divDebugToken"];
-            this.removeDivs(divsToRemove);
-
             // Compile the program
             var code = document.getElementById("textboxInputCode").value;
 
@@ -63,9 +60,6 @@ var Compiler;
 
             this.clearLog();
             this.clearCompilerResults();
-
-            var divsToRemove = ["divDebugToken"];
-            this.removeDivs(divsToRemove);
 
             this.runTests();
 
@@ -125,7 +119,43 @@ var Compiler;
             var tableName = "symbolTable";
             this.clearTable(tableName);
 
-            var table = document.getElementById(tableName);
+            var htmlTable = document.getElementById(tableName);
+
+            var firstScope = symbolTable.getCurrentScope();
+            this.buildTable(firstScope, htmlTable);
+        };
+
+        Control.buildTable = function (currentScope, htmlTable) {
+            for (var entryIndex = 0; entryIndex < currentScope.getSize(); entryIndex++) {
+                var entry = currentScope.getEntry(entryIndex);
+                Compiler.Logger.log("Adding " + entry.getIdName() + " to display table");
+
+                var row = htmlTable.insertRow(-1);
+
+                var numberCell = row.insertCell(-1);
+                numberCell.innerHTML = entry.getEntryNumber().toString();
+
+                var idCell = row.insertCell(-1);
+                idCell.innerHTML = entry.getIdName();
+
+                var typeCell = row.insertCell(-1);
+                typeCell.innerHTML = entry.getIdType();
+
+                var valueCell = row.insertCell(-1);
+                valueCell.innerHTML = entry.getValue();
+
+                var scopeCell = row.insertCell(-1);
+                scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+            }
+
+            var childScopeList = currentScope.getChildList();
+
+            if (childScopeList.length > 0) {
+                for (var childIndex = 0; childIndex < childScopeList.length; childIndex++) {
+                    var childScope = childScopeList[childIndex];
+                    this.buildTable(childScope, htmlTable);
+                }
+            }
         };
 
         Control.clearTable = function (tableName) {
