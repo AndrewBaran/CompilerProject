@@ -3,15 +3,13 @@ module Compiler {
 	export class SymbolTableEntry {
 
 		private entryNumber: number;
-		private tokenType: TokenType;
-		private tokenValue: string;
+		private value: string;
 		private identifierType: string;
 
 		constructor() {
 
 			this.entryNumber = -1;
-			this.tokenType = TokenType.T_DEFAULT;
-			this.tokenValue = "";
+			this.value = "";
 			this.identifierType = "";
 		}
 
@@ -23,20 +21,12 @@ module Compiler {
 			this.entryNumber = entryNumber;
 		}
 
-		public getTokenType(): TokenType {
-			return this.tokenType;
+		public getValue(): string {
+			return this.value;
 		}
 
-		public setTokenType(tokenType: TokenType): void {
-			this.tokenType = tokenType;
-		}
-
-		public getTokenValue(): string {
-			return this.tokenValue;
-		}
-
-		public setTokenValue(tokenValue: string): void {
-			this.tokenValue = tokenValue;
+		public setValue(value: string): void {
+			this.value = value;
 		}
 
 		public getIdentifierType(): string {
@@ -47,14 +37,10 @@ module Compiler {
 			this.identifierType = identifierType;
 		}
 
+		// TODO: Make this different
 		public toString(): string {
 
-			var token: Token = new Token();
-			token.setType(this.tokenType);
-			token.setValue(this.tokenValue);
-
-			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue();
-			return result;
+			return "";
 		}
 
 	}

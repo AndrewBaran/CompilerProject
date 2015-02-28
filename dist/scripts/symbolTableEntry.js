@@ -3,8 +3,7 @@ var Compiler;
     var SymbolTableEntry = (function () {
         function SymbolTableEntry() {
             this.entryNumber = -1;
-            this.tokenType = 1 /* T_DEFAULT */;
-            this.tokenValue = "";
+            this.value = "";
             this.identifierType = "";
         }
         SymbolTableEntry.prototype.getEntryNumber = function () {
@@ -15,20 +14,12 @@ var Compiler;
             this.entryNumber = entryNumber;
         };
 
-        SymbolTableEntry.prototype.getTokenType = function () {
-            return this.tokenType;
+        SymbolTableEntry.prototype.getValue = function () {
+            return this.value;
         };
 
-        SymbolTableEntry.prototype.setTokenType = function (tokenType) {
-            this.tokenType = tokenType;
-        };
-
-        SymbolTableEntry.prototype.getTokenValue = function () {
-            return this.tokenValue;
-        };
-
-        SymbolTableEntry.prototype.setTokenValue = function (tokenValue) {
-            this.tokenValue = tokenValue;
+        SymbolTableEntry.prototype.setValue = function (value) {
+            this.value = value;
         };
 
         SymbolTableEntry.prototype.getIdentifierType = function () {
@@ -39,13 +30,9 @@ var Compiler;
             this.identifierType = identifierType;
         };
 
+        // TODO: Make this different
         SymbolTableEntry.prototype.toString = function () {
-            var token = new Compiler.Token();
-            token.setType(this.tokenType);
-            token.setValue(this.tokenValue);
-
-            var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue();
-            return result;
+            return "";
         };
         return SymbolTableEntry;
     })();
