@@ -34,12 +34,12 @@ module Compiler {
 			SymbolTable.defaultScopeTable.setScopeLevel(-1);
 		}
 
-		public insertEntry(token: Token): boolean {
+		public insertEntry(token: Token, typeValue: string): boolean {
 
 			var result: boolean = false;
 
 			if(token.getType() === TokenType.T_ID) {
-				result = this.currentScopeTable.insertEntry(token);
+				result = this.currentScopeTable.insertEntry(token, typeValue);
 			}
 
 			else {
@@ -53,8 +53,6 @@ module Compiler {
 
 		public openScope(): void {
 
-			Logger.log("Opening new scope");
-
 			var newScope: ScopeTable = new ScopeTable();
 			newScope.setParent(this.currentScopeTable);
 			newScope.setScopeLevel(this.currentScopeTable.getScopeLevel() + 1);
@@ -64,10 +62,13 @@ module Compiler {
 			this.currentScopeTable = newScope;
 		}
 
-		// TODO: Implement
 		public closeScope(): void {
 
-			Logger.log("Closing current scope");
+			var parent: ScopeTable = this.currentScopeTable.getParent();
+
+			if(parent !== null) {
+				this.currentScopeTable = parent;
+			}
 		}
 
 		public getCurrentScope(): ScopeTable {
@@ -98,47 +99,40 @@ module Compiler {
 			this.childScopeList = [];
 		}
 
-		public insertEntry(token: Token): boolean {
-
-			Logger.log("Inserting into symbol table");
+		public insertEntry(token: Token, typeValue: string): boolean {
 
 			var entry: SymbolTableEntry = new SymbolTableEntry();
 			entry.setEntryNumber(this.nextAvailableIndex++);
 			entry.setIdName(token.getValue());
+			entry.setIdType(typeValue);
 
-			var idType: string = "";
+			// TODO: Not currently a hashtable
+			// Will want to hash the ordinal value of the char
+			if(!(this.hasEntry(entry.getIdName()))) {
 
-			switch(token.getType()) {
-
-				case TokenType.T_INT:
-
-					idType = "int";
-					break;
-
-				case TokenType.T_STRING:
-				
-					idType = "string";
-					break;
-
-				case TokenType.T_BOOLEAN:
-				
-					idType = "boolean";
-					break;
+				this.entryTable.push(entry);
+				return true;
 			}
 
-			entry.setIdType(idType);
-
-			// See if id already is in table
-			Logger.log("ID name: " + entry.getIdName())
-
-			// TODO: Do stuff here
-			if(this.entryTable) {
-
+			else {
+				return false;
 			}
 
-			this.entryTable.push(entry);
+		}
 
-			return true;
+		private hasEntry(idName: string): boolean {
+
+			for(var i: number = 0; i < this.entryTable.length; i++) {
+
+				var entry: SymbolTableEntry = this.entryTable[i];
+
+				if(entry.getIdName() === idName) {
+					return true;
+				}
+			}
+
+			// Not found
+			return false;
 		}
 
 		public addChildScope(child: ScopeTable): void {
@@ -160,6 +154,10 @@ module Compiler {
 
 		public setScopeLevel(scopeLevel): void {
 			this.scopeLevel = scopeLevel;
+		}
+
+		public getParent(): ScopeTable {
+			return this.parentScope;
 		}
 
 		public setParent(parentScope: ScopeTable): void {

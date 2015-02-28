@@ -244,16 +244,27 @@ module Compiler {
 
 		}
 
-		// TODO: It's not getting the type of the id
 		// VarDecl: type Id
 		private static parseVariableDeclaration(): void {
 
+			var typeToken: Token = this.getToken();
+			var typeValue: string = typeToken.getValue();
+
 			this.parseType();
+
+			var idToken: Token = this.getToken();
+			var lineFoundOn: number = this.getTokenLineNumber();
+
 			this.parseId();
 
-			var previousIDToken: Token = this.getPreviousToken();
+			var result: boolean = this.symbolTable.insertEntry(idToken, typeValue);
 
-			var result: boolean = this.symbolTable.insertEntry(previousIDToken);
+			// TODO: Move this to semantic analysis?
+			if(!result) {
+
+				Logger.log("Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.");
+				Logger.log("Panic!");
+			}
 		}
 
 		// WhileStatement: while BooleanExpr Block

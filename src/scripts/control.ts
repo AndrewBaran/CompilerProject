@@ -124,7 +124,6 @@ module Compiler {
 			}
 		}
 
-		// TODO: Implement when symbol table layout is set in stone
 		public static displaySymbolTable(symbolTable: SymbolTable): void {
 
 			var tableName: string = "symbolTable";
@@ -141,12 +140,11 @@ module Compiler {
 			for(var entryIndex: number = 0; entryIndex < currentScope.getSize(); entryIndex++) {
 
 				var entry: SymbolTableEntry = currentScope.getEntry(entryIndex);
+
+				// TODO: Remove after testing
 				Logger.log("Adding " + entry.getIdName() + " to display table");
 
 				var row = <HTMLTableRowElement> htmlTable.insertRow(-1);
-
-				var numberCell = row.insertCell(-1);
-				numberCell.innerHTML = entry.getEntryNumber().toString();
 
 				var idCell = row.insertCell(-1);
 				idCell.innerHTML = entry.getIdName();

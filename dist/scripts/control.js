@@ -114,7 +114,6 @@ var Compiler;
             }
         };
 
-        // TODO: Implement when symbol table layout is set in stone
         Control.displaySymbolTable = function (symbolTable) {
             var tableName = "symbolTable";
             this.clearTable(tableName);
@@ -128,12 +127,11 @@ var Compiler;
         Control.buildTable = function (currentScope, htmlTable) {
             for (var entryIndex = 0; entryIndex < currentScope.getSize(); entryIndex++) {
                 var entry = currentScope.getEntry(entryIndex);
+
+                // TODO: Remove after testing
                 Compiler.Logger.log("Adding " + entry.getIdName() + " to display table");
 
                 var row = htmlTable.insertRow(-1);
-
-                var numberCell = row.insertCell(-1);
-                numberCell.innerHTML = entry.getEntryNumber().toString();
 
                 var idCell = row.insertCell(-1);
                 idCell.innerHTML = entry.getIdName();

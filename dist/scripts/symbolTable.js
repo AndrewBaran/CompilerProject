@@ -26,11 +26,11 @@ var Compiler;
             SymbolTable.defaultScopeTable.setScopeLevel(-1);
         };
 
-        SymbolTable.prototype.insertEntry = function (token) {
+        SymbolTable.prototype.insertEntry = function (token, typeValue) {
             var result = false;
 
             if (token.getType() === 12 /* T_ID */) {
-                result = this.currentScopeTable.insertEntry(token);
+                result = this.currentScopeTable.insertEntry(token, typeValue);
             } else {
                 Compiler.Logger.log("Error! Attempt to insert " + token.getTokenName() + " into symbol table was made.");
                 result = false;
@@ -40,8 +40,6 @@ var Compiler;
         };
 
         SymbolTable.prototype.openScope = function () {
-            Compiler.Logger.log("Opening new scope");
-
             var newScope = new ScopeTable();
             newScope.setParent(this.currentScopeTable);
             newScope.setScopeLevel(this.currentScopeTable.getScopeLevel() + 1);
@@ -51,9 +49,12 @@ var Compiler;
             this.currentScopeTable = newScope;
         };
 
-        // TODO: Implement
         SymbolTable.prototype.closeScope = function () {
-            Compiler.Logger.log("Closing current scope");
+            var parent = this.currentScopeTable.getParent();
+
+            if (parent !== null) {
+                this.currentScopeTable = parent;
+            }
         };
 
         SymbolTable.prototype.getCurrentScope = function () {
@@ -73,41 +74,33 @@ var Compiler;
             this.parentScope = null;
             this.childScopeList = [];
         }
-        ScopeTable.prototype.insertEntry = function (token) {
-            Compiler.Logger.log("Inserting into symbol table");
-
+        ScopeTable.prototype.insertEntry = function (token, typeValue) {
             var entry = new Compiler.SymbolTableEntry();
             entry.setEntryNumber(this.nextAvailableIndex++);
             entry.setIdName(token.getValue());
+            entry.setIdType(typeValue);
 
-            var idType = "";
+            // TODO: Not currently a hashtable
+            // Will want to hash the ordinal value of the char
+            if (!(this.hasEntry(entry.getIdName()))) {
+                this.entryTable.push(entry);
+                return true;
+            } else {
+                return false;
+            }
+        };
 
-            switch (token.getType()) {
-                case 17 /* T_INT */:
-                    idType = "int";
-                    break;
+        ScopeTable.prototype.hasEntry = function (idName) {
+            for (var i = 0; i < this.entryTable.length; i++) {
+                var entry = this.entryTable[i];
 
-                case 18 /* T_STRING */:
-                    idType = "string";
-                    break;
-
-                case 19 /* T_BOOLEAN */:
-                    idType = "boolean";
-                    break;
+                if (entry.getIdName() === idName) {
+                    return true;
+                }
             }
 
-            entry.setIdType(idType);
-
-            // See if id already is in table
-            Compiler.Logger.log("ID name: " + entry.getIdName());
-
-            // TODO: Do stuff here
-            if (this.entryTable) {
-            }
-
-            this.entryTable.push(entry);
-
-            return true;
+            // Not found
+            return false;
         };
 
         ScopeTable.prototype.addChildScope = function (child) {
@@ -128,6 +121,10 @@ var Compiler;
 
         ScopeTable.prototype.setScopeLevel = function (scopeLevel) {
             this.scopeLevel = scopeLevel;
+        };
+
+        ScopeTable.prototype.getParent = function () {
+            return this.parentScope;
         };
 
         ScopeTable.prototype.setParent = function (parentScope) {

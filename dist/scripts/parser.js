@@ -190,15 +190,25 @@ var Compiler;
             }
         };
 
-        // TODO: It's not getting the type of the id
         // VarDecl: type Id
         Parser.parseVariableDeclaration = function () {
+            var typeToken = this.getToken();
+            var typeValue = typeToken.getValue();
+
             this.parseType();
+
+            var idToken = this.getToken();
+            var lineFoundOn = this.getTokenLineNumber();
+
             this.parseId();
 
-            var previousIDToken = this.getPreviousToken();
+            var result = this.symbolTable.insertEntry(idToken, typeValue);
 
-            var result = this.symbolTable.insertEntry(previousIDToken);
+            // TODO: Move this to semantic analysis?
+            if (!result) {
+                Compiler.Logger.log("Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.");
+                Compiler.Logger.log("Panic!");
+            }
         };
 
         // WhileStatement: while BooleanExpr Block
