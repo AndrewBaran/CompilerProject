@@ -5,8 +5,6 @@ var Compiler;
             this.entryNumber = -1;
             this.tokenType = 1 /* T_DEFAULT */;
             this.tokenValue = "";
-            this.reservedWordFlag = false;
-            this.scopeLevel = 0;
             this.identifierType = "";
         }
         SymbolTableEntry.prototype.getEntryNumber = function () {
@@ -33,22 +31,6 @@ var Compiler;
             this.tokenValue = tokenValue;
         };
 
-        SymbolTableEntry.prototype.isReservedWord = function () {
-            return this.reservedWordFlag;
-        };
-
-        SymbolTableEntry.prototype.setReservedWord = function (reservedWordFlag) {
-            this.reservedWordFlag = reservedWordFlag;
-        };
-
-        SymbolTableEntry.prototype.getScopeLevel = function () {
-            return this.scopeLevel;
-        };
-
-        SymbolTableEntry.prototype.setScopeLevel = function (scopeLevel) {
-            this.scopeLevel = scopeLevel;
-        };
-
         SymbolTableEntry.prototype.getIdentifierType = function () {
             return this.identifierType;
         };
@@ -62,7 +44,7 @@ var Compiler;
             token.setType(this.tokenType);
             token.setValue(this.tokenValue);
 
-            var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue() + " | " + this.scopeLevel;
+            var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue();
             return result;
         };
         return SymbolTableEntry;

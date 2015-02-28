@@ -5,8 +5,6 @@ module Compiler {
 		private entryNumber: number;
 		private tokenType: TokenType;
 		private tokenValue: string;
-		private reservedWordFlag: boolean;
-		private scopeLevel: number;
 		private identifierType: string;
 
 		constructor() {
@@ -14,8 +12,6 @@ module Compiler {
 			this.entryNumber = -1;
 			this.tokenType = TokenType.T_DEFAULT;
 			this.tokenValue = "";
-			this.reservedWordFlag = false;
-			this.scopeLevel = 0;
 			this.identifierType = "";
 		}
 
@@ -43,22 +39,6 @@ module Compiler {
 			this.tokenValue = tokenValue;
 		}
 
-		public isReservedWord(): boolean {
-			return this.reservedWordFlag;
-		}
-
-		public setReservedWord(reservedWordFlag: boolean): void {
-			this.reservedWordFlag = reservedWordFlag;
-		}
-
-		public getScopeLevel(): number {
-			return this.scopeLevel;
-		}
-
-		public setScopeLevel(scopeLevel: number): void {
-			this.scopeLevel = scopeLevel;
-		}
-
 		public getIdentifierType(): string {
 			return this.identifierType;
 		}
@@ -73,7 +53,7 @@ module Compiler {
 			token.setType(this.tokenType);
 			token.setValue(this.tokenValue);
 
-			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue() + " | " + this.scopeLevel;
+			var result = this.entryNumber + " | " + token.getTokenName() + " | " + token.getValue();
 			return result;
 		}
 

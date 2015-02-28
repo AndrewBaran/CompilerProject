@@ -125,27 +125,13 @@ var Compiler;
             document.getElementById("rowDebugInfo").appendChild(divTokenWindow);
         };
 
-        Control.debugCreateSymbolTableDiv = function (symbolTable) {
-            var divSymbolTable = document.createElement("div");
-            divSymbolTable.id = "divDebugSymbolTable";
+        // TODO: Implement when symbol table layout is set in stone
+        Control.displaySymbolTable = function (symbolTable) {
+            var table = document.getElementById("symbolTable");
 
-            var stringBody = "Symbol Table: <hr />";
-
-            for (var i = 0; i < symbolTable.getSize(); i++) {
-                var currentEntry = symbolTable.getEntry(i);
-
-                if (currentEntry !== null) {
-                    if (!currentEntry.isReservedWord) {
-                        stringBody += currentEntry.toString();
-                        stringBody += "<br />";
-                    }
-                }
+            while (table.rows.length > 1) {
+                table.deleteRow(-1);
             }
-
-            divSymbolTable.innerHTML = stringBody;
-
-            // TODO: Attach symbol table somewhere else
-            document.getElementById("mainBody").appendChild(divSymbolTable);
         };
 
         Control.removeDivs = function (divList) {

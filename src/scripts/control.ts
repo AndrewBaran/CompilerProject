@@ -135,31 +135,16 @@ module Compiler {
 			document.getElementById("rowDebugInfo").appendChild(divTokenWindow);
 		}
 
-		public static debugCreateSymbolTableDiv(symbolTable: SymbolTable): void {
+		// TODO: Implement when symbol table layout is set in stone
+		public static displaySymbolTable(symbolTable: SymbolTable): void {
 
-			var divSymbolTable = document.createElement("div");
-			divSymbolTable.id = "divDebugSymbolTable";
+			var table = <HTMLTableElement> document.getElementById("symbolTable");
 
-			var stringBody: string = "Symbol Table: <hr />";
-
-			for(var i: number = 0; i < symbolTable.getSize(); i++) {
-
-				var currentEntry: SymbolTableEntry = symbolTable.getEntry(i);
-
-				if(currentEntry !== null) {
-
-					if(!currentEntry.isReservedWord) {
-
-						stringBody += currentEntry.toString();
-						stringBody += "<br />";
-					}
-				}
+			// Clear table of potentially old data
+			while(table.rows.length > 1) {
+				table.deleteRow(-1);
 			}
 
-			divSymbolTable.innerHTML = stringBody;
-
-			// TODO: Attach symbol table somewhere else
-			document.getElementById("mainBody").appendChild(divSymbolTable);
 		}
 
 		private static removeDivs(divList: string[]): void {

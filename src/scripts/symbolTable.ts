@@ -5,23 +5,14 @@ module Compiler {
 		private table: SymbolTableEntry [];
 		private nextAvailableIndex: number;
 
-		constructor() {
+		private scopeLevel: number;
 
-			// Populate the table with reserved words
-			var reservedWordList: string[] = ["while", "if", "print", "int", "string", "boolean", "false", "true", "!=", "=", "=="];
+		constructor() {
 
 			this.table = [];
 			this.nextAvailableIndex = 0;
 
-			for(var i: number = 0; i < reservedWordList.length; i++) {
-
-				var entry: SymbolTableEntry = new SymbolTableEntry();
-				entry.setEntryNumber(this.nextAvailableIndex++);
-				entry.setTokenValue(reservedWordList[i]);
-				entry.setReservedWord(true);
-
-				this.table.push(entry);
-			}
+			this.scopeLevel = 0;
 		}
 
 		public insert(token: Token): void {
@@ -30,7 +21,6 @@ module Compiler {
 			entry.setEntryNumber(this.nextAvailableIndex++);
 			entry.setTokenType(token.getType());
 			entry.setTokenValue(token.getValue());
-			entry.setReservedWord(false);
 
 			this.table.push(entry);
 		}
@@ -42,6 +32,10 @@ module Compiler {
 
 		public getSize(): number {
 			return this.nextAvailableIndex;
+		}
+
+		public getScopeLevel(): number {
+			return this.scopeLevel;
 		}
 
 	}
