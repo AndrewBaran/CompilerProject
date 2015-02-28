@@ -8,6 +8,18 @@ textarea.noResize
 	resize: none;
 }
 
+#divTokenList
+{
+	height: 150px;
+	overflow: auto;
+}
+
+#divSymbolTable
+{
+	height: 150px;
+	overflow: auto;
+}
+
 #pageFooter
 {
 	margin-top: -15px;

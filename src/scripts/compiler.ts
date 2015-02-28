@@ -39,14 +39,7 @@ module Compiler {
 			if(tokenList.length > 0 && lexResult) {
 
 				if(!this.testMode) {
-
-					if(this.debugMode) {
-
-						Control.debugCreateTokenDiv(tokenList);
-					}
-
-					// TODO: Commented out for Project 1
-					// Control.debugCreateSymbolTableDiv(this.symbolTable);
+					Control.displayTokenTable(tokenList);
 				}
 				
 				try {
@@ -61,6 +54,10 @@ module Compiler {
 			}
 
 			if(parseResult) {
+
+				if(!this.testMode) {
+					Control.displaySymbolTable(this.symbolTable);
+				}
 
 				// TOOD: Semantic analysis
 			}

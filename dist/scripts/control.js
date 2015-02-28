@@ -100,37 +100,41 @@ var Compiler;
             document.getElementById("textboxInputCode").value = code;
         };
 
-        // TODO: Make pretty
-        // Displays tokens produced from lex if debug mode is enabled
-        Control.debugCreateTokenDiv = function (tokenList) {
-            var divTokenWindow = document.createElement("div");
-            divTokenWindow.id = "divDebugToken";
-            divTokenWindow.className = "col-sm-12 text-center";
+        // Displays tokens produced from lex
+        Control.displayTokenTable = function (tokenList) {
+            var tableName = "tokenTable";
+            this.clearTable(tableName);
 
-            var stringBody = tokenList.length + " Tokens found: <br />";
+            var table = document.getElementById(tableName);
 
             for (var i = 0; i < tokenList.length; i++) {
                 var token = tokenList[i].token;
 
-                stringBody += i.toString() + ": ";
-                stringBody += token.toString();
+                var row = table.insertRow(-1);
 
-                if ((i + 1) !== tokenList.length) {
-                    stringBody += " | ";
-                }
+                var nameCell = row.insertCell(-1);
+                nameCell.innerHTML = token.getTokenName();
+
+                var valueCell = row.insertCell(-1);
+                valueCell.innerHTML = token.getValue();
             }
-
-            divTokenWindow.innerHTML = stringBody;
-
-            document.getElementById("rowDebugInfo").appendChild(divTokenWindow);
         };
 
         // TODO: Implement when symbol table layout is set in stone
         Control.displaySymbolTable = function (symbolTable) {
-            var table = document.getElementById("symbolTable");
+            var tableName = "symbolTable";
+            this.clearTable(tableName);
 
-            while (table.rows.length > 1) {
-                table.deleteRow(-1);
+            var table = document.getElementById(tableName);
+        };
+
+        Control.clearTable = function (tableName) {
+            var table = document.getElementById(tableName);
+
+            if (table !== null) {
+                while (table.rows.length > 1) {
+                    table.deleteRow(-1);
+                }
             }
         };
 

@@ -27,11 +27,7 @@ var Compiler;
 
             if (tokenList.length > 0 && lexResult) {
                 if (!this.testMode) {
-                    if (this.debugMode) {
-                        _Compiler.Control.debugCreateTokenDiv(tokenList);
-                    }
-                    // TODO: Commented out for Project 1
-                    // Control.debugCreateSymbolTableDiv(this.symbolTable);
+                    _Compiler.Control.displayTokenTable(tokenList);
                 }
 
                 try  {
@@ -43,6 +39,9 @@ var Compiler;
             }
 
             if (parseResult) {
+                if (!this.testMode) {
+                    _Compiler.Control.displaySymbolTable(this.symbolTable);
+                }
                 // TOOD: Semantic analysis
             }
 

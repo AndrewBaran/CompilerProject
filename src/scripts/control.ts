@@ -108,43 +108,47 @@ module Compiler {
 			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = code;
 		}
 
-		// TODO: Make pretty
-		// Displays tokens produced from lex if debug mode is enabled
-		public static debugCreateTokenDiv(tokenList: TokenInfo[]): void {
+		// Displays tokens produced from lex
+		public static displayTokenTable(tokenList: TokenInfo[]): void {
 
-			var divTokenWindow = document.createElement("div");
-			divTokenWindow.id = "divDebugToken";
-			divTokenWindow.className = "col-sm-12 text-center";
+			var tableName: string = "tokenTable";
+			this.clearTable(tableName);
 
-			var stringBody: string = tokenList.length + " Tokens found: <br />";
+			var table = <HTMLTableElement> document.getElementById(tableName);
 
 			for(var i: number = 0; i < tokenList.length; i++) {
 
 				var token: Token = tokenList[i].token;
 
-				stringBody += i.toString() + ": ";
-				stringBody += token.toString();
+				var row = <HTMLTableRowElement> table.insertRow(-1);
 
-				if((i + 1) !== tokenList.length) {
-					stringBody += " | ";
-				}
+				var nameCell = <HTMLTableCellElement> row.insertCell(-1);
+				nameCell.innerHTML = token.getTokenName();
+
+				var valueCell = <HTMLTableCellElement> row.insertCell(-1);
+				valueCell.innerHTML = token.getValue();
 			}
-
-			divTokenWindow.innerHTML = stringBody;
-
-			document.getElementById("rowDebugInfo").appendChild(divTokenWindow);
 		}
 
 		// TODO: Implement when symbol table layout is set in stone
 		public static displaySymbolTable(symbolTable: SymbolTable): void {
 
-			var table = <HTMLTableElement> document.getElementById("symbolTable");
+			var tableName: string = "symbolTable";
+			this.clearTable(tableName);
 
-			// Clear table of potentially old data
-			while(table.rows.length > 1) {
-				table.deleteRow(-1);
+			var table = <HTMLTableElement> document.getElementById(tableName);
+		}
+
+		private static clearTable(tableName: string): void {
+
+			var table = <HTMLTableElement> document.getElementById(tableName);
+
+			if(table !== null) {
+
+				while(table.rows.length > 1) {
+					table.deleteRow(-1);
+				}
 			}
-
 		}
 
 		private static removeDivs(divList: string[]): void {
@@ -158,6 +162,7 @@ module Compiler {
 				}
 			}
 		}
+
 
 		// TODO: Display which phase of compilation failed
 		// Executes each unit test and displays the result
