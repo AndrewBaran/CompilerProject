@@ -46,12 +46,5 @@ module Compiler {
 		public setIdType(idType: string): void {
 			this.idType = idType;
 		}
-
-		// TODO: Make this different
-		public toString(): string {
-
-			return "";
-		}
-
 	}
 }

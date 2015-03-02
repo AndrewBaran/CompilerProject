@@ -66,3 +66,9 @@ enum TokenType {
 	T_TRUE, // true
 	T_WHITE_SPACE
 }
+
+interface Constants {
+	MAX_SCOPE_ENTRIES: number;
+}
+
+var _Constants: Constants = {MAX_SCOPE_ENTRIES: 26};

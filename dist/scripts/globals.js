@@ -65,3 +65,5 @@ var TokenType;
     TokenType[TokenType["T_TRUE"] = 25] = "T_TRUE";
     TokenType[TokenType["T_WHITE_SPACE"] = 26] = "T_WHITE_SPACE";
 })(TokenType || (TokenType = {}));
+
+var _Constants = { MAX_SCOPE_ENTRIES: 26 };

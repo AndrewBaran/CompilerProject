@@ -1,21 +1,5 @@
 var Compiler;
 (function (Compiler) {
-    /* Game Plan
-    
-    A symbol table is a tree of hash tables:
-    Each hash table has a list of entries (ids), a link to its parent (can be null),
-    and a list of links to its children
-    
-    Methods:
-    openScope():
-    Creates new hash table
-    Adds it to current table's list of children
-    Move currentTablePointer to the new child
-    
-    closeScope():
-    Move currentTablePointer to its parent
-    
-    */
     var SymbolTable = (function () {
         function SymbolTable() {
             this.setDefaultScope();
@@ -64,9 +48,15 @@ var Compiler;
     })();
     Compiler.SymbolTable = SymbolTable;
 
+    // TODO: Move to another file
     var ScopeTable = (function () {
         function ScopeTable() {
             this.entryTable = [];
+
+            for (var i = 0; i < _Constants.MAX_SCOPE_ENTRIES; i++) {
+                this.entryTable[i] = null;
+            }
+
             this.nextAvailableIndex = 0;
 
             this.scopeLevel = 0;
@@ -80,27 +70,23 @@ var Compiler;
             entry.setIdName(token.getValue());
             entry.setIdType(typeValue);
 
-            // TODO: Not currently a hashtable
-            // Will want to hash the ordinal value of the char
-            if (!(this.hasEntry(entry.getIdName()))) {
-                this.entryTable.push(entry);
+            var hashIndex = this.hashID(entry.getIdName());
+
+            if (this.entryTable[hashIndex] === null) {
+                this.entryTable[hashIndex] = entry;
                 return true;
             } else {
                 return false;
             }
         };
 
-        ScopeTable.prototype.hasEntry = function (idName) {
-            for (var i = 0; i < this.entryTable.length; i++) {
-                var entry = this.entryTable[i];
+        ScopeTable.prototype.hashID = function (idName) {
+            var firstLowerCaseValue = 97;
 
-                if (entry.getIdName() === idName) {
-                    return true;
-                }
-            }
+            var hashValue = idName.charCodeAt(0);
+            hashValue = hashValue - firstLowerCaseValue;
 
-            // Not found
-            return false;
+            return hashValue;
         };
 
         ScopeTable.prototype.addChildScope = function (child) {

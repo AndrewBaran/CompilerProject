@@ -3,6 +3,7 @@ var Compiler;
     var Control = (function () {
         function Control() {
         }
+        // TODO: Do I need debug mode anymore?
         // Clears out the code and log textboxes when the page is loaded
         Control.clearData = function () {
             // Clear textboxes and divs of any content
@@ -11,7 +12,6 @@ var Compiler;
             this.clearCompilerResults();
 
             // Reset selections on compiler flags
-            // TODO: Checked for now (debugging)
             document.getElementById("checkboxDebug").checked = false;
 
             this.enableButtons();
@@ -125,25 +125,27 @@ var Compiler;
         };
 
         Control.buildTable = function (currentScope, htmlTable) {
-            for (var entryIndex = 0; entryIndex < currentScope.getSize(); entryIndex++) {
+            for (var entryIndex = 0; entryIndex < _Constants.MAX_SCOPE_ENTRIES; entryIndex++) {
                 var entry = currentScope.getEntry(entryIndex);
 
-                // TODO: Remove after testing
-                Compiler.Logger.log("Adding " + entry.getIdName() + " to display table");
+                if (entry !== null) {
+                    // TODO: Remove after testing
+                    Compiler.Logger.log("Adding " + entry.getIdName() + " to display table");
 
-                var row = htmlTable.insertRow(-1);
+                    var row = htmlTable.insertRow(-1);
 
-                var idCell = row.insertCell(-1);
-                idCell.innerHTML = entry.getIdName();
+                    var idCell = row.insertCell(-1);
+                    idCell.innerHTML = entry.getIdName();
 
-                var typeCell = row.insertCell(-1);
-                typeCell.innerHTML = entry.getIdType();
+                    var typeCell = row.insertCell(-1);
+                    typeCell.innerHTML = entry.getIdType();
 
-                var valueCell = row.insertCell(-1);
-                valueCell.innerHTML = entry.getValue();
+                    var valueCell = row.insertCell(-1);
+                    valueCell.innerHTML = entry.getValue();
 
-                var scopeCell = row.insertCell(-1);
-                scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+                    var scopeCell = row.insertCell(-1);
+                    scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+                }
             }
 
             var childScopeList = currentScope.getChildList();

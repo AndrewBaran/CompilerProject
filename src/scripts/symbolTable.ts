@@ -1,22 +1,5 @@
 module Compiler {
 
-	/* Game Plan
-	
-		A symbol table is a tree of hash tables:
-			Each hash table has a list of entries (ids), a link to its parent (can be null), 
-			and a list of links to its children
-
-		Methods:
-			openScope():
-				Creates new hash table
-				Adds it to current table's list of children
-				Move currentTablePointer to the new child
-
-			closeScope():
-				Move currentTablePointer to its parent
-
-	*/
-
 	export class SymbolTable {
 
 		private currentScopeTable: ScopeTable;
@@ -78,6 +61,7 @@ module Compiler {
 	}
 
 
+	// TODO: Move to another file
 	export class ScopeTable {
 
 		private entryTable: SymbolTableEntry [];
@@ -91,6 +75,12 @@ module Compiler {
 		constructor() {
 
 			this.entryTable = [];
+
+			// Fill with null instead of undefined (the default)
+			for(var i: number = 0; i < _Constants.MAX_SCOPE_ENTRIES; i++) {
+				this.entryTable[i] = null;
+			}
+
 			this.nextAvailableIndex = 0;
 
 			this.scopeLevel = 0;
@@ -106,11 +96,11 @@ module Compiler {
 			entry.setIdName(token.getValue());
 			entry.setIdType(typeValue);
 
-			// TODO: Not currently a hashtable
-			// Will want to hash the ordinal value of the char
-			if(!(this.hasEntry(entry.getIdName()))) {
+			var hashIndex: number = this.hashID(entry.getIdName());
 
-				this.entryTable.push(entry);
+			if(this.entryTable[hashIndex] === null) {
+
+				this.entryTable[hashIndex] = entry;
 				return true;
 			}
 
@@ -120,19 +110,14 @@ module Compiler {
 
 		}
 
-		private hasEntry(idName: string): boolean {
+		private hashID(idName: string): number {
 
-			for(var i: number = 0; i < this.entryTable.length; i++) {
+			var firstLowerCaseValue: number = 97;
 
-				var entry: SymbolTableEntry = this.entryTable[i];
+			var hashValue: number = idName.charCodeAt(0);
+			hashValue = hashValue - firstLowerCaseValue;
 
-				if(entry.getIdName() === idName) {
-					return true;
-				}
-			}
-
-			// Not found
-			return false;
+			return hashValue;
 		}
 
 		public addChildScope(child: ScopeTable): void {

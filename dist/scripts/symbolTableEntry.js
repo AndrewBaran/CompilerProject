@@ -38,11 +38,6 @@ var Compiler;
         SymbolTableEntry.prototype.setIdType = function (idType) {
             this.idType = idType;
         };
-
-        // TODO: Make this different
-        SymbolTableEntry.prototype.toString = function () {
-            return "";
-        };
         return SymbolTableEntry;
     })();
     Compiler.SymbolTableEntry = SymbolTableEntry;

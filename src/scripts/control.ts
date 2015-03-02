@@ -2,6 +2,7 @@ module Compiler {
 
 	export class Control {
 
+		// TODO: Do I need debug mode anymore?
 		// Clears out the code and log textboxes when the page is loaded
 		public static clearData(): void {
 
@@ -11,7 +12,6 @@ module Compiler {
 			this.clearCompilerResults();
 
 			// Reset selections on compiler flags
-			// TODO: Checked for now (debugging) 
 			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = false;
 
 			this.enableButtons();
@@ -137,26 +137,29 @@ module Compiler {
 
 		private static buildTable(currentScope: ScopeTable, htmlTable: HTMLTableElement): void {
 
-			for(var entryIndex: number = 0; entryIndex < currentScope.getSize(); entryIndex++) {
+			for(var entryIndex: number = 0; entryIndex < _Constants.MAX_SCOPE_ENTRIES; entryIndex++) {
 
 				var entry: SymbolTableEntry = currentScope.getEntry(entryIndex);
 
-				// TODO: Remove after testing
-				Logger.log("Adding " + entry.getIdName() + " to display table");
+				if(entry !== null) {
 
-				var row = <HTMLTableRowElement> htmlTable.insertRow(-1);
+					// TODO: Remove after testing
+					Logger.log("Adding " + entry.getIdName() + " to display table");
 
-				var idCell = row.insertCell(-1);
-				idCell.innerHTML = entry.getIdName();
+					var row = <HTMLTableRowElement> htmlTable.insertRow(-1);
 
-				var typeCell = row.insertCell(-1);
-				typeCell.innerHTML = entry.getIdType();
+					var idCell = row.insertCell(-1);
+					idCell.innerHTML = entry.getIdName();
 
-				var valueCell = row.insertCell(-1);
-				valueCell.innerHTML = entry.getValue();
+					var typeCell = row.insertCell(-1);
+					typeCell.innerHTML = entry.getIdType();
 
-				var scopeCell = row.insertCell(-1);
-				scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+					var valueCell = row.insertCell(-1);
+					valueCell.innerHTML = entry.getValue();
+
+					var scopeCell = row.insertCell(-1);
+					scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+				}
 
 			}
 
