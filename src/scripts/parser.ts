@@ -262,8 +262,10 @@ module Compiler {
 			// TODO: Move this to semantic analysis?
 			if(!result) {
 
-				Logger.log("Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.");
-				Logger.log("Panic!");
+				var errorMessage: string = "Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.";
+
+				Logger.log(errorMessage);
+				throw errorMessage;
 			}
 		}
 

@@ -206,8 +206,10 @@ var Compiler;
 
             // TODO: Move this to semantic analysis?
             if (!result) {
-                Compiler.Logger.log("Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.");
-                Compiler.Logger.log("Panic!");
+                var errorMessage = "Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             }
         };
 

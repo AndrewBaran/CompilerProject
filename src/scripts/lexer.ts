@@ -11,7 +11,7 @@ module Compiler {
 
 			this.setupTokenPatterns();
 
-			Logger.log("Performing lexical analysis");
+			Logger.log("Performing Lexical Analysis");
 
 			var tokenList: TokenInfo [] = [];
 

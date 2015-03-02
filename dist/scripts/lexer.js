@@ -7,7 +7,7 @@ var Compiler;
         Lexer.tokenizeCode = function (inputCode, symbolTable) {
             this.setupTokenPatterns();
 
-            Compiler.Logger.log("Performing lexical analysis");
+            Compiler.Logger.log("Performing Lexical Analysis");
 
             var tokenList = [];
 

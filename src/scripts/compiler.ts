@@ -2,20 +2,19 @@ module Compiler {
 	
 	export class Compiler {
 
-		private static symbolTable: SymbolTable;
-
 		private static debugMode: boolean;
 		private static testMode: boolean;
 
 		public static compile(codeToCompile: string): boolean {
 
-			this.symbolTable = new SymbolTable();
 			this.setCompilerFlags();
 
 			var lexResult: boolean = false;
 			var parseResult: boolean = false;
+			var semanticResult: boolean = false;
 
 			var tokenList: TokenInfo [] = [];
+			var symbolTable: SymbolTable = new SymbolTable(); 
 			var concreteSyntaxTree: ConcreteSyntaxTree = null;
 
 			// No available code to lex
@@ -27,7 +26,7 @@ module Compiler {
 
 				try {
 
-					tokenList = Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+					tokenList = Lexer.tokenizeCode(codeToCompile, symbolTable);
 					lexResult = true;
 				}
 
@@ -44,7 +43,7 @@ module Compiler {
 				
 				try {
 
-					concreteSyntaxTree = Parser.parseCode(tokenList, this.symbolTable);
+					concreteSyntaxTree = Parser.parseCode(tokenList, symbolTable);
 					parseResult = true;
 				}
 
@@ -56,18 +55,27 @@ module Compiler {
 			if(parseResult) {
 
 				if(!this.testMode) {
-					Control.displaySymbolTable(this.symbolTable);
+					Control.displaySymbolTable(symbolTable);
 				}
 
-				// TOOD: Semantic analysis
+				try {
+
+					SemanticAnalyzer.analyze(concreteSyntaxTree, symbolTable);
+					semanticResult = true;
+				}
+
+				catch(exception) {
+					semanticResult = false;
+				}
+				
 			}
 
 			if(!this.testMode) {
-				Control.displayCompilerResults(lexResult, parseResult);
+				Control.displayCompilerResults(lexResult, parseResult, semanticResult);
 			}
 
 			// TODO: Return the AND of each compilation result
-			return lexResult && parseResult;
+			return lexResult && parseResult && semanticResult;
 		}
 
 		// Set flags for use by the compiler (debug mode, etc.)

@@ -14,6 +14,13 @@ var Compiler;
             // Reset selections on compiler flags
             document.getElementById("checkboxDebug").checked = false;
 
+            // Reset any tables that were created on the last run
+            var tablesToClear = ["tokenTable", "symbolTable"];
+
+            for (var i = 0; i < tablesToClear.length; i++) {
+                this.clearTable(tablesToClear[i]);
+            }
+
             this.enableButtons();
         };
 
@@ -223,7 +230,7 @@ var Compiler;
             }
         };
 
-        Control.displayCompilerResults = function (lex, parse) {
+        Control.displayCompilerResults = function (lex, parse, semantic) {
             var resultDiv = document.getElementById("divCompilerResults");
 
             var results = "Compilation Results <br />";
@@ -234,6 +241,10 @@ var Compiler;
 
             results += "Parse: ";
             results += parse ? "<b>Passed</b>" : "<b>Failed</b>";
+            results += " | ";
+
+            results += "Semantic: ";
+            results += semantic ? "<b>Passed</b>" : "<b>Failed</b>";
 
             resultDiv.innerHTML = results;
         };

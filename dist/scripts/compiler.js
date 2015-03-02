@@ -4,13 +4,14 @@ var Compiler;
         function Compiler() {
         }
         Compiler.compile = function (codeToCompile) {
-            this.symbolTable = new _Compiler.SymbolTable();
             this.setCompilerFlags();
 
             var lexResult = false;
             var parseResult = false;
+            var semanticResult = false;
 
             var tokenList = [];
+            var symbolTable = new _Compiler.SymbolTable();
             var concreteSyntaxTree = null;
 
             // No available code to lex
@@ -18,7 +19,7 @@ var Compiler;
                 _Compiler.Logger.log("Error! No code present to compile");
             } else {
                 try  {
-                    tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, this.symbolTable);
+                    tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, symbolTable);
                     lexResult = true;
                 } catch (exception) {
                     lexResult = false;
@@ -31,7 +32,7 @@ var Compiler;
                 }
 
                 try  {
-                    concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList, this.symbolTable);
+                    concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList, symbolTable);
                     parseResult = true;
                 } catch (exception) {
                     parseResult = false;
@@ -40,17 +41,23 @@ var Compiler;
 
             if (parseResult) {
                 if (!this.testMode) {
-                    _Compiler.Control.displaySymbolTable(this.symbolTable);
+                    _Compiler.Control.displaySymbolTable(symbolTable);
                 }
-                // TOOD: Semantic analysis
+
+                try  {
+                    _Compiler.SemanticAnalyzer.analyze(concreteSyntaxTree, symbolTable);
+                    semanticResult = true;
+                } catch (exception) {
+                    semanticResult = false;
+                }
             }
 
             if (!this.testMode) {
-                _Compiler.Control.displayCompilerResults(lexResult, parseResult);
+                _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
             }
 
             // TODO: Return the AND of each compilation result
-            return lexResult && parseResult;
+            return lexResult && parseResult && semanticResult;
         };
 
         // Set flags for use by the compiler (debug mode, etc.)

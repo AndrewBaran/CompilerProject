@@ -14,6 +14,13 @@ module Compiler {
 			// Reset selections on compiler flags
 			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = false;
 
+			// Reset any tables that were created on the last run
+			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
+
+			for(var i: number = 0; i < tablesToClear.length; i++) {
+				this.clearTable(tablesToClear[i]);
+			}
+
 			this.enableButtons();
 		}
 
@@ -253,7 +260,7 @@ module Compiler {
 
 		}
 
-		public static displayCompilerResults(lex: boolean, parse: boolean): void {
+		public static displayCompilerResults(lex: boolean, parse: boolean, semantic: boolean): void {
 
 			var resultDiv = document.getElementById("divCompilerResults");
 
@@ -265,6 +272,10 @@ module Compiler {
 
 			results += "Parse: ";
 			results += parse ? "<b>Passed</b>" : "<b>Failed</b>";
+			results += " | ";
+
+			results += "Semantic: ";
+			results += semantic ? "<b>Passed</b>" : "<b>Failed</b>";
 
 			resultDiv.innerHTML = results;
 		}

@@ -3,12 +3,15 @@ module Compiler {
 	export class SymbolTable {
 
 		private currentScopeTable: ScopeTable;
+		private nextScopeNumber: number;
+
 		private static defaultScopeTable: ScopeTable;
 
 		constructor() {
 
 			this.setDefaultScope();
 			this.currentScopeTable = SymbolTable.defaultScopeTable;
+			this.nextScopeNumber = 0;
 		}
 
 		private setDefaultScope(): void {
@@ -38,7 +41,7 @@ module Compiler {
 
 			var newScope: ScopeTable = new ScopeTable();
 			newScope.setParent(this.currentScopeTable);
-			newScope.setScopeLevel(this.currentScopeTable.getScopeLevel() + 1);
+			newScope.setScopeLevel(this.nextScopeNumber++);
 
 			this.currentScopeTable.addChildScope(newScope);
 

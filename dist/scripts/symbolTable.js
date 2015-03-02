@@ -4,6 +4,7 @@ var Compiler;
         function SymbolTable() {
             this.setDefaultScope();
             this.currentScopeTable = SymbolTable.defaultScopeTable;
+            this.nextScopeNumber = 0;
         }
         SymbolTable.prototype.setDefaultScope = function () {
             SymbolTable.defaultScopeTable = new ScopeTable();
@@ -26,7 +27,7 @@ var Compiler;
         SymbolTable.prototype.openScope = function () {
             var newScope = new ScopeTable();
             newScope.setParent(this.currentScopeTable);
-            newScope.setScopeLevel(this.currentScopeTable.getScopeLevel() + 1);
+            newScope.setScopeLevel(this.nextScopeNumber++);
 
             this.currentScopeTable.addChildScope(newScope);
 
