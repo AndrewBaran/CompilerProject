@@ -2,7 +2,6 @@ module Compiler {
 
 	export class Control {
 
-		// TODO: Do I need debug mode anymore?
 		// Clears out the code and log textboxes when the page is loaded
 		public static clearData(): void {
 
@@ -10,9 +9,6 @@ module Compiler {
 			this.clearInputCode();
 			this.clearLog();
 			this.clearCompilerResults();
-
-			// Reset selections on compiler flags
-			(<HTMLInputElement> document.getElementById("checkboxDebug")).checked = false;
 
 			// Reset any tables that were created on the last run
 			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
@@ -150,9 +146,6 @@ module Compiler {
 
 				if(entry !== null) {
 
-					// TODO: Remove after testing
-					Logger.log("Adding " + entry.getIdName() + " to display table");
-
 					var row = <HTMLTableRowElement> htmlTable.insertRow(-1);
 
 					var idCell = row.insertCell(-1);
@@ -194,19 +187,6 @@ module Compiler {
 				}
 			}
 		}
-
-		private static removeDivs(divList: string[]): void {
-
-			for(var i: number = 0; i < divList.length; i++) {
-
-				var divToRemove = document.getElementById(divList[i]);
-
-				if(divToRemove !== null) {
-					document.getElementById("rowDebugInfo").removeChild(divToRemove);
-				}
-			}
-		}
-
 
 		// TODO: Display which phase of compilation failed
 		// Executes each unit test and displays the result

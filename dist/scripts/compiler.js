@@ -4,8 +4,6 @@ var Compiler;
         function Compiler() {
         }
         Compiler.compile = function (codeToCompile) {
-            this.setCompilerFlags();
-
             var lexResult = false;
             var parseResult = false;
             var semanticResult = false;
@@ -14,9 +12,8 @@ var Compiler;
             var symbolTable = new _Compiler.SymbolTable();
             var concreteSyntaxTree = null;
 
-            // No available code to lex
             if (codeToCompile.length == 0) {
-                _Compiler.Logger.log("Error! No code present to compile");
+                _Compiler.Logger.log("Error! No code available to compile.");
             } else {
                 try  {
                     tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, symbolTable);
@@ -58,17 +55,6 @@ var Compiler;
 
             // TODO: Return the AND of each compilation result
             return lexResult && parseResult && semanticResult;
-        };
-
-        // Set flags for use by the compiler (debug mode, etc.)
-        Compiler.setCompilerFlags = function () {
-            var checkboxDebug = document.getElementById("checkboxDebug");
-            this.debugMode = checkboxDebug.checked;
-
-            if (this.debugMode) {
-                _Compiler.Logger.log("Debug mode enabled");
-                _Compiler.Logger.log("");
-            }
         };
 
         Compiler.setTestMode = function (isTestMode) {

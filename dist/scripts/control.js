@@ -3,16 +3,12 @@ var Compiler;
     var Control = (function () {
         function Control() {
         }
-        // TODO: Do I need debug mode anymore?
         // Clears out the code and log textboxes when the page is loaded
         Control.clearData = function () {
             // Clear textboxes and divs of any content
             this.clearInputCode();
             this.clearLog();
             this.clearCompilerResults();
-
-            // Reset selections on compiler flags
-            document.getElementById("checkboxDebug").checked = false;
 
             // Reset any tables that were created on the last run
             var tablesToClear = ["tokenTable", "symbolTable"];
@@ -136,9 +132,6 @@ var Compiler;
                 var entry = currentScope.getEntry(entryIndex);
 
                 if (entry !== null) {
-                    // TODO: Remove after testing
-                    Compiler.Logger.log("Adding " + entry.getIdName() + " to display table");
-
                     var row = htmlTable.insertRow(-1);
 
                     var idCell = row.insertCell(-1);
@@ -171,16 +164,6 @@ var Compiler;
             if (table !== null) {
                 while (table.rows.length > 1) {
                     table.deleteRow(-1);
-                }
-            }
-        };
-
-        Control.removeDivs = function (divList) {
-            for (var i = 0; i < divList.length; i++) {
-                var divToRemove = document.getElementById(divList[i]);
-
-                if (divToRemove !== null) {
-                    document.getElementById("rowDebugInfo").removeChild(divToRemove);
                 }
             }
         };
