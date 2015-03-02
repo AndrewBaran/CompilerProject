@@ -1,0 +1,83 @@
+Andrew Baran
+Professor Labouseur
+Design of Compilers
+March 2, 2015
+
+Lab 4:
+
+Crafting a Compiler:
+
+4.9.
+
+First:
+	S -> {a, b, c, d}
+	B -> {b, c, d}
+	C -> {c, d}
+
+Follow:
+	S -> {e ,EOF}
+	B -> {e}
+	C -> {e}
+
+5.10.
+
+1st way:
+S
+Stmt $
+if expr then Stmt else Stmt
+if expr then if expr then Stmt else Stmt
+if expr then if expr then other else Stmt
+if expr then if expr then other else other
+
+					S
+				/		\
+			Stmt  			$
+	/	/	|	 |	 \	   \
+   if  expr then Stmt else Stmt
+							|
+	   			/ | | \   other
+
+		   if expr then Stmt
+			   			 |
+						other
+
+The then statements have higher precendence, as they are lower in the tree.
+
+2nd way:
+S
+Stmt $
+if expr then Stmt
+if expr then if expr then Stmt else Stmt
+if expr then if expr then other else Stmt
+if expr then if expr then other else other
+
+					S
+				/		\
+			Stmt  			$
+	/   /    |	 \	
+   if  expr then Stmt
+							
+	   			/ | | \      \   \
+
+		   if expr then Stmt else Stmt
+			   			 |			|
+						other      other
+
+The then and else statements have the same precendence levels, as they are on the same level in the parse tree.
+
+
+Dragon:
+
+4.4.3.
+
+Compute First and Follow for the grammar of exercise 4.2.1
+
+S 	-> S S +
+	-> S S *
+	-> a
+
+First:
+	S -> {a}
+
+Follow:
+	S -> {a, +, *, EOF}
