@@ -134,6 +134,13 @@ var Compiler;
                 listIndex++;
             }
 
+            if (tokenList.length === 0) {
+                var errorMessage = "Error! Input was only whitespace, so no tokens were found.";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            }
+
             var logWarningCount = 0;
 
             if (eofFound) {

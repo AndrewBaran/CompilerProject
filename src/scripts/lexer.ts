@@ -166,6 +166,15 @@ module Compiler {
 			}
 
 
+			if(tokenList.length === 0) {
+
+				var errorMessage: string = "Error! Input was only whitespace, so no tokens were found.";
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
+
+
 			var logWarningCount: number = 0;
 
 			if(eofFound) {
