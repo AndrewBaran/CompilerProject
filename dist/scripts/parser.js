@@ -206,7 +206,7 @@ var Compiler;
 
             // TODO: Move this to semantic analysis?
             if (!result) {
-                var errorMessage = "Error on line " + lineFoundOn + "! " + idToken.getValue() + " has already been declared in this scope.";
+                var errorMessage = "Error on line " + lineFoundOn + ": The identifier " + idToken.getValue() + " has already been declared in this scope.";
 
                 Compiler.Logger.log(errorMessage);
                 throw errorMessage;

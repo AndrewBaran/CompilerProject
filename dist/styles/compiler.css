@@ -20,6 +20,11 @@ textarea.noResize
 	overflow: auto;
 }
 
+#treeRow
+{
+	margin-top: 10px;
+}
+
 #pageFooter
 {
 	margin-top: -15px;

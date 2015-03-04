@@ -12,7 +12,7 @@ Last updated: February 26, 2015
 Purpose
 =======
 
-This is a compiler, written in TypeScript, that takes an input source file in the [following grammar](http://www.labouseur.com/courses/compilers/grammar.pdf) and generates 6502 Assembly OP codes.
+This is a compiler, written in TypeScript, that takes an input source file in the [following grammar](http://www.labouseur.com/courses/compilers/grammar.pdf) and generates 6502a Assembly OP codes.
 
 
 Project 1 Checklist
@@ -30,17 +30,17 @@ Project 2 Checklist
 - [ ] Modify your parser to create a concrete syntax tree (CST) while parsing
 	- [ ] Display the CST
 - [ ] Write a semantic analyzer that scope-checks and type-checks the CST for our grammar
-	- [ ] Create a display a symbol table with type and scope information
-	- [ ] Create an display the abstract syntax tree (AST)
-- [ ] Type-check the source code using the AST to catch...
+	- [ ] Create and display a symbol table with type and scope information
+	- [ ] Create and display the abstract syntax tree (AST)
+- [ ] Type-check the source code using the AST to catch:
 	- [ ] Undeclared identifiers
 	- [ ] Redeclared identifiers in the same scope
-	- [ ] Type Mismatches
-- [ ] Issue warning about:
+	- [ ] Type mismatches
+- [ ] Issue warnings about:
 	- [ ] Declared but unused identifiers
 	- [ ] Use of uninitialized variables, but do not treat them as errors
 - [ ] Issue verbose output functionality that traces the semantic analysis stages
-	- [ ] When you detect an error, report it in helpful detail including where it was found 
+	- [ ] When you detect an error, report it in helpful detail, including where it was found 
 
 Final Project Checklist
 =======================
