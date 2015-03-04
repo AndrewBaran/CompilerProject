@@ -37,12 +37,16 @@ module Compiler {
 		// Program: Block $
 		private static parseProgram(): void {
 
+			this.concreteSyntaxTree.insertInteriorNode("program");
+
 			this.parseBlock();
 			this.parseEOF();
 		}
 
 		// Block: { StatementList }
 		private static parseBlock(): void {
+
+			this.concreteSyntaxTree.insertInteriorNode("block");
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a left brace");

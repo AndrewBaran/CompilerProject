@@ -9,6 +9,8 @@ module Compiler {
 			this.clearInputCode();
 			this.clearLog();
 			this.clearCompilerResults();
+			this.clearCST();
+			this.clearAST();
 
 			// Reset any tables that were created on the last run
 			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
@@ -26,6 +28,14 @@ module Compiler {
 
 		private static clearLog(): void {
 			(<HTMLInputElement> document.getElementById("textboxLog")).value = "";
+		}
+
+		private static clearCST(): void {
+			(<HTMLInputElement> document.getElementById("textboxCST")).value = "";
+		}
+
+		private static clearAST(): void {
+			(<HTMLInputElement> document.getElementById("textboxAST")).value = "";
 		}
 
 		private static clearCompilerResults(): void {
@@ -51,6 +61,8 @@ module Compiler {
 
 			this.clearLog();
 			this.clearCompilerResults();
+			this.clearCST();
+			this.clearAST();
 
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
@@ -186,6 +198,10 @@ module Compiler {
 					table.deleteRow(-1);
 				}
 			}
+		}
+
+		public static displayCST(concreteSyntaxTree: ConcreteSyntaxTree): void {
+			concreteSyntaxTree.preOrderTraversal();
 		}
 
 		// TODO: Display which phase of compilation failed

@@ -10,7 +10,7 @@ var Compiler;
 
             var tokenList = [];
             var symbolTable = new _Compiler.SymbolTable();
-            var concreteSyntaxTree = null;
+            var concreteSyntaxTree = new _Compiler.ConcreteSyntaxTree();
 
             if (codeToCompile.length == 0) {
                 _Compiler.Logger.log("Error! No code available to compile.");
@@ -39,6 +39,7 @@ var Compiler;
             if (parseResult) {
                 if (!this.testMode) {
                     _Compiler.Control.displaySymbolTable(symbolTable);
+                    _Compiler.Control.displayCST(concreteSyntaxTree);
                 }
 
                 try  {

@@ -12,7 +12,7 @@ module Compiler {
 
 			var tokenList: TokenInfo [] = [];
 			var symbolTable: SymbolTable = new SymbolTable(); 
-			var concreteSyntaxTree: ConcreteSyntaxTree = null;
+			var concreteSyntaxTree: ConcreteSyntaxTree = new ConcreteSyntaxTree();
 
 			if(codeToCompile.length == 0) {
 				Logger.log("Error! No code available to compile.");
@@ -51,7 +51,9 @@ module Compiler {
 			if(parseResult) {
 
 				if(!this.testMode) {
+
 					Control.displaySymbolTable(symbolTable);
+					Control.displayCST(concreteSyntaxTree);
 				}
 
 				try {

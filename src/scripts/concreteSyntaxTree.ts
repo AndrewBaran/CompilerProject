@@ -13,6 +13,8 @@ module Compiler {
 
 		public insertInteriorNode(operator: string): void {
 
+			Logger.log("Adding interior node: " + operator, "cst");
+
 			var node: CSTNode = new CSTNode();
 			node.setOperator(operator);
 
@@ -25,6 +27,7 @@ module Compiler {
 			else {
 
 				this.currentNode.addChild(node);
+				this.currentNode = node;
 			}
 		}
 
@@ -33,7 +36,6 @@ module Compiler {
 		}
 
 		public preOrderTraversal(): void {
-
 			this.root.preOrderTraversal(this.root);
 		}
 
@@ -63,6 +65,10 @@ module Compiler {
 			this.childList.push(newNode);
 		}
 
+		public getOperator(): string {
+			return this.operator;
+		}
+
 		public setOperator(operator: string): void {
 			this.operator = operator;
 		}
@@ -71,9 +77,21 @@ module Compiler {
 			this.parent = parent;
 		}
 
+		public getNumChildren(): number {
+			return this.childList.length;
+		}
+
 		public preOrderTraversal(root: CSTNode): void {
 
+			if(root !== null) {
 
+				Logger.log("Op: " + root.getOperator(), "cst");
+
+				for(var i: number = 0; i < root.getNumChildren(); i++) {
+
+					root.preOrderTraversal(root.childList[i]);
+				}
+			}
 		}
 
 

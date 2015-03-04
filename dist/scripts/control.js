@@ -9,6 +9,8 @@ var Compiler;
             this.clearInputCode();
             this.clearLog();
             this.clearCompilerResults();
+            this.clearCST();
+            this.clearAST();
 
             // Reset any tables that were created on the last run
             var tablesToClear = ["tokenTable", "symbolTable"];
@@ -26,6 +28,14 @@ var Compiler;
 
         Control.clearLog = function () {
             document.getElementById("textboxLog").value = "";
+        };
+
+        Control.clearCST = function () {
+            document.getElementById("textboxCST").value = "";
+        };
+
+        Control.clearAST = function () {
+            document.getElementById("textboxAST").value = "";
         };
 
         Control.clearCompilerResults = function () {
@@ -48,6 +58,8 @@ var Compiler;
 
             this.clearLog();
             this.clearCompilerResults();
+            this.clearCST();
+            this.clearAST();
 
             // Compile the program
             var code = document.getElementById("textboxInputCode").value;
@@ -166,6 +178,10 @@ var Compiler;
                     table.deleteRow(-1);
                 }
             }
+        };
+
+        Control.displayCST = function (concreteSyntaxTree) {
+            concreteSyntaxTree.preOrderTraversal();
         };
 
         // TODO: Display which phase of compilation failed

@@ -6,6 +6,8 @@ var Compiler;
             this.currentNode = null;
         }
         ConcreteSyntaxTree.prototype.insertInteriorNode = function (operator) {
+            Compiler.Logger.log("Adding interior node: " + operator, "cst");
+
             var node = new CSTNode();
             node.setOperator(operator);
 
@@ -14,6 +16,7 @@ var Compiler;
                 this.currentNode = node;
             } else {
                 this.currentNode.addChild(node);
+                this.currentNode = node;
             }
         };
 
@@ -40,6 +43,10 @@ var Compiler;
             this.childList.push(newNode);
         };
 
+        CSTNode.prototype.getOperator = function () {
+            return this.operator;
+        };
+
         CSTNode.prototype.setOperator = function (operator) {
             this.operator = operator;
         };
@@ -48,7 +55,18 @@ var Compiler;
             this.parent = parent;
         };
 
+        CSTNode.prototype.getNumChildren = function () {
+            return this.childList.length;
+        };
+
         CSTNode.prototype.preOrderTraversal = function (root) {
+            if (root !== null) {
+                Compiler.Logger.log("Op: " + root.getOperator(), "cst");
+
+                for (var i = 0; i < root.getNumChildren(); i++) {
+                    root.preOrderTraversal(root.childList[i]);
+                }
+            }
         };
         return CSTNode;
     })();

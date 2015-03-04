@@ -28,12 +28,16 @@ var Compiler;
 
         // Program: Block $
         Parser.parseProgram = function () {
+            this.concreteSyntaxTree.insertInteriorNode("program");
+
             this.parseBlock();
             this.parseEOF();
         };
 
         // Block: { StatementList }
         Parser.parseBlock = function () {
+            this.concreteSyntaxTree.insertInteriorNode("block");
+
             var token = this.getToken();
             Compiler.Logger.log("Expecting a left brace");
 
