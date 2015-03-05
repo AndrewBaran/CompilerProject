@@ -158,6 +158,8 @@ var Compiler;
 
         // PrintStatement: print ( Expr )
         Parser.parsePrintStatement = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Print Statement");
+
             var token = this.getToken();
             Compiler.Logger.log("Expecting a print");
 
@@ -165,12 +167,16 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got a print!");
 
+                this.concreteSyntaxTree.insertLeafNode(token);
+
                 token = this.getToken();
                 Compiler.Logger.log("Expecting a left paren");
 
                 if (token.getType() === 2 /* T_LPAREN */) {
                     this.consumeToken();
                     Compiler.Logger.log("Got a left paren!");
+
+                    this.concreteSyntaxTree.insertLeafNode(token);
 
                     this.parseExpression();
 
@@ -180,6 +186,8 @@ var Compiler;
                     if (token.getType() === 3 /* T_RPAREN */) {
                         this.consumeToken();
                         Compiler.Logger.log("Got a right paren!");
+
+                        this.concreteSyntaxTree.insertLeafNode(token);
                     } else {
                         this.errorExpectedActual(3 /* T_RPAREN */, token.getType());
                     }
@@ -189,10 +197,14 @@ var Compiler;
             } else {
                 this.errorExpectedActual(7 /* T_PRINT */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // AssignmentStatement: Id = Expr
         Parser.parseAssignmentStatement = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Assignment Statement");
+
             this.parseId();
 
             var token = this.getToken();
@@ -202,10 +214,14 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got a = !");
 
+                this.concreteSyntaxTree.insertLeafNode(token);
+
                 this.parseExpression();
             } else {
                 this.errorExpectedActual(20 /* T_SINGLE_EQUALS */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // VarDecl: type Id
@@ -237,6 +253,8 @@ var Compiler;
 
         // WhileStatement: while BooleanExpr Block
         Parser.parseWhileStatement = function () {
+            this.concreteSyntaxTree.insertInteriorNode("While Statement");
+
             var token = this.getToken();
             Compiler.Logger.log("Expecting a while");
 
@@ -244,15 +262,21 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got a while!");
 
+                this.concreteSyntaxTree.insertLeafNode(token);
+
                 this.parseBooleanExpression();
                 this.parseBlock();
             } else {
                 this.errorExpectedActual(9 /* T_WHILE */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // IfStatement: if BooleanExpr Block
         Parser.parseIfStatement = function () {
+            this.concreteSyntaxTree.insertInteriorNode("If Statement");
+
             var token = this.getToken();
             Compiler.Logger.log("Expecting an if");
 
@@ -260,15 +284,21 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got an if!");
 
+                this.concreteSyntaxTree.insertLeafNode(token);
+
                 this.parseBooleanExpression();
                 this.parseBlock();
             } else {
                 this.errorExpectedActual(10 /* T_IF */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // Expr: IntExpr | String Expr | BooleanExpr | Id
         Parser.parseExpression = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Expression");
+
             var token = this.getToken();
 
             switch (token.getType()) {
@@ -298,16 +328,22 @@ var Compiler;
 
                     break;
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // IntExpr: digit intop Expr | digit
         Parser.parseIntExpression = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Int Expression");
+
             var token = this.getToken();
             Compiler.Logger.log("Expecting a digit");
 
             if (token.getType() === 11 /* T_DIGIT */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a digit!");
+
+                this.concreteSyntaxTree.insertLeafNode(token);
 
                 var intOpExisted = this.parseIntOperator();
 
@@ -317,16 +353,22 @@ var Compiler;
             } else {
                 this.errorExpectedActual(11 /* T_DIGIT */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // StringExpr: " CharList "
         Parser.parseStringExpression = function () {
+            this.concreteSyntaxTree.insertInteriorNode("String Expression");
+
             var token = this.getToken();
             Compiler.Logger.log("Expecting a quotation mark");
 
             if (token.getType() === 6 /* T_QUOTE */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a quotation mark!");
+
+                this.concreteSyntaxTree.insertLeafNode(token);
 
                 this.parseCharList();
 
@@ -336,16 +378,22 @@ var Compiler;
                 if (token.getType() === 6 /* T_QUOTE */) {
                     this.consumeToken();
                     Compiler.Logger.log("Got a quotation mark!");
+
+                    this.concreteSyntaxTree.insertLeafNode(token);
                 } else {
                     this.errorExpectedActual(6 /* T_QUOTE */, token.getType());
                 }
             } else {
                 this.errorExpectedActual(6 /* T_QUOTE */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // BooleanExpr: ( Expr boolop Expr ) | boolval
         Parser.parseBooleanExpression = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Boolean Expression");
+
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a left paren, true, or false");
 
@@ -353,6 +401,8 @@ var Compiler;
                 case 2 /* T_LPAREN */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a left paren!");
+
+                    this.concreteSyntaxTree.insertLeafNode(token);
 
                     this.parseExpression();
                     this.parseBooleanOperator();
@@ -364,6 +414,8 @@ var Compiler;
                     if (token.getType() === 3 /* T_RPAREN */) {
                         this.consumeToken();
                         Compiler.Logger.log("Got a right paren!");
+
+                        this.concreteSyntaxTree.insertLeafNode(token);
                     } else {
                         this.errorExpectedActual(3 /* T_RPAREN */, token.getType());
                     }
@@ -374,11 +426,15 @@ var Compiler;
                     this.consumeToken();
                     Compiler.Logger.log("Got a true!");
 
+                    this.concreteSyntaxTree.insertLeafNode(token);
+
                     break;
 
                 case 24 /* T_FALSE */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a false!");
+
+                    this.concreteSyntaxTree.insertLeafNode(token);
 
                     break;
 
@@ -390,6 +446,8 @@ var Compiler;
 
                     break;
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // int | string | boolean
@@ -445,6 +503,8 @@ var Compiler;
 
         // CharList: char CharList | space CharList | ""
         Parser.parseCharList = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Char List");
+
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a string character");
 
@@ -452,10 +512,14 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got a string character!");
 
+                this.concreteSyntaxTree.insertLeafNode(token);
+
                 this.parseCharList();
             } else {
                 // Epsilon case
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // +
@@ -466,6 +530,8 @@ var Compiler;
             if (token.getType() === 14 /* T_PLUS */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got a plus operator!");
+
+                this.concreteSyntaxTree.insertLeafNode(token);
 
                 return true;
             } else {
@@ -482,11 +548,15 @@ var Compiler;
                     this.consumeToken();
                     Compiler.Logger.log("Got a double equals!");
 
+                    this.concreteSyntaxTree.insertLeafNode(token);
+
                     break;
 
                 case 22 /* T_NOT_EQUALS */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a not equals!");
+
+                    this.concreteSyntaxTree.insertLeafNode(token);
 
                     break;
 
