@@ -37,7 +37,7 @@ module Compiler {
 		// Program: Block $
 		private static parseProgram(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("program");
+			this.concreteSyntaxTree.insertInteriorNode("Program");
 
 			this.parseBlock();
 			this.parseEOF();
@@ -46,7 +46,7 @@ module Compiler {
 		// Block: { StatementList }
 		private static parseBlock(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("block");
+			this.concreteSyntaxTree.insertInteriorNode("Block");
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a left brace");
@@ -56,6 +56,7 @@ module Compiler {
 				this.consumeToken();
 				Logger.log("Got a left brace!");
 
+				this.concreteSyntaxTree.insertLeafNode(token);
 				this.symbolTable.openScope();
 
 				this.parseStatementList();
@@ -68,6 +69,7 @@ module Compiler {
 					this.consumeToken();
 					Logger.log("Got a right brace!");
 
+					this.concreteSyntaxTree.insertLeafNode(token);
 					this.symbolTable.closeScope();
 				}
 
@@ -79,6 +81,8 @@ module Compiler {
 			else {
 				this.errorExpectedActual(TokenType.T_LBRACE, token.getType());
 			}
+
+			this.concreteSyntaxTree.moveToParent();
 
 		}
 
@@ -92,6 +96,8 @@ module Compiler {
 
 				this.consumeToken();
 				Logger.log("Got an EOF!");
+
+				this.concreteSyntaxTree.insertLeafNode(token);
 			}
 
 			else {
@@ -101,6 +107,8 @@ module Compiler {
 
 		// StatementList: Statement StatementList | ""
 		private static parseStatementList(): void {
+
+			this.concreteSyntaxTree.insertInteriorNode("Statement List");
 
 			var token: Token = this.getToken();
 
@@ -127,10 +135,14 @@ module Compiler {
 					break;
 
 			}
+
+			this.concreteSyntaxTree.moveToParent();
 		}
 
 		// Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
 		private static parseStatement(): void {
+
+			this.concreteSyntaxTree.insertInteriorNode("Statement");
 
 			var token: Token = this.getToken();
 
@@ -178,6 +190,8 @@ module Compiler {
 
 					break;
 			}
+
+			this.concreteSyntaxTree.moveToParent();
 		}
 
 		// PrintStatement: print ( Expr )
@@ -251,6 +265,8 @@ module Compiler {
 		// VarDecl: type Id
 		private static parseVariableDeclaration(): void {
 
+			this.concreteSyntaxTree.insertInteriorNode("Variable Declaration");
+
 			var typeToken: Token = this.getToken();
 			var typeValue: string = typeToken.getValue();
 
@@ -271,6 +287,8 @@ module Compiler {
 				Logger.log(errorMessage);
 				throw errorMessage;
 			}
+
+			this.concreteSyntaxTree.moveToParent();
 		}
 
 		// WhileStatement: while BooleanExpr Block
@@ -481,6 +499,8 @@ module Compiler {
 					this.consumeToken();
 					Logger.log("Got an int type!");
 
+					this.concreteSyntaxTree.insertLeafNode(token);
+
 					break;
 
 				case TokenType.T_STRING:
@@ -488,12 +508,16 @@ module Compiler {
 					this.consumeToken();
 					Logger.log("Got a string type!");
 
+					this.concreteSyntaxTree.insertLeafNode(token);
+
 					break;
 
 				case TokenType.T_BOOLEAN:
 
 					this.consumeToken();
 					Logger.log("Got a boolean type!");
+
+					this.concreteSyntaxTree.insertLeafNode(token);
 
 					break;
 
@@ -514,6 +538,8 @@ module Compiler {
 
 				this.consumeToken();
 				Logger.log("Got an id!");
+				
+				this.concreteSyntaxTree.insertLeafNode(token);
 			}
 
 			else {

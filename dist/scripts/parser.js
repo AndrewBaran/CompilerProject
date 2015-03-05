@@ -28,7 +28,7 @@ var Compiler;
 
         // Program: Block $
         Parser.parseProgram = function () {
-            this.concreteSyntaxTree.insertInteriorNode("program");
+            this.concreteSyntaxTree.insertInteriorNode("Program");
 
             this.parseBlock();
             this.parseEOF();
@@ -36,7 +36,7 @@ var Compiler;
 
         // Block: { StatementList }
         Parser.parseBlock = function () {
-            this.concreteSyntaxTree.insertInteriorNode("block");
+            this.concreteSyntaxTree.insertInteriorNode("Block");
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting a left brace");
@@ -45,6 +45,7 @@ var Compiler;
                 this.consumeToken();
                 Compiler.Logger.log("Got a left brace!");
 
+                this.concreteSyntaxTree.insertLeafNode(token);
                 this.symbolTable.openScope();
 
                 this.parseStatementList();
@@ -56,6 +57,7 @@ var Compiler;
                     this.consumeToken();
                     Compiler.Logger.log("Got a right brace!");
 
+                    this.concreteSyntaxTree.insertLeafNode(token);
                     this.symbolTable.closeScope();
                 } else {
                     this.errorExpectedActual(5 /* T_RBRACE */, token.getType());
@@ -63,6 +65,8 @@ var Compiler;
             } else {
                 this.errorExpectedActual(4 /* T_LBRACE */, token.getType());
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // EOF: $
@@ -73,6 +77,8 @@ var Compiler;
             if (token.getType() === 8 /* T_EOF */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got an EOF!");
+
+                this.concreteSyntaxTree.insertLeafNode(token);
             } else {
                 this.errorExpectedActual(8 /* T_EOF */, token.getType());
             }
@@ -80,6 +86,8 @@ var Compiler;
 
         // StatementList: Statement StatementList | ""
         Parser.parseStatementList = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Statement List");
+
             var token = this.getToken();
 
             switch (token.getType()) {
@@ -99,10 +107,14 @@ var Compiler;
                 default:
                     break;
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
         Parser.parseStatement = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Statement");
+
             var token = this.getToken();
 
             switch (token.getType()) {
@@ -140,6 +152,8 @@ var Compiler;
 
                     break;
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // PrintStatement: print ( Expr )
@@ -196,6 +210,8 @@ var Compiler;
 
         // VarDecl: type Id
         Parser.parseVariableDeclaration = function () {
+            this.concreteSyntaxTree.insertInteriorNode("Variable Declaration");
+
             var typeToken = this.getToken();
             var typeValue = typeToken.getValue();
 
@@ -215,6 +231,8 @@ var Compiler;
                 Compiler.Logger.log(errorMessage);
                 throw errorMessage;
             }
+
+            this.concreteSyntaxTree.moveToParent();
         };
 
         // WhileStatement: while BooleanExpr Block
@@ -384,17 +402,23 @@ var Compiler;
                     this.consumeToken();
                     Compiler.Logger.log("Got an int type!");
 
+                    this.concreteSyntaxTree.insertLeafNode(token);
+
                     break;
 
                 case 18 /* T_STRING */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a string type!");
 
+                    this.concreteSyntaxTree.insertLeafNode(token);
+
                     break;
 
                 case 19 /* T_BOOLEAN */:
                     this.consumeToken();
                     Compiler.Logger.log("Got a boolean type!");
+
+                    this.concreteSyntaxTree.insertLeafNode(token);
 
                     break;
 
@@ -412,6 +436,8 @@ var Compiler;
             if (token.getType() === 12 /* T_ID */) {
                 this.consumeToken();
                 Compiler.Logger.log("Got an id!");
+
+                this.concreteSyntaxTree.insertLeafNode(token);
             } else {
                 this.errorExpectedActual(12 /* T_ID */, token.getType());
             }
