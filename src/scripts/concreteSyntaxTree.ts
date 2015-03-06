@@ -157,7 +157,22 @@ module Compiler {
 
 			if(root !== null) {
 
-				Logger.log(root.getTreeLevel() + ". Type: " + root.getType() + " | Value: " + root.getValue(), "cst");
+				var indentDashes: string = "";
+				var treeLevel: number = root.getTreeLevel();
+
+				for(var i: number = 0; i < treeLevel; i++) {
+					indentDashes += "-";
+				}
+
+				// Interior node
+				if(root.childList.length > 0) {
+					Logger.log(indentDashes + "< " + root.getValue() + " >", "cst");
+				}
+
+				// Leaf node
+				else {
+					Logger.log(indentDashes + "[ " + root.getValue() + " ]", "cst");
+				}
 
 				for(var i: number = 0; i < root.childList.length; i++) {
 					root.preOrderTraversal(root.childList[i]);

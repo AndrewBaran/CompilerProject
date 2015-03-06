@@ -120,7 +120,19 @@ var Compiler;
 
         CSTNode.prototype.preOrderTraversal = function (root) {
             if (root !== null) {
-                Compiler.Logger.log(root.getTreeLevel() + ". Type: " + root.getType() + " | Value: " + root.getValue(), "cst");
+                var indentDashes = "";
+                var treeLevel = root.getTreeLevel();
+
+                for (var i = 0; i < treeLevel; i++) {
+                    indentDashes += "-";
+                }
+
+                // Interior node
+                if (root.childList.length > 0) {
+                    Compiler.Logger.log(indentDashes + "< " + root.getValue() + " >", "cst");
+                } else {
+                    Compiler.Logger.log(indentDashes + "[ " + root.getValue() + " ]", "cst");
+                }
 
                 for (var i = 0; i < root.childList.length; i++) {
                     root.preOrderTraversal(root.childList[i]);
