@@ -6,9 +6,6 @@ var Compiler;
             this.currentNode = null;
         }
         ConcreteSyntaxTree.prototype.insertInteriorNode = function (value) {
-            // TODO: Remove after testing
-            Compiler.Logger.log("Adding interior node: Value: " + value, "cst");
-
             var node = new CSTNode();
             node.setValue(value);
 
@@ -27,9 +24,6 @@ var Compiler;
         };
 
         ConcreteSyntaxTree.prototype.insertLeafNode = function (token) {
-            // TODO: Remove after testing
-            Compiler.Logger.log("Adding leaf node: Type: " + token.getTokenName() + " | Value = " + token.getValue(), "cst");
-
             var node = new CSTNode();
             node.setType(token.getTokenName());
             node.setValue(token.getValue());
@@ -55,9 +49,6 @@ var Compiler;
             var parent = this.currentNode.getParent();
 
             if (parent !== null) {
-                // TODO: Remove after testing
-                Compiler.Logger.log("Moving to Parent: Value: " + parent.getValue());
-
                 this.currentNode = this.currentNode.getParent();
             } else {
                 var errorMessage = "Error! Current CST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";

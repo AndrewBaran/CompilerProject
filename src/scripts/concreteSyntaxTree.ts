@@ -13,9 +13,6 @@ module Compiler {
 
 		public insertInteriorNode(value: string): void {
 
-			// TODO: Remove after testing
-			Logger.log("Adding interior node: Value: " + value, "cst");
-
 			var node: CSTNode = new CSTNode();
 			node.setValue(value);
 
@@ -38,9 +35,6 @@ module Compiler {
 		}
 
 		public insertLeafNode(token: Token): void {
-
-			// TODO: Remove after testing
-			Logger.log("Adding leaf node: Type: " + token.getTokenName() + " | Value = " + token.getValue(), "cst");
 
 			var node: CSTNode = new CSTNode();
 			node.setType(token.getTokenName());
@@ -73,10 +67,6 @@ module Compiler {
 			var parent: CSTNode = this.currentNode.getParent();
 
 			if(parent !== null) {
-
-				// TODO: Remove after testing
-				Logger.log("Moving to Parent: Value: " + parent.getValue());
-
 				this.currentNode = this.currentNode.getParent();
 			}
 

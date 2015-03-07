@@ -28,7 +28,7 @@ Project 2 Checklist
 ===================
 
 - [ ] Modify your parser to create a concrete syntax tree (CST) while parsing
-	- [ ] Display the CST
+	- [x] Display the CST
 - [ ] Write a semantic analyzer that scope-checks and type-checks the CST for our grammar
 	- [ ] Create and display a symbol table with type and scope information
 	- [ ] Create and display the abstract syntax tree (AST)

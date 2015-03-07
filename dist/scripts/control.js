@@ -67,7 +67,6 @@ var Compiler;
             var compileResult = Compiler.Compiler.compile(code);
 
             this.enableButtons();
-            // TODO: Make use of the boolean result of the compilation by showing error signs or something
         };
 
         Control.buttonTestClick = function () {
@@ -184,7 +183,6 @@ var Compiler;
             concreteSyntaxTree.preOrderTraversal();
         };
 
-        // TODO: Display which phase of compilation failed
         // Executes each unit test and displays the result
         Control.runTests = function () {
             var unitTestsPassed = 0;
@@ -202,6 +200,8 @@ var Compiler;
                 var testResult = Compiler.Compiler.compile(code);
 
                 this.clearLog();
+                this.clearCST();
+                this.clearAST();
 
                 if (testResult) {
                     unitTestsPassed++;
