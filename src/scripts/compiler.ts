@@ -13,6 +13,7 @@ module Compiler {
 			var tokenList: TokenInfo [] = [];
 			var symbolTable: SymbolTable = new SymbolTable(); 
 			var concreteSyntaxTree: ConcreteSyntaxTree = new ConcreteSyntaxTree();
+			var abstractSyntaxTree: AbstractSyntaxTree = new AbstractSyntaxTree();
 
 			if(codeToCompile.length == 0) {
 				Logger.log("Error! No code available to compile.");
@@ -58,7 +59,7 @@ module Compiler {
 
 				try {
 
-					SemanticAnalyzer.analyze(concreteSyntaxTree, symbolTable);
+					abstractSyntaxTree = SemanticAnalyzer.analyze(concreteSyntaxTree, symbolTable);
 					semanticResult = true;
 				}
 

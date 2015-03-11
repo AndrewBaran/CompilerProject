@@ -63,7 +63,6 @@ var Compiler;
 
             // Compile the program
             var code = document.getElementById("textboxInputCode").value;
-
             var compileResult = Compiler.Compiler.compile(code);
 
             this.enableButtons();

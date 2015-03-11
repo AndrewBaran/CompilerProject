@@ -66,7 +66,6 @@ module Compiler {
 
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
-
 			var compileResult: boolean = Compiler.compile(code);
 
 			this.enableButtons();

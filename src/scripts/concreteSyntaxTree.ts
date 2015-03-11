@@ -83,7 +83,6 @@ module Compiler {
 	} // CST
 
 
-	// Structs
 	class CSTNode {
 
 		private type: string;

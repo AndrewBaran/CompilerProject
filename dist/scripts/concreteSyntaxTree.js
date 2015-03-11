@@ -61,7 +61,6 @@ var Compiler;
     })();
     Compiler.ConcreteSyntaxTree = ConcreteSyntaxTree;
 
-    // Structs
     var CSTNode = (function () {
         function CSTNode() {
             this.type = "";

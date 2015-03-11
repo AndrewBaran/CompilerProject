@@ -11,6 +11,7 @@ var Compiler;
             var tokenList = [];
             var symbolTable = new _Compiler.SymbolTable();
             var concreteSyntaxTree = new _Compiler.ConcreteSyntaxTree();
+            var abstractSyntaxTree = new _Compiler.AbstractSyntaxTree();
 
             if (codeToCompile.length == 0) {
                 _Compiler.Logger.log("Error! No code available to compile.");
@@ -43,7 +44,7 @@ var Compiler;
                 }
 
                 try  {
-                    _Compiler.SemanticAnalyzer.analyze(concreteSyntaxTree, symbolTable);
+                    abstractSyntaxTree = _Compiler.SemanticAnalyzer.analyze(concreteSyntaxTree, symbolTable);
                     semanticResult = true;
                 } catch (exception) {
                     semanticResult = false;
