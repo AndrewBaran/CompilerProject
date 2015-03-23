@@ -9,7 +9,7 @@ var Compiler;
 
             this.setupAnalysisEnvironment();
 
-            this.createAST();
+            this.createAST(concreteSyntaxTree);
             this.scopeCheck();
             this.typeCheck();
 
@@ -20,8 +20,9 @@ var Compiler;
             this.abstractSyntaxTree = new Compiler.AbstractSyntaxTree();
         };
 
-        SemanticAnalyzer.createAST = function () {
+        SemanticAnalyzer.createAST = function (concreteSyntaxTree) {
             Compiler.Logger.log("Creating the Abstract Syntax Tree");
+            this.abstractSyntaxTree = concreteSyntaxTree.buildAST();
         };
 
         SemanticAnalyzer.scopeCheck = function () {

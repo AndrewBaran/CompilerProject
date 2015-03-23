@@ -198,7 +198,7 @@ module Compiler {
 		}
 
 		public static displayCST(concreteSyntaxTree: ConcreteSyntaxTree): void {
-			concreteSyntaxTree.preOrderTraversal();
+			concreteSyntaxTree.printPreOrderTraversal();
 		}
 
 		// Executes each unit test and displays the result

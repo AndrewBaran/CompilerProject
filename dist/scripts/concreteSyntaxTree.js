@@ -41,8 +41,8 @@ var Compiler;
             }
         };
 
-        ConcreteSyntaxTree.prototype.preOrderTraversal = function () {
-            this.root.preOrderTraversal(this.root);
+        ConcreteSyntaxTree.prototype.printPreOrderTraversal = function () {
+            this.root.printPreOrderTraversal(this.root);
         };
 
         ConcreteSyntaxTree.prototype.moveToParent = function () {
@@ -56,6 +56,13 @@ var Compiler;
                 Compiler.Logger.log(errorMessage);
                 throw errorMessage;
             }
+        };
+
+        ConcreteSyntaxTree.prototype.buildAST = function () {
+            var ast = new Compiler.AbstractSyntaxTree();
+
+            this.root.buildPreOrderTraversal(this.root, ast);
+            return ast;
         };
         return ConcreteSyntaxTree;
     })();
@@ -108,7 +115,7 @@ var Compiler;
             this.childList.push(newNode);
         };
 
-        CSTNode.prototype.preOrderTraversal = function (root) {
+        CSTNode.prototype.printPreOrderTraversal = function (root) {
             if (root !== null) {
                 var indentDashes = "";
                 var treeLevel = root.getTreeLevel();
@@ -125,7 +132,18 @@ var Compiler;
                 }
 
                 for (var i = 0; i < root.childList.length; i++) {
-                    root.preOrderTraversal(root.childList[i]);
+                    root.printPreOrderTraversal(root.childList[i]);
+                }
+            }
+        };
+
+        CSTNode.prototype.buildPreOrderTraversal = function (root, abstractSyntaxTree) {
+            if (root !== null) {
+                switch (root.getValue()) {
+                }
+
+                for (var i = 0; i < root.childList.length; i++) {
+                    root.buildPreOrderTraversal(root.childList[i], abstractSyntaxTree);
                 }
             }
         };

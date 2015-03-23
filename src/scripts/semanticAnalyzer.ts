@@ -12,7 +12,7 @@ module Compiler {
 
 			this.setupAnalysisEnvironment();
 
-			this.createAST();
+			this.createAST(concreteSyntaxTree);
 			this.scopeCheck();
 			this.typeCheck();
 
@@ -23,9 +23,10 @@ module Compiler {
 			this.abstractSyntaxTree = new AbstractSyntaxTree();
 		}
 
-		private static createAST(): void {
+		private static createAST(concreteSyntaxTree: ConcreteSyntaxTree): void {
 
 			Logger.log("Creating the Abstract Syntax Tree");
+			this.abstractSyntaxTree = concreteSyntaxTree.buildAST();
 		}
 
 		private static scopeCheck(): void {

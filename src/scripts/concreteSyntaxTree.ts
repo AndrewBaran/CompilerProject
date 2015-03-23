@@ -58,8 +58,8 @@ module Compiler {
 
 		}
 
-		public preOrderTraversal(): void {
-			this.root.preOrderTraversal(this.root);
+		public printPreOrderTraversal(): void {
+			this.root.printPreOrderTraversal(this.root);
 		}
 
 		public moveToParent(): void {
@@ -78,6 +78,14 @@ module Compiler {
 				throw errorMessage;
 			}
 
+		}
+
+		public buildAST(): AbstractSyntaxTree {
+
+			var ast: AbstractSyntaxTree = new AbstractSyntaxTree();
+
+			this.root.buildPreOrderTraversal(this.root, ast);
+			return ast;
 		}
 
 	} // CST
@@ -142,7 +150,7 @@ module Compiler {
 			this.childList.push(newNode);
 		}
 
-		public preOrderTraversal(root: CSTNode): void {
+		public printPreOrderTraversal(root: CSTNode): void {
 
 			if(root !== null) {
 
@@ -164,10 +172,23 @@ module Compiler {
 				}
 
 				for(var i: number = 0; i < root.childList.length; i++) {
-					root.preOrderTraversal(root.childList[i]);
+					root.printPreOrderTraversal(root.childList[i]);
 				}
 			}
 		}
 
+		public buildPreOrderTraversal(root: CSTNode, abstractSyntaxTree: AbstractSyntaxTree): void {
+
+			if(root !== null) {
+
+				switch(root.getValue()) {
+
+				}
+
+				for(var i: number = 0; i < root.childList.length; i++) {
+					root.buildPreOrderTraversal(root.childList[i], abstractSyntaxTree);
+				}
+			}
+		}
 	}
 }
