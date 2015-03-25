@@ -28,7 +28,7 @@ var Compiler;
 
         // Program: Block $
         Parser.parseProgram = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Program");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.PROGRAM);
 
             this.parseBlock();
             this.parseEOF();
@@ -36,7 +36,7 @@ var Compiler;
 
         // Block: { StatementList }
         Parser.parseBlock = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Block");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.BLOCK);
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting a left brace");
@@ -86,7 +86,7 @@ var Compiler;
 
         // StatementList: Statement StatementList | ""
         Parser.parseStatementList = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Statement List");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.STATEMENT_LIST);
 
             var token = this.getToken();
 
@@ -113,7 +113,7 @@ var Compiler;
 
         // Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
         Parser.parseStatement = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Statement");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.STATEMENT);
 
             var token = this.getToken();
 
@@ -158,7 +158,7 @@ var Compiler;
 
         // PrintStatement: print ( Expr )
         Parser.parsePrintStatement = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Print Statement");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.PRINT_STATEMENT);
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting a print");
@@ -203,7 +203,7 @@ var Compiler;
 
         // AssignmentStatement: Id = Expr
         Parser.parseAssignmentStatement = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Assignment Statement");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.ASSIGNMENT_STATEMENT);
 
             this.parseId();
 
@@ -226,7 +226,7 @@ var Compiler;
 
         // VarDecl: type Id
         Parser.parseVariableDeclaration = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Variable Declaration");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.VAR_DECLARATION);
 
             var typeToken = this.getToken();
             var typeValue = typeToken.getValue();
@@ -253,7 +253,7 @@ var Compiler;
 
         // WhileStatement: while BooleanExpr Block
         Parser.parseWhileStatement = function () {
-            this.concreteSyntaxTree.insertInteriorNode("While Statement");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.WHILE_STATEMENT);
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting a while");
@@ -275,7 +275,7 @@ var Compiler;
 
         // IfStatement: if BooleanExpr Block
         Parser.parseIfStatement = function () {
-            this.concreteSyntaxTree.insertInteriorNode("If Statement");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.IF_STATEMENT);
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting an if");
@@ -297,7 +297,7 @@ var Compiler;
 
         // Expr: IntExpr | String Expr | BooleanExpr | Id
         Parser.parseExpression = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Expression");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.EXPRESSION);
 
             var token = this.getToken();
 
@@ -334,7 +334,7 @@ var Compiler;
 
         // IntExpr: digit intop Expr | digit
         Parser.parseIntExpression = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Int Expression");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.INT_EXPRESSION);
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting a digit");
@@ -359,7 +359,7 @@ var Compiler;
 
         // StringExpr: " CharList "
         Parser.parseStringExpression = function () {
-            this.concreteSyntaxTree.insertInteriorNode("String Expression");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.STRING_EXPRESSION);
 
             var token = this.getToken();
             Compiler.Logger.log("Expecting a quotation mark");
@@ -392,7 +392,7 @@ var Compiler;
 
         // BooleanExpr: ( Expr boolop Expr ) | boolval
         Parser.parseBooleanExpression = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Boolean Expression");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.BOOLEAN_EXPRESSION);
 
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a left paren, true, or false");
@@ -503,7 +503,7 @@ var Compiler;
 
         // CharList: char CharList | space CharList | ""
         Parser.parseCharList = function () {
-            this.concreteSyntaxTree.insertInteriorNode("Char List");
+            this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.CHAR_LIST);
 
             var token = this.getToken();
             Compiler.Logger.log("Potentially expecting a string character");

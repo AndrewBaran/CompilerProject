@@ -181,6 +181,8 @@ module Compiler {
 
 			if(root !== null) {
 
+				Logger.log(root.getValue(), "ast");
+
 				switch(root.getValue()) {
 
 				}

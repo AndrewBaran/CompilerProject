@@ -37,7 +37,7 @@ module Compiler {
 		// Program: Block $
 		private static parseProgram(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Program");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.PROGRAM);
 
 			this.parseBlock();
 			this.parseEOF();
@@ -46,7 +46,7 @@ module Compiler {
 		// Block: { StatementList }
 		private static parseBlock(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Block");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.BLOCK);
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a left brace");
@@ -108,7 +108,7 @@ module Compiler {
 		// StatementList: Statement StatementList | ""
 		private static parseStatementList(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Statement List");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.STATEMENT_LIST);
 
 			var token: Token = this.getToken();
 
@@ -142,7 +142,7 @@ module Compiler {
 		// Statemment: PrintStatement | AssignmentStatement | VarDecl | WhileStatement | IfStatement | Block
 		private static parseStatement(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Statement");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.STATEMENT);
 
 			var token: Token = this.getToken();
 
@@ -197,7 +197,7 @@ module Compiler {
 		// PrintStatement: print ( Expr )
 		private static parsePrintStatement(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Print Statement");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.PRINT_STATEMENT);
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a print");
@@ -252,7 +252,7 @@ module Compiler {
 		// AssignmentStatement: Id = Expr
 		private static parseAssignmentStatement(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Assignment Statement");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.ASSIGNMENT_STATEMENT);
 
 			this.parseId();
 
@@ -279,7 +279,7 @@ module Compiler {
 		// VarDecl: type Id
 		private static parseVariableDeclaration(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Variable Declaration");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.VAR_DECLARATION);
 
 			var typeToken: Token = this.getToken();
 			var typeValue: string = typeToken.getValue();
@@ -308,7 +308,7 @@ module Compiler {
 		// WhileStatement: while BooleanExpr Block
 		private static parseWhileStatement(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("While Statement");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.WHILE_STATEMENT);
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a while");
@@ -334,7 +334,7 @@ module Compiler {
 		// IfStatement: if BooleanExpr Block
 		private static parseIfStatement(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("If Statement");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.IF_STATEMENT);
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting an if");
@@ -360,7 +360,7 @@ module Compiler {
 		// Expr: IntExpr | String Expr | BooleanExpr | Id
 		private static parseExpression(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Expression");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.EXPRESSION);
 
 			var token: Token = this.getToken();
 
@@ -404,7 +404,7 @@ module Compiler {
 		// IntExpr: digit intop Expr | digit
 		private static parseIntExpression(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Int Expression");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.INT_EXPRESSION);
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a digit");
@@ -434,7 +434,7 @@ module Compiler {
 		// StringExpr: " CharList "
 		private static parseStringExpression(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("String Expression");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.STRING_EXPRESSION);
 
 			var token: Token = this.getToken();
 			Logger.log("Expecting a quotation mark");
@@ -474,7 +474,7 @@ module Compiler {
 		// BooleanExpr: ( Expr boolop Expr ) | boolval
 		private static parseBooleanExpression(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Boolean Expression");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.BOOLEAN_EXPRESSION);
 
 			var token: Token = this.getToken();
 			Logger.log("Potentially expecting a left paren, true, or false");
@@ -605,7 +605,7 @@ module Compiler {
 		// CharList: char CharList | space CharList | ""
 		private static parseCharList(): void {
 
-			this.concreteSyntaxTree.insertInteriorNode("Char List");
+			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.CHAR_LIST);
 
 			var token: Token = this.getToken();
 			Logger.log("Potentially expecting a string character");

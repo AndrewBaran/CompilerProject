@@ -139,6 +139,8 @@ var Compiler;
 
         CSTNode.prototype.buildPreOrderTraversal = function (root, abstractSyntaxTree) {
             if (root !== null) {
+                Compiler.Logger.log(root.getValue(), "ast");
+
                 switch (root.getValue()) {
                 }
 

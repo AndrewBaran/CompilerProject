@@ -65,11 +65,48 @@ module Compiler {
 	class ASTNode {
 
 		private value: string;
+		private type: string;
+
+		private leftmostSibling: ASTNode;
+		private rightSibling: ASTNode;
+		private parent: ASTNode;
+
+		private childList: ASTNode [];
 
 		constructor() {
 
 			this.value = "";
+			this.type = "";
 
+			this.leftmostSibling = null;
+			this.rightSibling = null;
+			this.parent = null;
+
+			this.childList = [];
+		}
+
+		private getValue(): string {
+			return this.value;
+		}
+
+		private setValue(value: string): void {
+			this.value = value;
+		}
+
+		private getType(): string {
+			return this.type;
+		}
+
+		private setType(type: string): void {
+			this.type = type;
+		}
+
+		private getLeftmostSibling(): ASTNode {
+			return this.leftmostSibling;
+		}
+
+		private setLeftmostSibling(leftmostSibling: ASTNode): void {
+			this.leftmostSibling = leftmostSibling;
 		}
 
 	}

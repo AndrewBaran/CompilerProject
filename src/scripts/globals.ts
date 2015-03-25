@@ -67,6 +67,24 @@ enum TokenType {
 	T_WHITE_SPACE
 }
 
+var cstNodeTypes = {
+	PROGRAM: "Program",
+	BLOCK: "Block",
+	STATEMENT_LIST: "Statement List",
+	STATEMENT: "Statement",
+	PRINT_STATEMENT: "Print Statement",
+	ASSIGNMENT_STATEMENT: "Assignment Statement",
+	VAR_DECLARATION: "Variable Declaration",
+	WHILE_STATEMENT: "While Statement",
+	IF_STATEMENT: "If Statement",
+	EXPRESSION: "Expression",
+	INT_EXPRESSION: "Int Expression",
+	STRING_EXPRESSION: "String Expression",
+	BOOLEAN_EXPRESSION: "Boolean Expression",
+	CHAR_LIST: "Char List"
+};
+
+
 interface Constants {
 	MAX_SCOPE_ENTRIES: number;
 }
