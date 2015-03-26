@@ -57,7 +57,6 @@ module Compiler {
 				Logger.log("Got a left brace!");
 
 				this.concreteSyntaxTree.insertLeafNode(token);
-				this.symbolTable.openScope();
 
 				this.parseStatementList();
 
@@ -70,7 +69,6 @@ module Compiler {
 					Logger.log("Got a right brace!");
 
 					this.concreteSyntaxTree.insertLeafNode(token);
-					this.symbolTable.closeScope();
 				}
 
 				else {
@@ -281,26 +279,8 @@ module Compiler {
 
 			this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.VAR_DECLARATION);
 
-			var typeToken: Token = this.getToken();
-			var typeValue: string = typeToken.getValue();
-
 			this.parseType();
-
-			var idToken: Token = this.getToken();
-			var lineFoundOn: number = this.getTokenLineNumber();
-
 			this.parseId();
-
-			var result: boolean = this.symbolTable.insertEntry(idToken, typeValue);
-
-			// TODO: Move this to semantic analysis?
-			if(!result) {
-
-				var errorMessage: string = "Error on line " + lineFoundOn + ": The identifier " + idToken.getValue() + " has already been declared in this scope.";
-
-				Logger.log(errorMessage);
-				throw errorMessage;
-			}
 
 			this.concreteSyntaxTree.moveToParent();
 		}

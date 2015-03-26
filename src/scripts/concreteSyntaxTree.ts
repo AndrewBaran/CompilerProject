@@ -67,7 +67,7 @@ module Compiler {
 			var parent: CSTNode = this.currentNode.getParent();
 
 			if(parent !== null) {
-				this.currentNode = this.currentNode.getParent();
+				this.currentNode = parent; 
 			}
 
 			else {

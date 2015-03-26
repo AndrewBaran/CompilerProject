@@ -49,7 +49,7 @@ var Compiler;
             var parent = this.currentNode.getParent();
 
             if (parent !== null) {
-                this.currentNode = this.currentNode.getParent();
+                this.currentNode = parent;
             } else {
                 var errorMessage = "Error! Current CST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";
 

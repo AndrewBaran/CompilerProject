@@ -46,7 +46,6 @@ var Compiler;
                 Compiler.Logger.log("Got a left brace!");
 
                 this.concreteSyntaxTree.insertLeafNode(token);
-                this.symbolTable.openScope();
 
                 this.parseStatementList();
 
@@ -58,7 +57,6 @@ var Compiler;
                     Compiler.Logger.log("Got a right brace!");
 
                     this.concreteSyntaxTree.insertLeafNode(token);
-                    this.symbolTable.closeScope();
                 } else {
                     this.errorExpectedActual(5 /* T_RBRACE */, token.getType());
                 }
@@ -228,25 +226,8 @@ var Compiler;
         Parser.parseVariableDeclaration = function () {
             this.concreteSyntaxTree.insertInteriorNode(cstNodeTypes.VAR_DECLARATION);
 
-            var typeToken = this.getToken();
-            var typeValue = typeToken.getValue();
-
             this.parseType();
-
-            var idToken = this.getToken();
-            var lineFoundOn = this.getTokenLineNumber();
-
             this.parseId();
-
-            var result = this.symbolTable.insertEntry(idToken, typeValue);
-
-            // TODO: Move this to semantic analysis?
-            if (!result) {
-                var errorMessage = "Error on line " + lineFoundOn + ": The identifier " + idToken.getValue() + " has already been declared in this scope.";
-
-                Compiler.Logger.log(errorMessage);
-                throw errorMessage;
-            }
 
             this.concreteSyntaxTree.moveToParent();
         };
