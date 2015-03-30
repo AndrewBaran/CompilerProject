@@ -182,8 +182,8 @@ var Compiler;
             concreteSyntaxTree.printPreOrder();
         };
 
-        Control.displayAST = function (concreteSyntaxTree) {
-            concreteSyntaxTree.printPreOrder();
+        Control.displayAST = function (abstractSyntaxTree) {
+            abstractSyntaxTree.printPreOrder();
         };
 
         // Executes each unit test and displays the result

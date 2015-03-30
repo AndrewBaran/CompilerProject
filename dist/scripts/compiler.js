@@ -52,7 +52,7 @@ var Compiler;
             }
 
             if (semanticResult) {
-                _Compiler.Control.displayAST(concreteSyntaxTree);
+                _Compiler.Control.displayAST(abstractSyntaxTree);
             }
 
             if (!this.testMode) {

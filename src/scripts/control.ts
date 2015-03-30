@@ -201,8 +201,8 @@ module Compiler {
 			concreteSyntaxTree.printPreOrder();
 		}
 
-		public static displayAST(concreteSyntaxTree: ConcreteSyntaxTree): void {
-			concreteSyntaxTree.printPreOrder();
+		public static displayAST(abstractSyntaxTree: AbstractSyntaxTree): void {
+			abstractSyntaxTree.printPreOrder();
 		}
 
 

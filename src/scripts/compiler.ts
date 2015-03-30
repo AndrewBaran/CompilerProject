@@ -70,7 +70,7 @@ module Compiler {
 			}
 
 			if(semanticResult) {
-				Control.displayAST(concreteSyntaxTree);
+				Control.displayAST(abstractSyntaxTree);
 			}
 
 			if(!this.testMode) {
