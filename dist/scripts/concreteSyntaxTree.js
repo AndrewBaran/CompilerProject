@@ -61,7 +61,7 @@ var Compiler;
         ConcreteSyntaxTree.prototype.buildAST = function () {
             var ast = new Compiler.AbstractSyntaxTree();
 
-            this.root.buildPreOrderTraversal(this.root, ast);
+            this.root.buildPreOrder(this.root, ast);
             return ast;
         };
         return ConcreteSyntaxTree;
@@ -137,13 +137,12 @@ var Compiler;
             }
         };
 
-        CSTNode.prototype.buildPreOrderTraversal = function (root, abstractSyntaxTree) {
+        CSTNode.prototype.buildPreOrder = function (root, abstractSyntaxTree) {
             if (root !== null) {
                 var wentDownALevel = true;
 
                 switch (root.getValue()) {
                     case cstNodeTypes.BLOCK:
-                        Compiler.Logger.log("Found a block, going down a level.");
                         abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
                         break;
 
@@ -153,7 +152,7 @@ var Compiler;
                 }
 
                 for (var i = 0; i < root.childList.length; i++) {
-                    root.buildPreOrderTraversal(root.childList[i], abstractSyntaxTree);
+                    root.buildPreOrder(root.childList[i], abstractSyntaxTree);
                 }
 
                 if (wentDownALevel) {

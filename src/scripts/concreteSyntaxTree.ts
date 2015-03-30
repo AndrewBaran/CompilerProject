@@ -84,7 +84,7 @@ module Compiler {
 
 			var ast: AbstractSyntaxTree = new AbstractSyntaxTree();
 
-			this.root.buildPreOrderTraversal(this.root, ast);
+			this.root.buildPreOrder(this.root, ast);
 			return ast;
 		}
 
@@ -177,7 +177,7 @@ module Compiler {
 			}
 		}
 
-		public buildPreOrderTraversal(root: CSTNode, abstractSyntaxTree: AbstractSyntaxTree): void {
+		public buildPreOrder(root: CSTNode, abstractSyntaxTree: AbstractSyntaxTree): void {
 
 			if(root !== null) {
 
@@ -187,7 +187,6 @@ module Compiler {
 
 					case cstNodeTypes.BLOCK:
 
-						Logger.log("Found a block, going down a level.");
 						abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
 						break;
 
@@ -198,7 +197,7 @@ module Compiler {
 				}
 
 				for(var i: number = 0; i < root.childList.length; i++) {
-					root.buildPreOrderTraversal(root.childList[i], abstractSyntaxTree);
+					root.buildPreOrder(root.childList[i], abstractSyntaxTree);
 				}
 
 				if(wentDownALevel) {
