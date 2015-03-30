@@ -58,8 +58,8 @@ module Compiler {
 
 		}
 
-		public printPreOrderTraversal(): void {
-			this.root.printPreOrderTraversal(this.root);
+		public printPreOrder(): void {
+			this.root.printPreOrder(this.root);
 		}
 
 		public moveToParent(): void {
@@ -144,13 +144,13 @@ module Compiler {
 			this.treeLevel = treeLevel;
 		}
 
-		public addChild(newNode: CSTNode): void {
+		public addChild(child: CSTNode): void {
 
-			newNode.setParent(this);
-			this.childList.push(newNode);
+			child.setParent(this);
+			this.childList.push(child);
 		}
 
-		public printPreOrderTraversal(root: CSTNode): void {
+		public printPreOrder(root: CSTNode): void {
 
 			if(root !== null) {
 
@@ -172,7 +172,7 @@ module Compiler {
 				}
 
 				for(var i: number = 0; i < root.childList.length; i++) {
-					root.printPreOrderTraversal(root.childList[i]);
+					root.printPreOrder(root.childList[i]);
 				}
 			}
 		}
@@ -181,8 +181,6 @@ module Compiler {
 
 			if(root !== null) {
 
-				Logger.log(root.getValue(), "ast");
-
 				var wentDownALevel: boolean = true;
 
 				switch(root.getValue()) {
@@ -190,11 +188,7 @@ module Compiler {
 					case cstNodeTypes.BLOCK:
 
 						Logger.log("Found a block, going down a level.");
-						break;
-
-					case cstNodeTypes.ASSIGNMENT_STATEMENT:
-
-						Logger.log("Found an assignment statement. Going down a level.");
+						abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
 						break;
 
 					default:
@@ -205,6 +199,10 @@ module Compiler {
 
 				for(var i: number = 0; i < root.childList.length; i++) {
 					root.buildPreOrderTraversal(root.childList[i], abstractSyntaxTree);
+				}
+
+				if(wentDownALevel) {
+					abstractSyntaxTree.moveToParent();
 				}
 			}
 		}

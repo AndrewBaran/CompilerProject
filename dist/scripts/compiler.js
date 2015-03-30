@@ -51,6 +51,10 @@ var Compiler;
                 }
             }
 
+            if (semanticResult) {
+                _Compiler.Control.displayAST(concreteSyntaxTree);
+            }
+
             if (!this.testMode) {
                 _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
             }

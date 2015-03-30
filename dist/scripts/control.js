@@ -179,7 +179,11 @@ var Compiler;
         };
 
         Control.displayCST = function (concreteSyntaxTree) {
-            concreteSyntaxTree.printPreOrderTraversal();
+            concreteSyntaxTree.printPreOrder();
+        };
+
+        Control.displayAST = function (concreteSyntaxTree) {
+            concreteSyntaxTree.printPreOrder();
         };
 
         // Executes each unit test and displays the result

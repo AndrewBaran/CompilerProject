@@ -35,13 +35,47 @@ var Compiler;
             this.root = null;
             this.currentNode = null;
         }
-        AbstractSyntaxTree.prototype.addInteriorNode = function () {
+        AbstractSyntaxTree.prototype.insertInteriorNode = function (value) {
+            Compiler.Logger.log("Inserting interior node: " + value);
+
+            var node = new ASTNode();
+            node.setValue(value);
+
+            if (this.root === null) {
+                node.setTreeLevel(0);
+
+                this.root = node;
+                this.currentNode = node;
+            } else {
+                var nextLevel = this.currentNode.getTreeLevel() + 1;
+                node.setTreeLevel(nextLevel);
+
+                this.currentNode.addChild(node);
+                this.currentNode = node;
+            }
         };
 
         AbstractSyntaxTree.prototype.addLeafNode = function () {
         };
 
         AbstractSyntaxTree.prototype.moveToParent = function () {
+            if (this.currentNode !== this.root) {
+                var parent = this.currentNode.getParent();
+
+                if (parent !== null) {
+                    Compiler.Logger.log("Moving to parent");
+                    this.currentNode = parent;
+                } else {
+                    var errorMessage = "Error! Current AST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";
+
+                    Compiler.Logger.log(errorMessage);
+                    throw errorMessage;
+                }
+            }
+        };
+
+        AbstractSyntaxTree.prototype.printPreOrder = function () {
+            this.root.printPreOrder(this.root);
         };
         return AbstractSyntaxTree;
     })();
@@ -51,6 +85,8 @@ var Compiler;
         function ASTNode() {
             this.value = "";
             this.typeInfo = "";
+
+            this.treeLevel = 0;
 
             this.leftmostSibling = null;
             this.rightSibling = null;
@@ -72,6 +108,14 @@ var Compiler;
 
         ASTNode.prototype.setTypeInfo = function (typeInfo) {
             this.typeInfo = typeInfo;
+        };
+
+        ASTNode.prototype.getTreeLevel = function () {
+            return this.treeLevel;
+        };
+
+        ASTNode.prototype.setTreeLevel = function (treeLevel) {
+            this.treeLevel = treeLevel;
         };
 
         ASTNode.prototype.getLeftmostSibling = function () {
@@ -99,7 +143,30 @@ var Compiler;
         };
 
         ASTNode.prototype.addChild = function (child) {
+            child.setParent(this);
             this.childList.push(child);
+        };
+
+        ASTNode.prototype.printPreOrder = function (root) {
+            if (root !== null) {
+                var indentDashes = "";
+                var treeLevel = root.getTreeLevel();
+
+                for (var i = 0; i < treeLevel; i++) {
+                    indentDashes += "-";
+                }
+
+                // Interior node
+                if (root.childList.length > 0) {
+                    Compiler.Logger.log(indentDashes + "< " + root.getValue() + " >", "ast");
+                } else {
+                    Compiler.Logger.log(indentDashes + "[ " + root.getValue() + " ]", "ast");
+                }
+
+                for (var i = 0; i < root.childList.length; i++) {
+                    root.printPreOrder(root.childList[i]);
+                }
+            }
         };
         return ASTNode;
     })();

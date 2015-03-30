@@ -41,8 +41,8 @@ var Compiler;
             }
         };
 
-        ConcreteSyntaxTree.prototype.printPreOrderTraversal = function () {
-            this.root.printPreOrderTraversal(this.root);
+        ConcreteSyntaxTree.prototype.printPreOrder = function () {
+            this.root.printPreOrder(this.root);
         };
 
         ConcreteSyntaxTree.prototype.moveToParent = function () {
@@ -110,12 +110,12 @@ var Compiler;
             this.treeLevel = treeLevel;
         };
 
-        CSTNode.prototype.addChild = function (newNode) {
-            newNode.setParent(this);
-            this.childList.push(newNode);
+        CSTNode.prototype.addChild = function (child) {
+            child.setParent(this);
+            this.childList.push(child);
         };
 
-        CSTNode.prototype.printPreOrderTraversal = function (root) {
+        CSTNode.prototype.printPreOrder = function (root) {
             if (root !== null) {
                 var indentDashes = "";
                 var treeLevel = root.getTreeLevel();
@@ -132,24 +132,19 @@ var Compiler;
                 }
 
                 for (var i = 0; i < root.childList.length; i++) {
-                    root.printPreOrderTraversal(root.childList[i]);
+                    root.printPreOrder(root.childList[i]);
                 }
             }
         };
 
         CSTNode.prototype.buildPreOrderTraversal = function (root, abstractSyntaxTree) {
             if (root !== null) {
-                Compiler.Logger.log(root.getValue(), "ast");
-
                 var wentDownALevel = true;
 
                 switch (root.getValue()) {
                     case cstNodeTypes.BLOCK:
                         Compiler.Logger.log("Found a block, going down a level.");
-                        break;
-
-                    case cstNodeTypes.ASSIGNMENT_STATEMENT:
-                        Compiler.Logger.log("Found an assignment statement. Going down a level.");
+                        abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
                         break;
 
                     default:
@@ -159,6 +154,10 @@ var Compiler;
 
                 for (var i = 0; i < root.childList.length; i++) {
                     root.buildPreOrderTraversal(root.childList[i], abstractSyntaxTree);
+                }
+
+                if (wentDownALevel) {
+                    abstractSyntaxTree.moveToParent();
                 }
             }
         };

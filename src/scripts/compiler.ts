@@ -69,6 +69,10 @@ module Compiler {
 				
 			}
 
+			if(semanticResult) {
+				Control.displayAST(concreteSyntaxTree);
+			}
+
 			if(!this.testMode) {
 				Control.displayCompilerResults(lexResult, parseResult, semanticResult);
 			}

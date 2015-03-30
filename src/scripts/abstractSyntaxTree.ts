@@ -47,8 +47,29 @@ module Compiler {
 			this.currentNode = null;
 		}
 
-		public addInteriorNode(): void {
+		public insertInteriorNode(value: string): void {
 
+			Logger.log("Inserting interior node: " + value);
+
+			var node: ASTNode = new ASTNode();
+			node.setValue(value);
+
+			if(this.root === null) {
+
+				node.setTreeLevel(0);
+
+				this.root = node;
+				this.currentNode = node;
+			}
+
+			else {
+
+				var nextLevel: number = this.currentNode.getTreeLevel() + 1;
+				node.setTreeLevel(nextLevel);
+
+				this.currentNode.addChild(node);
+				this.currentNode = node;
+			}
 		}
 
 		public addLeafNode(): void {
@@ -57,6 +78,28 @@ module Compiler {
 
 		public moveToParent(): void {
 
+			if(this.currentNode !== this.root) {
+
+				var parent: ASTNode = this.currentNode.getParent();
+
+				if(parent !== null) {
+
+					Logger.log("Moving to parent");
+					this.currentNode = parent;
+				}
+
+				else {
+
+					var errorMessage: string = "Error! Current AST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";
+
+					Logger.log(errorMessage);
+					throw errorMessage;
+				}
+			}
+		}
+
+		public printPreOrder(): void {
+			this.root.printPreOrder(this.root);
 		}
 
 	}
@@ -66,6 +109,8 @@ module Compiler {
 
 		private value: string;
 		private typeInfo: string;
+
+		private treeLevel: number;
 
 		private leftmostSibling: ASTNode;
 		private rightSibling: ASTNode;
@@ -78,6 +123,8 @@ module Compiler {
 			this.value = "";
 			this.typeInfo = "";
 
+			this.treeLevel = 0;
+
 			this.leftmostSibling = null;
 			this.rightSibling = null;
 			this.parent = null;
@@ -85,48 +132,85 @@ module Compiler {
 			this.childList = [];
 		}
 
-		private getValue(): string {
+		public getValue(): string {
 			return this.value;
 		}
 
-		private setValue(value: string): void {
+		public setValue(value: string): void {
 			this.value = value;
 		}
 
-		private getTypeInfo(): string {
+		public getTypeInfo(): string {
 			return this.typeInfo;
 		}
 
-		private setTypeInfo(typeInfo: string): void {
+		public setTypeInfo(typeInfo: string): void {
 			this.typeInfo = typeInfo;
 		}
 
-		private getLeftmostSibling(): ASTNode {
+		public getTreeLevel(): number {
+			return this.treeLevel;
+		}
+
+		public setTreeLevel(treeLevel): void {
+			this.treeLevel = treeLevel;
+		}
+
+		public getLeftmostSibling(): ASTNode {
 			return this.leftmostSibling;
 		}
 
-		private setLeftmostSibling(leftmostSibling: ASTNode): void {
+		public setLeftmostSibling(leftmostSibling: ASTNode): void {
 			this.leftmostSibling = leftmostSibling;
 		}
 
-		private getRightSibling(): ASTNode {
+		public getRightSibling(): ASTNode {
 			return this.rightSibling;
 		}
 
-		private setRightSibling(rightSibling: ASTNode): void {
+		public setRightSibling(rightSibling: ASTNode): void {
 			this.rightSibling = rightSibling;
 		}
 
-		private getParent(): ASTNode {
+		public getParent(): ASTNode {
 			return this.parent;
 		}
 
-		private setParent(parent: ASTNode): void {
+		public setParent(parent: ASTNode): void {
 			this.parent = parent;
 		}
 
-		private addChild(child: ASTNode): void {
+		public addChild(child: ASTNode): void {
+
+			child.setParent(this);
 			this.childList.push(child);
+		}
+
+		public printPreOrder(root: ASTNode): void {
+
+			if(root !== null) {
+
+				var indentDashes: string = "";
+				var treeLevel: number = root.getTreeLevel();
+
+				for(var i: number = 0; i < treeLevel; i++) {
+					indentDashes += "-";
+				}
+
+				// Interior node
+				if(root.childList.length > 0) {
+					Logger.log(indentDashes + "< " + root.getValue() + " >", "ast");
+				}
+
+				// Leaf node
+				else {
+					Logger.log(indentDashes + "[ " + root.getValue() + " ]", "ast");
+				}
+
+				for(var i: number = 0; i < root.childList.length; i++) {
+					root.printPreOrder(root.childList[i]);
+				}
+			}
 		}
 
 	}
