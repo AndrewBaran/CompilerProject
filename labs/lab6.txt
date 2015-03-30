@@ -1,0 +1,27 @@
+Andrew Baran
+Professor Labouseur
+Design of Compilers
+March 2, 2015
+
+Lab 6:
+
+Crafting a Compiler:
+
+9.2.
+
+AST of:
+
+signtest(exp) {
+	neg: stmts
+	zero: stmts
+	pos: stmts
+}
+
+							if
+		/			  /               \               \
+	less-than		block			else if          else
+   /       \          |           /         \          |		
+exp			0	 	stmtms	   equal       block     block
+							   /     \        \        |
+							 exp       0     stmts    stmts
+

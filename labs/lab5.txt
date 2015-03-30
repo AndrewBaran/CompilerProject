@@ -3,7 +3,7 @@ Professor Labouseur
 Design of Compilers
 March 2, 2015
 
-Lab 4:
+Lab 5:
 
 Crafting a Compiler:
 
