@@ -85,6 +85,10 @@ var cstNodeTypes = {
 	CHAR_LIST: "Char List"
 };
 
+var astNodeTypes = {
+	BLOCK: "BLOCK"
+};
+
 
 interface Constants {
 	MAX_SCOPE_ENTRIES: number;

@@ -50,7 +50,7 @@ var Compiler;
     var ASTNode = (function () {
         function ASTNode() {
             this.value = "";
-            this.type = "";
+            this.typeInfo = "";
 
             this.leftmostSibling = null;
             this.rightSibling = null;
@@ -66,12 +66,12 @@ var Compiler;
             this.value = value;
         };
 
-        ASTNode.prototype.getType = function () {
-            return this.type;
+        ASTNode.prototype.getTypeInfo = function () {
+            return this.typeInfo;
         };
 
-        ASTNode.prototype.setType = function (type) {
-            this.type = type;
+        ASTNode.prototype.setTypeInfo = function (typeInfo) {
+            this.typeInfo = typeInfo;
         };
 
         ASTNode.prototype.getLeftmostSibling = function () {
@@ -80,6 +80,26 @@ var Compiler;
 
         ASTNode.prototype.setLeftmostSibling = function (leftmostSibling) {
             this.leftmostSibling = leftmostSibling;
+        };
+
+        ASTNode.prototype.getRightSibling = function () {
+            return this.rightSibling;
+        };
+
+        ASTNode.prototype.setRightSibling = function (rightSibling) {
+            this.rightSibling = rightSibling;
+        };
+
+        ASTNode.prototype.getParent = function () {
+            return this.parent;
+        };
+
+        ASTNode.prototype.setParent = function (parent) {
+            this.parent = parent;
+        };
+
+        ASTNode.prototype.addChild = function (child) {
+            this.childList.push(child);
         };
         return ASTNode;
     })();

@@ -29,10 +29,10 @@ var Compiler;
             node.setValue(token.getValue());
 
             if (this.root === null) {
-                node.setTreeLevel(0);
+                var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
 
-                this.root = node;
-                this.currentNode = node;
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             } else {
                 var nextLevel = this.currentNode.getTreeLevel() + 1;
                 node.setTreeLevel(nextLevel);
@@ -141,7 +141,20 @@ var Compiler;
             if (root !== null) {
                 Compiler.Logger.log(root.getValue(), "ast");
 
+                var wentDownALevel = true;
+
                 switch (root.getValue()) {
+                    case cstNodeTypes.BLOCK:
+                        Compiler.Logger.log("Found a block, going down a level.");
+                        break;
+
+                    case cstNodeTypes.ASSIGNMENT_STATEMENT:
+                        Compiler.Logger.log("Found an assignment statement. Going down a level.");
+                        break;
+
+                    default:
+                        wentDownALevel = false;
+                        break;
                 }
 
                 for (var i = 0; i < root.childList.length; i++) {

@@ -84,4 +84,8 @@ var cstNodeTypes = {
     CHAR_LIST: "Char List"
 };
 
+var astNodeTypes = {
+    BLOCK: "BLOCK"
+};
+
 var _Constants = { MAX_SCOPE_ENTRIES: 26 };

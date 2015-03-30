@@ -42,10 +42,10 @@ module Compiler {
 
 			if(this.root === null) {
 
-				node.setTreeLevel(0);
+				var errorMessage: string = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
 
-				this.root = node;
-				this.currentNode = node;
+				Logger.log(errorMessage);
+				throw errorMessage;	
 			}
 
 			else {
@@ -183,8 +183,24 @@ module Compiler {
 
 				Logger.log(root.getValue(), "ast");
 
+				var wentDownALevel: boolean = true;
+
 				switch(root.getValue()) {
 
+					case cstNodeTypes.BLOCK:
+
+						Logger.log("Found a block, going down a level.");
+						break;
+
+					case cstNodeTypes.ASSIGNMENT_STATEMENT:
+
+						Logger.log("Found an assignment statement. Going down a level.");
+						break;
+
+					default:
+
+						wentDownALevel = false;
+						break;
 				}
 
 				for(var i: number = 0; i < root.childList.length; i++) {
