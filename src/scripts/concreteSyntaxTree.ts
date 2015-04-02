@@ -15,6 +15,7 @@ module Compiler {
 
 			var node: CSTNode = new CSTNode();
 			node.setValue(value);
+			node.setNodeType("Interior");
 
 			if(this.root === null) {
 
@@ -39,6 +40,7 @@ module Compiler {
 			var node: CSTNode = new CSTNode();
 			node.setType(token.getTokenName());
 			node.setValue(token.getValue());
+			node.setNodeType("Leaf");
 
 			if(this.root === null) {
 
@@ -84,7 +86,7 @@ module Compiler {
 
 			var ast: AbstractSyntaxTree = new AbstractSyntaxTree();
 
-			this.root.buildPreOrder(this.root, ast);
+			this.root.buildInOrder(this.root, ast);
 			return ast;
 		}
 
@@ -96,6 +98,7 @@ module Compiler {
 		private type: string;
 		private value: string;
 
+		private nodeType: string;
 		private treeLevel: number;
 
 		private parent: CSTNode;
@@ -106,6 +109,7 @@ module Compiler {
 			this.type = "";
 			this.value = "";
 
+			this.nodeType = "";
 			this.treeLevel = 0;
 
 			this.parent = null;
@@ -144,6 +148,14 @@ module Compiler {
 			this.treeLevel = treeLevel;
 		}
 
+		public getNodeType(): string {
+			return this.nodeType;
+		}
+
+		public setNodeType(nodeType: string): void {
+			this.nodeType = nodeType;
+		}
+
 		public addChild(child: CSTNode): void {
 
 			child.setParent(this);
@@ -177,7 +189,7 @@ module Compiler {
 			}
 		}
 
-		public buildPreOrder(root: CSTNode, abstractSyntaxTree: AbstractSyntaxTree): void {
+		public buildInOrder(root: CSTNode, abstractSyntaxTree: AbstractSyntaxTree): void {
 
 			if(root !== null) {
 
@@ -197,7 +209,7 @@ module Compiler {
 				}
 
 				for(var i: number = 0; i < root.childList.length; i++) {
-					root.buildPreOrder(root.childList[i], abstractSyntaxTree);
+					root.buildInOrder(root.childList[i], abstractSyntaxTree);
 				}
 
 				if(wentDownALevel) {

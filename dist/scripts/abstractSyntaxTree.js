@@ -8,6 +8,11 @@ Children have a link to their parent
 Block:
 Interior node of { }
 Move down to new level on tree
+VarDecl:
+Interior node if VarDecl
+Children:
+Left: type
+Right: variable
 Assignment:
 Interior node of assign
 Children:

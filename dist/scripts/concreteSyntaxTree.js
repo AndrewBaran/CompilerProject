@@ -8,6 +8,7 @@ var Compiler;
         ConcreteSyntaxTree.prototype.insertInteriorNode = function (value) {
             var node = new CSTNode();
             node.setValue(value);
+            node.setNodeType("Interior");
 
             if (this.root === null) {
                 node.setTreeLevel(0);
@@ -27,6 +28,7 @@ var Compiler;
             var node = new CSTNode();
             node.setType(token.getTokenName());
             node.setValue(token.getValue());
+            node.setNodeType("Leaf");
 
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
@@ -61,7 +63,7 @@ var Compiler;
         ConcreteSyntaxTree.prototype.buildAST = function () {
             var ast = new Compiler.AbstractSyntaxTree();
 
-            this.root.buildPreOrder(this.root, ast);
+            this.root.buildInOrder(this.root, ast);
             return ast;
         };
         return ConcreteSyntaxTree;
@@ -73,6 +75,7 @@ var Compiler;
             this.type = "";
             this.value = "";
 
+            this.nodeType = "";
             this.treeLevel = 0;
 
             this.parent = null;
@@ -110,6 +113,14 @@ var Compiler;
             this.treeLevel = treeLevel;
         };
 
+        CSTNode.prototype.getNodeType = function () {
+            return this.nodeType;
+        };
+
+        CSTNode.prototype.setNodeType = function (nodeType) {
+            this.nodeType = nodeType;
+        };
+
         CSTNode.prototype.addChild = function (child) {
             child.setParent(this);
             this.childList.push(child);
@@ -137,7 +148,7 @@ var Compiler;
             }
         };
 
-        CSTNode.prototype.buildPreOrder = function (root, abstractSyntaxTree) {
+        CSTNode.prototype.buildInOrder = function (root, abstractSyntaxTree) {
             if (root !== null) {
                 var wentDownALevel = true;
 
@@ -152,7 +163,7 @@ var Compiler;
                 }
 
                 for (var i = 0; i < root.childList.length; i++) {
-                    root.buildPreOrder(root.childList[i], abstractSyntaxTree);
+                    root.buildInOrder(root.childList[i], abstractSyntaxTree);
                 }
 
                 if (wentDownALevel) {
