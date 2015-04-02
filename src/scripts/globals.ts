@@ -68,6 +68,11 @@ enum TokenType {
 	T_WHITE_SPACE
 }
 
+var treeNodeTypes = {
+	INTERIOR: "Interior",
+	LEAF: "LEAF"
+};
+
 var cstNodeTypes = {
 	PROGRAM: "Program",
 	BLOCK: "Block",

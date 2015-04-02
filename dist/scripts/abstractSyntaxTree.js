@@ -45,6 +45,7 @@ var Compiler;
 
             var node = new ASTNode();
             node.setValue(value);
+            node.setNodeType(treeNodeTypes.INTERIOR);
 
             if (this.root === null) {
                 node.setTreeLevel(0);
@@ -115,6 +116,14 @@ var Compiler;
             this.typeInfo = typeInfo;
         };
 
+        ASTNode.prototype.getNodeType = function () {
+            return this.nodeType;
+        };
+
+        ASTNode.prototype.setNodeType = function (nodeType) {
+            this.nodeType = nodeType;
+        };
+
         ASTNode.prototype.getTreeLevel = function () {
             return this.treeLevel;
         };
@@ -162,7 +171,7 @@ var Compiler;
                 }
 
                 // Interior node
-                if (root.childList.length > 0) {
+                if (root.getNodeType() === treeNodeTypes.INTERIOR) {
                     Compiler.Logger.log(indentDashes + "< " + root.getValue() + " >", "ast");
                 } else {
                     Compiler.Logger.log(indentDashes + "[ " + root.getValue() + " ]", "ast");

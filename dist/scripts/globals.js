@@ -67,6 +67,11 @@ var TokenType;
     TokenType[TokenType["T_WHITE_SPACE"] = 26] = "T_WHITE_SPACE";
 })(TokenType || (TokenType = {}));
 
+var treeNodeTypes = {
+    INTERIOR: "Interior",
+    LEAF: "LEAF"
+};
+
 var cstNodeTypes = {
     PROGRAM: "Program",
     BLOCK: "Block",

@@ -58,6 +58,7 @@ module Compiler {
 
 			var node: ASTNode = new ASTNode();
 			node.setValue(value);
+			node.setNodeType(treeNodeTypes.INTERIOR);
 
 			if(this.root === null) {
 
@@ -115,6 +116,7 @@ module Compiler {
 		private value: string;
 		private typeInfo: string;
 
+		private nodeType: string;
 		private treeLevel: number;
 
 		private leftmostSibling: ASTNode;
@@ -151,6 +153,14 @@ module Compiler {
 
 		public setTypeInfo(typeInfo: string): void {
 			this.typeInfo = typeInfo;
+		}
+
+		public getNodeType(): string {
+			return this.nodeType;
+		}
+
+		public setNodeType(nodeType): void {
+			this.nodeType = nodeType;
 		}
 
 		public getTreeLevel(): number {
@@ -203,7 +213,7 @@ module Compiler {
 				}
 
 				// Interior node
-				if(root.childList.length > 0) {
+				if(root.getNodeType() === treeNodeTypes.INTERIOR) {
 					Logger.log(indentDashes + "< " + root.getValue() + " >", "ast");
 				}
 

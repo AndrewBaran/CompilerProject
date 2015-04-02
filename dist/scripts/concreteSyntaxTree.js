@@ -8,7 +8,7 @@ var Compiler;
         ConcreteSyntaxTree.prototype.insertInteriorNode = function (value) {
             var node = new CSTNode();
             node.setValue(value);
-            node.setNodeType("Interior");
+            node.setNodeType(treeNodeTypes.INTERIOR);
 
             if (this.root === null) {
                 node.setTreeLevel(0);
@@ -28,7 +28,7 @@ var Compiler;
             var node = new CSTNode();
             node.setType(token.getTokenName());
             node.setValue(token.getValue());
-            node.setNodeType("Leaf");
+            node.setNodeType(treeNodeTypes.LEAF);
 
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
@@ -136,7 +136,7 @@ var Compiler;
                 }
 
                 // Interior node
-                if (root.childList.length > 0) {
+                if (root.getNodeType() === treeNodeTypes.INTERIOR) {
                     Compiler.Logger.log(indentDashes + "< " + root.getValue() + " >", "cst");
                 } else {
                     Compiler.Logger.log(indentDashes + "[ " + root.getValue() + " ]", "cst");

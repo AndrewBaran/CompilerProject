@@ -15,7 +15,7 @@ module Compiler {
 
 			var node: CSTNode = new CSTNode();
 			node.setValue(value);
-			node.setNodeType("Interior");
+			node.setNodeType(treeNodeTypes.INTERIOR);
 
 			if(this.root === null) {
 
@@ -40,7 +40,7 @@ module Compiler {
 			var node: CSTNode = new CSTNode();
 			node.setType(token.getTokenName());
 			node.setValue(token.getValue());
-			node.setNodeType("Leaf");
+			node.setNodeType(treeNodeTypes.LEAF);
 
 			if(this.root === null) {
 
@@ -174,7 +174,7 @@ module Compiler {
 				}
 
 				// Interior node
-				if(root.childList.length > 0) {
+				if(root.getNodeType() === treeNodeTypes.INTERIOR) {
 					Logger.log(indentDashes + "< " + root.getValue() + " >", "cst");
 				}
 
