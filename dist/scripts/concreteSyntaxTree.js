@@ -24,11 +24,15 @@ var Compiler;
             }
         };
 
-        ConcreteSyntaxTree.prototype.insertLeafNode = function (token) {
+        ConcreteSyntaxTree.prototype.insertLeafNode = function (tokenInfo) {
+            var token = tokenInfo.token;
+            var lineNumber = tokenInfo.lineFoundOn;
+
             var node = new CSTNode();
             node.setType(token.getTokenName());
             node.setValue(token.getValue());
             node.setNodeType(treeNodeTypes.LEAF);
+            node.setLineNumber(lineNumber);
 
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
@@ -111,6 +115,14 @@ var Compiler;
 
         CSTNode.prototype.setTreeLevel = function (treeLevel) {
             this.treeLevel = treeLevel;
+        };
+
+        CSTNode.prototype.getLineNumber = function () {
+            return this.lineNumber;
+        };
+
+        CSTNode.prototype.setLineNumber = function (lineNumber) {
+            this.lineNumber = lineNumber;
         };
 
         CSTNode.prototype.getNodeType = function () {

@@ -137,6 +137,7 @@ var Compiler;
             this.buildTable(firstScope, htmlTable);
         };
 
+        // TODO: Display line # found on
         Control.buildTable = function (currentScope, htmlTable) {
             for (var entryIndex = 0; entryIndex < _Constants.MAX_SCOPE_ENTRIES; entryIndex++) {
                 var entry = currentScope.getEntry(entryIndex);

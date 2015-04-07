@@ -35,12 +35,16 @@ module Compiler {
 			}
 		}
 
-		public insertLeafNode(token: Token): void {
+		public insertLeafNode(tokenInfo: TokenInfo): void {
+
+			var token: Token = tokenInfo.token;
+			var lineNumber: number = tokenInfo.lineFoundOn;
 
 			var node: CSTNode = new CSTNode();
 			node.setType(token.getTokenName());
 			node.setValue(token.getValue());
 			node.setNodeType(treeNodeTypes.LEAF);
+			node.setLineNumber(lineNumber);
 
 			if(this.root === null) {
 
@@ -101,6 +105,8 @@ module Compiler {
 		private nodeType: string;
 		private treeLevel: number;
 
+		private lineNumber: number;
+
 		private parent: CSTNode;
 		private childList: CSTNode [];
 
@@ -146,6 +152,14 @@ module Compiler {
 
 		public setTreeLevel(treeLevel): void {
 			this.treeLevel = treeLevel;
+		}
+
+		public getLineNumber(): number {
+			return this.lineNumber;
+		}
+
+		public setLineNumber(lineNumber: number): void {
+			this.lineNumber = lineNumber;
 		}
 
 		public getNodeType(): string {

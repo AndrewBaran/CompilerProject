@@ -147,6 +147,7 @@ module Compiler {
 			this.buildTable(firstScope, htmlTable);
 		}
 
+		// TODO: Display line # found on
 		private static buildTable(currentScope: ScopeTable, htmlTable: HTMLTableElement): void {
 
 			for(var entryIndex: number = 0; entryIndex < _Constants.MAX_SCOPE_ENTRIES; entryIndex++) {
