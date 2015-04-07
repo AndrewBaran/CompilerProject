@@ -232,6 +232,7 @@ var Compiler;
             }
         };
 
+        // TODO: Add Code Gen results in Project 3
         Control.displayCompilerResults = function (lex, parse, semantic) {
             var resultDiv = document.getElementById("divCompilerResults");
 

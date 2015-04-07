@@ -259,6 +259,7 @@ module Compiler {
 
 		}
 
+		// TODO: Add Code Gen results in Project 3
 		public static displayCompilerResults(lex: boolean, parse: boolean, semantic: boolean): void {
 
 			var resultDiv = document.getElementById("divCompilerResults");

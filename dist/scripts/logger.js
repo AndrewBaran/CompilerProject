@@ -21,10 +21,7 @@ var Compiler;
                     break;
             }
 
-            // Get the log textbox
             var logContents = document.getElementById(textboxName);
-
-            // Add new log message to the end of the log
             logContents.value = logContents.value + logMessage + "\n";
         };
         return Logger;

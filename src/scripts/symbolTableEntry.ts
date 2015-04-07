@@ -1,3 +1,5 @@
+// TODO: Have line found on as field
+
 module Compiler {
 
 	export class SymbolTableEntry {

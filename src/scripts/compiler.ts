@@ -23,7 +23,7 @@ module Compiler {
 
 				try {
 
-					tokenList = Lexer.tokenizeCode(codeToCompile, symbolTable);
+					tokenList = Lexer.tokenizeCode(codeToCompile);
 					lexResult = true;
 				}
 
@@ -40,7 +40,7 @@ module Compiler {
 				
 				try {
 
-					concreteSyntaxTree = Parser.parseCode(tokenList, symbolTable);
+					concreteSyntaxTree = Parser.parseCode(tokenList);
 					parseResult = true;
 				}
 
@@ -52,8 +52,6 @@ module Compiler {
 			if(parseResult) {
 
 				if(!this.testMode) {
-
-					Control.displaySymbolTable(symbolTable);
 					Control.displayCST(concreteSyntaxTree);
 				}
 
@@ -70,11 +68,14 @@ module Compiler {
 			}
 
 			if(semanticResult) {
-				Control.displayAST(abstractSyntaxTree);
-			}
 
-			if(!this.testMode) {
-				Control.displayCompilerResults(lexResult, parseResult, semanticResult);
+				if(!this.testMode) {
+
+					Control.displayCompilerResults(lexResult, parseResult, semanticResult);
+					Control.displaySymbolTable(symbolTable);
+					Control.displayAST(abstractSyntaxTree);
+				}
+
 			}
 
 			// TODO: Return the AND of each compilation result

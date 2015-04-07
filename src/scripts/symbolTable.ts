@@ -55,6 +55,14 @@ module Compiler {
 			if(parent !== null) {
 				this.currentScopeTable = parent;
 			}
+
+			else {
+				
+				var errorMessage: string = "Error! Attempt was made to move to nonexistant parent scope.";
+
+				Logger.log(errorMessage);
+				throw errorMessage;
+			}
 		}
 
 		public getCurrentScope(): ScopeTable {

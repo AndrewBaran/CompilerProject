@@ -21,11 +21,6 @@ var Compiler;
             return this.value;
         };
 
-        Token.prototype.toString = function () {
-            var result = this.getTokenName() + ": " + this.value;
-            return result;
-        };
-
         Token.prototype.getTokenName = function () {
             return TokenType[this.type];
         };

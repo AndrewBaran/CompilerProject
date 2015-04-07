@@ -54,7 +54,8 @@ module Compiler {
 
 		public insertInteriorNode(value: string): void {
 
-			Logger.log("Inserting interior node: " + value);
+			// TODO: Remove after testing
+			Logger.log("Inserting interior node: " + value, "ast");
 
 			var node: ASTNode = new ASTNode();
 			node.setValue(value);
@@ -79,6 +80,10 @@ module Compiler {
 		}
 
 		public addLeafNode(): void {
+
+			// TODO: Remove after testing
+			Logger.log("Not implemented yet", "ast");
+			Logger.log("Inserting leaf node", "ast");
 
 		}
 
@@ -105,6 +110,12 @@ module Compiler {
 		}
 
 		public printPreOrder(): void {
+
+			// TODO: Remove after testing
+			Logger.log("", "ast");
+			Logger.log("Displaying AST", "ast");
+			Logger.log("----------------------", "ast");
+
 			this.root.printPreOrder(this.root);
 		}
 

@@ -17,7 +17,7 @@ var Compiler;
                 _Compiler.Logger.log("Error! No code available to compile.");
             } else {
                 try  {
-                    tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile, symbolTable);
+                    tokenList = _Compiler.Lexer.tokenizeCode(codeToCompile);
                     lexResult = true;
                 } catch (exception) {
                     lexResult = false;
@@ -30,7 +30,7 @@ var Compiler;
                 }
 
                 try  {
-                    concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList, symbolTable);
+                    concreteSyntaxTree = _Compiler.Parser.parseCode(tokenList);
                     parseResult = true;
                 } catch (exception) {
                     parseResult = false;
@@ -39,7 +39,6 @@ var Compiler;
 
             if (parseResult) {
                 if (!this.testMode) {
-                    _Compiler.Control.displaySymbolTable(symbolTable);
                     _Compiler.Control.displayCST(concreteSyntaxTree);
                 }
 
@@ -52,11 +51,11 @@ var Compiler;
             }
 
             if (semanticResult) {
-                _Compiler.Control.displayAST(abstractSyntaxTree);
-            }
-
-            if (!this.testMode) {
-                _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
+                if (!this.testMode) {
+                    _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
+                    _Compiler.Control.displaySymbolTable(symbolTable);
+                    _Compiler.Control.displayAST(abstractSyntaxTree);
+                }
             }
 
             // TODO: Return the AND of each compilation result

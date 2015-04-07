@@ -39,6 +39,11 @@ var Compiler;
 
             if (parent !== null) {
                 this.currentScopeTable = parent;
+            } else {
+                var errorMessage = "Error! Attempt was made to move to nonexistant parent scope.";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             }
         };
 

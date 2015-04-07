@@ -7,7 +7,7 @@ module Compiler {
 
 
 		// Separates the input code into a list of tokens and returns that list
-		public static tokenizeCode(inputCode: string, symbolTable: SymbolTable): TokenInfo [] {
+		public static tokenizeCode(inputCode: string): TokenInfo [] {
 
 			this.setupTokenPatterns();
 

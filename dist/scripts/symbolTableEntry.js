@@ -1,3 +1,4 @@
+// TODO: Have line found on as field
 var Compiler;
 (function (Compiler) {
     var SymbolTableEntry = (function () {

@@ -65,7 +65,7 @@ enum TokenType {
 	T_EXCLAMATION_POINT, // !
 	T_FALSE, // false
 	T_TRUE, // true
-	T_WHITE_SPACE
+	T_WHITE_SPACE // space char in strings
 }
 
 var treeNodeTypes = {

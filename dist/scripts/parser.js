@@ -3,8 +3,8 @@ var Compiler;
     var Parser = (function () {
         function Parser() {
         }
-        Parser.parseCode = function (tokenList, symbolTable) {
-            this.setupParsingEnvironment(tokenList, symbolTable);
+        Parser.parseCode = function (tokenList) {
+            this.setupParsingEnvironment(tokenList);
 
             Compiler.Logger.log("Parsing the code");
             Compiler.Logger.log("");
@@ -17,10 +17,8 @@ var Compiler;
             return this.concreteSyntaxTree;
         };
 
-        Parser.setupParsingEnvironment = function (tokenList, symbolTable) {
+        Parser.setupParsingEnvironment = function (tokenList) {
             this.tokenList = tokenList;
-            this.symbolTable = symbolTable;
-
             this.currentTokenIndex = 0;
 
             this.concreteSyntaxTree = new Compiler.ConcreteSyntaxTree();
@@ -553,11 +551,6 @@ var Compiler;
 
         Parser.getToken = function () {
             var token = this.tokenList[this.currentTokenIndex].token;
-            return token;
-        };
-
-        Parser.getPreviousToken = function () {
-            var token = this.tokenList[this.currentTokenIndex - 1].token;
             return token;
         };
 

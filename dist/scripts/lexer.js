@@ -4,7 +4,7 @@ var Compiler;
         function Lexer() {
         }
         // Separates the input code into a list of tokens and returns that list
-        Lexer.tokenizeCode = function (inputCode, symbolTable) {
+        Lexer.tokenizeCode = function (inputCode) {
             this.setupTokenPatterns();
 
             Compiler.Logger.log("Performing Lexical Analysis");

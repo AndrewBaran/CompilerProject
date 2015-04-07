@@ -41,7 +41,8 @@ var Compiler;
             this.currentNode = null;
         }
         AbstractSyntaxTree.prototype.insertInteriorNode = function (value) {
-            Compiler.Logger.log("Inserting interior node: " + value);
+            // TODO: Remove after testing
+            Compiler.Logger.log("Inserting interior node: " + value, "ast");
 
             var node = new ASTNode();
             node.setValue(value);
@@ -62,6 +63,9 @@ var Compiler;
         };
 
         AbstractSyntaxTree.prototype.addLeafNode = function () {
+            // TODO: Remove after testing
+            Compiler.Logger.log("Not implemented yet", "ast");
+            Compiler.Logger.log("Inserting leaf node", "ast");
         };
 
         AbstractSyntaxTree.prototype.moveToParent = function () {
@@ -81,6 +85,11 @@ var Compiler;
         };
 
         AbstractSyntaxTree.prototype.printPreOrder = function () {
+            // TODO: Remove after testing
+            Compiler.Logger.log("", "ast");
+            Compiler.Logger.log("Displaying AST", "ast");
+            Compiler.Logger.log("----------------------", "ast");
+
             this.root.printPreOrder(this.root);
         };
         return AbstractSyntaxTree;

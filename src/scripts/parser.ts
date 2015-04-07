@@ -5,13 +5,11 @@ module Compiler {
 		private static tokenList: TokenInfo[];
 		private static currentTokenIndex: number;
 
-		private static symbolTable: SymbolTable;
-
 		private static concreteSyntaxTree: ConcreteSyntaxTree;
 
-		public static parseCode(tokenList: TokenInfo[], symbolTable: SymbolTable): ConcreteSyntaxTree {
+		public static parseCode(tokenList: TokenInfo[]): ConcreteSyntaxTree {
 
-			this.setupParsingEnvironment(tokenList, symbolTable);
+			this.setupParsingEnvironment(tokenList);
 
 			Logger.log("Parsing the code");
 			Logger.log("");
@@ -24,11 +22,9 @@ module Compiler {
 			return this.concreteSyntaxTree;
 		}
 
-		private static setupParsingEnvironment(tokenList: TokenInfo[], symbolTable: SymbolTable): void {
+		private static setupParsingEnvironment(tokenList: TokenInfo[]): void {
 
 			this.tokenList = tokenList;
-			this.symbolTable = symbolTable;
-
 			this.currentTokenIndex = 0;
 
 			this.concreteSyntaxTree = new ConcreteSyntaxTree();
@@ -670,12 +666,6 @@ module Compiler {
 
 			var token: Token = this.tokenList[this.currentTokenIndex].token;
 			return token; 
-		}
-
-		private static getPreviousToken(): Token {
-
-			var token: Token = this.tokenList[this.currentTokenIndex - 1].token;
-			return token;
 		}
 
 		private static consumeToken(): void {

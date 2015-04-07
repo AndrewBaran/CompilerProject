@@ -26,12 +26,6 @@ module Compiler {
 			return this.value;
 		}
 
-		public toString(): string {
-
-			var result: string = this.getTokenName() + ": " + this.value;
-			return result;
-		}
-
 		public getTokenName(): string {
 
 			return TokenType[this.type];
