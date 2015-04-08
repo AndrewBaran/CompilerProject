@@ -147,7 +147,6 @@ module Compiler {
 			this.buildTable(firstScope, htmlTable);
 		}
 
-		// TODO: Display line # found on
 		private static buildTable(currentScope: ScopeTable, htmlTable: HTMLTableElement): void {
 
 			for(var entryIndex: number = 0; entryIndex < _Constants.MAX_SCOPE_ENTRIES; entryIndex++) {
@@ -164,11 +163,11 @@ module Compiler {
 					var typeCell = row.insertCell(-1);
 					typeCell.innerHTML = entry.getIdType();
 
-					var valueCell = row.insertCell(-1);
-					valueCell.innerHTML = entry.getValue();
-
 					var scopeCell = row.insertCell(-1);
 					scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+
+					var lineCell = row.insertCell(-1);
+					lineCell.innerHTML = entry.getLineNumber().toString();
 				}
 
 			}

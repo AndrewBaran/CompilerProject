@@ -1,20 +1,18 @@
-// TODO: Have line found on as field
-
 module Compiler {
 
 	export class SymbolTableEntry {
 
 		private entryNumber: number;
 		private idName: string;
-		private value: string;
 		private idType: string;
+		private lineNumber: number;
 
 		constructor() {
 
 			this.entryNumber = -1;
 			this.idName = "";
-			this.value = "";
 			this.idType = "";
+			this.lineNumber = -1;
 		}
 
 		public getEntryNumber(): number {
@@ -33,20 +31,20 @@ module Compiler {
 			this.idName = idName;
 		}
 
-		public getValue(): string {
-			return this.value;
-		}
-
-		public setValue(value: string): void {
-			this.value = value;
-		}
-
 		public getIdType(): string {
 			return this.idType;
 		}
 
 		public setIdType(idType: string): void {
 			this.idType = idType;
+		}
+
+		public getLineNumber(): number {
+			return this.lineNumber;
+		}
+
+		public setLineNumber(lineNumber: number): void {
+			this.lineNumber = lineNumber;
 		}
 	}
 }

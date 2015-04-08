@@ -1,12 +1,11 @@
-// TODO: Have line found on as field
 var Compiler;
 (function (Compiler) {
     var SymbolTableEntry = (function () {
         function SymbolTableEntry() {
             this.entryNumber = -1;
             this.idName = "";
-            this.value = "";
             this.idType = "";
+            this.lineNumber = -1;
         }
         SymbolTableEntry.prototype.getEntryNumber = function () {
             return this.entryNumber;
@@ -24,20 +23,20 @@ var Compiler;
             this.idName = idName;
         };
 
-        SymbolTableEntry.prototype.getValue = function () {
-            return this.value;
-        };
-
-        SymbolTableEntry.prototype.setValue = function (value) {
-            this.value = value;
-        };
-
         SymbolTableEntry.prototype.getIdType = function () {
             return this.idType;
         };
 
         SymbolTableEntry.prototype.setIdType = function (idType) {
             this.idType = idType;
+        };
+
+        SymbolTableEntry.prototype.getLineNumber = function () {
+            return this.lineNumber;
+        };
+
+        SymbolTableEntry.prototype.setLineNumber = function (lineNumber) {
+            this.lineNumber = lineNumber;
         };
         return SymbolTableEntry;
     })();

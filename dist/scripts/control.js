@@ -137,7 +137,6 @@ var Compiler;
             this.buildTable(firstScope, htmlTable);
         };
 
-        // TODO: Display line # found on
         Control.buildTable = function (currentScope, htmlTable) {
             for (var entryIndex = 0; entryIndex < _Constants.MAX_SCOPE_ENTRIES; entryIndex++) {
                 var entry = currentScope.getEntry(entryIndex);
@@ -151,11 +150,11 @@ var Compiler;
                     var typeCell = row.insertCell(-1);
                     typeCell.innerHTML = entry.getIdType();
 
-                    var valueCell = row.insertCell(-1);
-                    valueCell.innerHTML = entry.getValue();
-
                     var scopeCell = row.insertCell(-1);
                     scopeCell.innerHTML = currentScope.getScopeLevel().toString();
+
+                    var lineCell = row.insertCell(-1);
+                    lineCell.innerHTML = entry.getLineNumber().toString();
                 }
             }
 
