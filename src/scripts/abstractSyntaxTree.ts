@@ -1,41 +1,3 @@
-/*
-
-Game plan:
-
-	AST starts with { } / Block node as root node
-	Statements are children of a block node in the order that they are declared
-		Children have a link to the leftmost child
-		Children have a link to their right sibling (like a B-tree)
-		Children have a link to their parent
-
-	VarDecl:
-		Interior node of VarDecl
-		Children:
-			Left: type
-			Right: variable
-	Assignment:
-		Interior node of assign
-		Children:
-			Left: variable
-			Right: expression
-	Print:
-		Interior node of print
-		Children:
-			Value to be printed / expression
-	If:
-		Interior node of if
-		Child nodes:
-			Left: Predicate / boolean expression
-			Right: Block node, containing statements
-	While:
-		Interior node of while
-		Child nodes:
-			Left: Predicate / boolean expression
-			Right: Block node, containing statements
-
-*/
-
-
 module Compiler {
 
 	export class AbstractSyntaxTree {
@@ -156,6 +118,7 @@ module Compiler {
 	}
 
 
+	// TODO: Do I need a lot of these fields?
 	export class ASTNode {
 
 		private value: string;
