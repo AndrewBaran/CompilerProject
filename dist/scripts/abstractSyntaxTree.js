@@ -60,8 +60,7 @@ var Compiler;
         };
 
         AbstractSyntaxTree.prototype.insertLeafNode = function (cstNode, newType) {
-            // TODO: Remove after testing
-            Compiler.Logger.log("Type: " + cstNode.getType() + " | Value: " + cstNode.getValue() + " | Line #: " + cstNode.getLineNumber(), "ast");
+            Compiler.Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
 
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";

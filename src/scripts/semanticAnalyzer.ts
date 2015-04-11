@@ -31,12 +31,12 @@ module Compiler {
 
 		private static scopeCheck(): void {
 
-			Logger.log("Performing Scope Checking");
+			Logger.log("Performing Scope Checking (NOT IMPLEMENTED)");
 		}
 
 		private static typeCheck(): void {
 
-			Logger.log("Performing Type Checking");
+			Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
 		}
 
 	}

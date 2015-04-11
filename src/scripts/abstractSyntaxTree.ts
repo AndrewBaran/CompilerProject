@@ -78,8 +78,7 @@ module Compiler {
 
 		public insertLeafNode(cstNode: CSTNode, newType?: string): void {
 
-			// TODO: Remove after testing
-			Logger.log("Type: " + cstNode.getType() + " | Value: " + cstNode.getValue() + " | Line #: " + cstNode.getLineNumber(), "ast");
+			Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
 
 			if(this.root === null) {
 

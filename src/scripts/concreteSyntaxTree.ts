@@ -207,8 +207,6 @@ module Compiler {
 
 			if(root !== null) {
 
-				Logger.log("Current: [ " + root.getValue() + " ] | Path taken: " + interiorNodePath, "ast");
-
 				var wentDownALevel: boolean = true;
 
 				switch(root.getValue()) {
@@ -216,12 +214,14 @@ module Compiler {
 					case cstNodeTypes.BLOCK:
 
 						abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
+
 						break;
 
 					case cstNodeTypes.VAR_DECLARATION:
 
 						interiorNodePath = astNodeTypes.VAR_DECLARATION;
 						abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
 						break;
 
 					case cstNodeTypes.ASSIGNMENT_STATEMENT:
@@ -250,6 +250,8 @@ module Compiler {
 						interiorNodePath = astNodeTypes.WHILE_STATEMENT;
 						abstractSyntaxTree.insertInteriorNode(interiorNodePath);
 
+						break;
+
 					case cstNodeTypes.INT_EXPRESSION:
 
 						// Add plus subtree
@@ -259,7 +261,7 @@ module Compiler {
 							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
 						}
 
-						// Add single leaf
+						// Add single digit leaf
 						else {
 							interiorNodePath = astNodeTypes.DIGIT;
 						}
@@ -287,6 +289,7 @@ module Compiler {
 							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
 						}
 
+						// Add single boolval leaf
 						else {
 							interiorNodePath = astNodeTypes.BOOLEAN_EXPRESSION;
 						}
@@ -300,26 +303,17 @@ module Compiler {
 						break;
 				}
 
-				// TODO: Consilidate cases that are the same operations
+
 				switch(interiorNodePath) {
 
 					case astNodeTypes.VAR_DECLARATION:
-
-						if(root.getNodeType() === treeNodeTypes.LEAF) {
-							abstractSyntaxTree.insertLeafNode(root);
-						}
-
-						break;
-
 					case astNodeTypes.ASSIGNMENT_STATEMENT:
-
-						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
-							abstractSyntaxTree.insertLeafNode(root);
-						}
-
-						break;
-
 					case astNodeTypes.PRINT_STATEMENT:
+					case astNodeTypes.ADD:
+					case astNodeTypes.IF_STATEMENT:
+					case astNodeTypes.WHILE_STATEMENT:
+					case astNodeTypes.EQUAL:
+					case astNodeTypes.NOT_EQUAL:
 
 						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
 							abstractSyntaxTree.insertLeafNode(root);
@@ -347,29 +341,6 @@ module Compiler {
 
 						break;
 
-					case astNodeTypes.ADD:
-
-						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
-							abstractSyntaxTree.insertLeafNode(root);
-						}
-
-						break;
-
-					case astNodeTypes.IF_STATEMENT:
-
-						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
-							abstractSyntaxTree.insertLeafNode(root);
-						}
-
-						break;
-
-					case astNodeTypes.WHILE_STATEMENT:
-
-						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
-							abstractSyntaxTree.insertLeafNode(root);
-						}
-
-						break;
 
 					case astNodeTypes.STRING_EXPRESSION:
 
@@ -403,21 +374,14 @@ module Compiler {
 
 						break;
 
-					case astNodeTypes.EQUAL:
-					case astNodeTypes.NOT_EQUAL:
-
-						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
-							abstractSyntaxTree.insertLeafNode(root);
-						}
-
-						break;
-
 					default:
 
+						// TODO: Do I need this?
 						break;
 
 				}
 
+				// Recurse through children to continue AST construction
 				for(var i: number = 0; i < root.childList.length; i++) {
 					root.buildInOrder(root.childList[i], abstractSyntaxTree, interiorNodePath);
 				}

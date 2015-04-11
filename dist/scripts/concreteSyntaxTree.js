@@ -162,18 +162,18 @@ var Compiler;
 
         CSTNode.prototype.buildInOrder = function (root, abstractSyntaxTree, interiorNodePath) {
             if (root !== null) {
-                Compiler.Logger.log("Current: [ " + root.getValue() + " ] | Path taken: " + interiorNodePath, "ast");
-
                 var wentDownALevel = true;
 
                 switch (root.getValue()) {
                     case cstNodeTypes.BLOCK:
                         abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
+
                         break;
 
                     case cstNodeTypes.VAR_DECLARATION:
                         interiorNodePath = astNodeTypes.VAR_DECLARATION;
                         abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
                         break;
 
                     case cstNodeTypes.ASSIGNMENT_STATEMENT:
@@ -197,6 +197,8 @@ var Compiler;
                     case cstNodeTypes.WHILE_STATEMENT:
                         interiorNodePath = astNodeTypes.WHILE_STATEMENT;
                         abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
+                        break;
 
                     case cstNodeTypes.INT_EXPRESSION:
                         // Add plus subtree
@@ -235,20 +237,13 @@ var Compiler;
 
                 switch (interiorNodePath) {
                     case astNodeTypes.VAR_DECLARATION:
-                        if (root.getNodeType() === treeNodeTypes.LEAF) {
-                            abstractSyntaxTree.insertLeafNode(root);
-                        }
-
-                        break;
-
                     case astNodeTypes.ASSIGNMENT_STATEMENT:
-                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
-                            abstractSyntaxTree.insertLeafNode(root);
-                        }
-
-                        break;
-
                     case astNodeTypes.PRINT_STATEMENT:
+                    case astNodeTypes.ADD:
+                    case astNodeTypes.IF_STATEMENT:
+                    case astNodeTypes.WHILE_STATEMENT:
+                    case astNodeTypes.EQUAL:
+                    case astNodeTypes.NOT_EQUAL:
                         if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
                             abstractSyntaxTree.insertLeafNode(root);
                         }
@@ -270,28 +265,6 @@ var Compiler;
                         }
 
                         wentDownALevel = false;
-
-                        break;
-
-                    case astNodeTypes.ADD:
-                        // TODO: This may be wrong
-                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
-                            abstractSyntaxTree.insertLeafNode(root);
-                        }
-
-                        break;
-
-                    case astNodeTypes.IF_STATEMENT:
-                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
-                            abstractSyntaxTree.insertLeafNode(root);
-                        }
-
-                        break;
-
-                    case astNodeTypes.WHILE_STATEMENT:
-                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
-                            abstractSyntaxTree.insertLeafNode(root);
-                        }
 
                         break;
 
@@ -321,14 +294,6 @@ var Compiler;
                         }
 
                         wentDownALevel = false;
-
-                        break;
-
-                    case astNodeTypes.EQUAL:
-                    case astNodeTypes.NOT_EQUAL:
-                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
-                            abstractSyntaxTree.insertLeafNode(root);
-                        }
 
                         break;
 

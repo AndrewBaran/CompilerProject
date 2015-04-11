@@ -26,11 +26,11 @@ var Compiler;
         };
 
         SemanticAnalyzer.scopeCheck = function () {
-            Compiler.Logger.log("Performing Scope Checking");
+            Compiler.Logger.log("Performing Scope Checking (NOT IMPLEMENTED)");
         };
 
         SemanticAnalyzer.typeCheck = function () {
-            Compiler.Logger.log("Performing Type Checking");
+            Compiler.Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
         };
         return SemanticAnalyzer;
     })();
