@@ -94,7 +94,8 @@ var astNodeTypes = {
 	BLOCK: "BLOCK",
 	VAR_DECLARATION: "Variable Declaration",
 	ASSIGNMENT_STATEMENT: "Assignment Statement",
-	PRINT_STATEMENT: "Print Statement"
+	PRINT_STATEMENT: "Print Statement",
+	STRING_EXPRESSION: "String Expression"
 };
 
 

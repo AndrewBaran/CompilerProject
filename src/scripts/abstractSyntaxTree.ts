@@ -76,10 +76,10 @@ module Compiler {
 			}
 		}
 
-		public insertLeafNode(type: string, value: string, lineNumber: number): void {
+		public insertLeafNode(cstNode: CSTNode, newType?: string): void {
 
 			// TODO: Remove after testing
-			Logger.log("Type: " + type + " | Value: " + value + " | Line #: " + lineNumber, "ast");
+			Logger.log("Type: " + cstNode.getType() + " | Value: " + cstNode.getValue() + " | Line #: " + cstNode.getLineNumber(), "ast");
 
 			if(this.root === null) {
 
@@ -93,9 +93,19 @@ module Compiler {
 
 				var node: ASTNode = new ASTNode();
 
-				node.setTokenType(type);
-				node.setValue(value);
-				node.setLineNumber(lineNumber);
+				if(newType !== undefined) {
+					node.setTokenType(newType);
+				}
+
+				else {
+					node.setTokenType(cstNode.getType());
+				}
+
+				if(cstNode.getNodeType() === treeNodeTypes.LEAF) {
+					node.setLineNumber(cstNode.getLineNumber());
+				}
+
+				node.setValue(cstNode.getValue());
 				node.setParent(this.currentNode);
 				node.setNodeType(treeNodeTypes.LEAF);
 
@@ -130,6 +140,10 @@ module Compiler {
 			}
 		}
 
+		public getCurrentNode(): ASTNode {
+			return this.currentNode;
+		}
+
 		public printPreOrder(): void {
 
 			// TODO: Remove after testing
@@ -143,7 +157,7 @@ module Compiler {
 	}
 
 
-	class ASTNode {
+	export class ASTNode {
 
 		private value: string;
 
@@ -276,6 +290,10 @@ module Compiler {
 
 			child.setParent(this);
 			this.childList.push(child);
+		}
+
+		public getChildren(): ASTNode [] {
+			return this.childList;
 		}
 
 		public printPreOrder(root: ASTNode): void {

@@ -59,9 +59,9 @@ var Compiler;
             }
         };
 
-        AbstractSyntaxTree.prototype.insertLeafNode = function (type, value, lineNumber) {
+        AbstractSyntaxTree.prototype.insertLeafNode = function (cstNode, newType) {
             // TODO: Remove after testing
-            Compiler.Logger.log("Type: " + type + " | Value: " + value + " | Line #: " + lineNumber, "ast");
+            Compiler.Logger.log("Type: " + cstNode.getType() + " | Value: " + cstNode.getValue() + " | Line #: " + cstNode.getLineNumber(), "ast");
 
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
@@ -71,9 +71,17 @@ var Compiler;
             } else {
                 var node = new ASTNode();
 
-                node.setTokenType(type);
-                node.setValue(value);
-                node.setLineNumber(lineNumber);
+                if (newType !== undefined) {
+                    node.setTokenType(newType);
+                } else {
+                    node.setTokenType(cstNode.getType());
+                }
+
+                if (cstNode.getNodeType() === treeNodeTypes.LEAF) {
+                    node.setLineNumber(cstNode.getLineNumber());
+                }
+
+                node.setValue(cstNode.getValue());
                 node.setParent(this.currentNode);
                 node.setNodeType(treeNodeTypes.LEAF);
 
@@ -99,6 +107,10 @@ var Compiler;
                     throw errorMessage;
                 }
             }
+        };
+
+        AbstractSyntaxTree.prototype.getCurrentNode = function () {
+            return this.currentNode;
         };
 
         AbstractSyntaxTree.prototype.printPreOrder = function () {
@@ -226,6 +238,10 @@ var Compiler;
             this.childList.push(child);
         };
 
+        ASTNode.prototype.getChildren = function () {
+            return this.childList;
+        };
+
         ASTNode.prototype.printPreOrder = function (root) {
             if (root !== null) {
                 var indentDashes = "";
@@ -249,4 +265,5 @@ var Compiler;
         };
         return ASTNode;
     })();
+    Compiler.ASTNode = ASTNode;
 })(Compiler || (Compiler = {}));

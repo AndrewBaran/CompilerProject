@@ -186,6 +186,14 @@ var Compiler;
                         abstractSyntaxTree.insertInteriorNode(interiorNodePath);
                         break;
 
+                    case cstNodeTypes.STRING_EXPRESSION:
+                        // TODO: Remove
+                        Compiler.Logger.log("Looking for string now", "ast");
+
+                        interiorNodePath = astNodeTypes.STRING_EXPRESSION;
+                        abstractSyntaxTree.insertLeafNode(root, astNodeTypes.STRING_EXPRESSION);
+                        break;
+
                     default:
                         wentDownALevel = false;
                         break;
@@ -194,16 +202,46 @@ var Compiler;
                 switch (interiorNodePath) {
                     case astNodeTypes.VAR_DECLARATION:
                         if (root.getNodeType() === treeNodeTypes.LEAF) {
-                            abstractSyntaxTree.insertLeafNode(root.getType(), root.getValue(), root.getLineNumber());
+                            abstractSyntaxTree.insertLeafNode(root);
                         }
 
                         break;
 
                     case astNodeTypes.ASSIGNMENT_STATEMENT:
-                        if (root.getNodeType() === treeNodeTypes.LEAF && root.getValue() !== "=") {
-                            abstractSyntaxTree.insertLeafNode(root.getType(), root.getValue(), root.getLineNumber());
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            abstractSyntaxTree.insertLeafNode(root);
                         }
 
+                        break;
+
+                    case astNodeTypes.STRING_EXPRESSION:
+                        var currentASTNode = abstractSyntaxTree.getCurrentNode();
+                        var childList = currentASTNode.getChildren();
+                        var rightMostChild = childList[childList.length - 1];
+
+                        // Clear out default value
+                        if (rightMostChild.getValue() === astNodeTypes.STRING_EXPRESSION) {
+                            rightMostChild.setValue("");
+                        }
+
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            // Add to existing string
+                            if (rightMostChild !== null && rightMostChild.getTokenType() === astNodeTypes.STRING_EXPRESSION) {
+                                // Update line number
+                                if (rightMostChild.getLineNumber() === -1) {
+                                    rightMostChild.setLineNumber(root.getLineNumber());
+                                }
+
+                                var currentString = rightMostChild.getValue();
+                                var newString = currentString + root.getValue();
+
+                                rightMostChild.setValue(newString);
+                            }
+                        }
+
+                        break;
+
+                    default:
                         break;
                 }
 
@@ -218,4 +256,5 @@ var Compiler;
         };
         return CSTNode;
     })();
+    Compiler.CSTNode = CSTNode;
 })(Compiler || (Compiler = {}));
