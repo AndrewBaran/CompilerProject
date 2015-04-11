@@ -94,7 +94,9 @@ var astNodeTypes = {
     VAR_DECLARATION: "Variable Declaration",
     ASSIGNMENT_STATEMENT: "Assignment Statement",
     PRINT_STATEMENT: "Print Statement",
-    STRING_EXPRESSION: "String Expression"
+    STRING_EXPRESSION: "String Expression",
+    ADD: "Add",
+    DIGIT: "Digit"
 };
 
 var _Constants = { MAX_SCOPE_ENTRIES: 26 };

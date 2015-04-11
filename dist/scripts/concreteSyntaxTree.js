@@ -184,12 +184,21 @@ var Compiler;
                     case cstNodeTypes.PRINT_STATEMENT:
                         interiorNodePath = astNodeTypes.PRINT_STATEMENT;
                         abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
+                        break;
+
+                    case cstNodeTypes.INT_EXPRESSION:
+                        // Add plus subtree
+                        if (this.contains(this, "+")) {
+                            interiorNodePath = astNodeTypes.ADD;
+                            abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        } else {
+                            interiorNodePath = astNodeTypes.DIGIT;
+                        }
+
                         break;
 
                     case cstNodeTypes.STRING_EXPRESSION:
-                        // TODO: Remove
-                        Compiler.Logger.log("Looking for string now", "ast");
-
                         interiorNodePath = astNodeTypes.STRING_EXPRESSION;
                         abstractSyntaxTree.insertLeafNode(root, astNodeTypes.STRING_EXPRESSION);
                         break;
@@ -208,6 +217,28 @@ var Compiler;
                         break;
 
                     case astNodeTypes.ASSIGNMENT_STATEMENT:
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            abstractSyntaxTree.insertLeafNode(root);
+                        }
+
+                        break;
+
+                    case astNodeTypes.PRINT_STATEMENT:
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            abstractSyntaxTree.insertLeafNode(root);
+                        }
+
+                        break;
+
+                    case astNodeTypes.DIGIT:
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            abstractSyntaxTree.insertLeafNode(root);
+                        }
+
+                        break;
+
+                    case astNodeTypes.ADD:
+                        // TODO: This may be wrong
                         if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
                             abstractSyntaxTree.insertLeafNode(root);
                         }
@@ -252,6 +283,25 @@ var Compiler;
                 if (wentDownALevel) {
                     abstractSyntaxTree.moveToParent();
                 }
+            }
+        };
+
+        // Searchs the root nodes subtree for the desired value in any of its descendent nodes
+        CSTNode.prototype.contains = function (root, desiredValue) {
+            if (root !== null) {
+                if (root.getNodeType() === treeNodeTypes.LEAF && root.getValue() === desiredValue) {
+                    return true;
+                }
+
+                var result = false;
+                var childResult = false;
+
+                for (var i = 0; i < root.childList.length; i++) {
+                    childResult = root.contains(root.childList[i], desiredValue);
+                    result = result || childResult;
+                }
+
+                return result;
             }
         };
         return CSTNode;

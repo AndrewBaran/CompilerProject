@@ -4,7 +4,7 @@ var Compiler;
         function Utils() {
         }
         Utils.isIgnoredLeaf = function (nodeValue) {
-            var ignoredLeafValues = ["=", "\""];
+            var ignoredLeafValues = ["=", "\"", "+", "(", ")", "print"];
             var leafMatched = false;
 
             for (var i = 0; i < ignoredLeafValues.length; i++) {
@@ -12,11 +12,6 @@ var Compiler;
                     leafMatched = true;
                     break;
                 }
-            }
-
-            // TODO: Remove after testing
-            if (leafMatched) {
-                Compiler.Logger.log(nodeValue + " not being added as a leaf.", "ast");
             }
 
             return leafMatched;
