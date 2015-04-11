@@ -179,6 +179,7 @@ var Compiler;
                     case cstNodeTypes.ASSIGNMENT_STATEMENT:
                         interiorNodePath = astNodeTypes.ASSIGNMENT_STATEMENT;
                         abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
                         break;
 
                     case cstNodeTypes.PRINT_STATEMENT:
@@ -201,6 +202,19 @@ var Compiler;
                     case cstNodeTypes.STRING_EXPRESSION:
                         interiorNodePath = astNodeTypes.STRING_EXPRESSION;
                         abstractSyntaxTree.insertLeafNode(root, astNodeTypes.STRING_EXPRESSION);
+                        break;
+
+                    case cstNodeTypes.BOOLEAN_EXPRESSION:
+                        if (this.contains(this, "==")) {
+                            interiorNodePath = astNodeTypes.EQUAL;
+                            abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        } else if (this.contains(this, "!=")) {
+                            interiorNodePath = astNodeTypes.NOT_EQUAL;
+                            abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        } else {
+                            interiorNodePath = astNodeTypes.BOOLEAN_EXPRESSION;
+                        }
+
                         break;
 
                     default:
@@ -237,6 +251,15 @@ var Compiler;
 
                         break;
 
+                    case astNodeTypes.BOOLEAN_EXPRESSION:
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            abstractSyntaxTree.insertLeafNode(root);
+                        }
+
+                        wentDownALevel = false;
+
+                        break;
+
                     case astNodeTypes.ADD:
                         // TODO: This may be wrong
                         if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
@@ -268,6 +291,14 @@ var Compiler;
 
                                 rightMostChild.setValue(newString);
                             }
+                        }
+
+                        break;
+
+                    case astNodeTypes.EQUAL:
+                    case astNodeTypes.NOT_EQUAL:
+                        if (root.getNodeType() === treeNodeTypes.LEAF && !Compiler.Utils.isIgnoredLeaf(root.getValue())) {
+                            abstractSyntaxTree.insertLeafNode(root);
                         }
 
                         break;

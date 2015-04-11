@@ -97,7 +97,10 @@ var astNodeTypes = {
 	PRINT_STATEMENT: "Print Statement",
 	STRING_EXPRESSION: "String Expression",
 	ADD: "Add",
-	DIGIT: "Digit"
+	DIGIT: "Digit",
+	EQUAL: "Equal",
+	NOT_EQUAL: "Not Equal",
+	BOOLEAN_EXPRESSION: "Boolean Expression"
 };
 
 

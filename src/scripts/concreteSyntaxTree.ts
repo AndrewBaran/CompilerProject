@@ -228,6 +228,7 @@ module Compiler {
 
 						interiorNodePath = astNodeTypes.ASSIGNMENT_STATEMENT
 						abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
 						break;
 
 					case cstNodeTypes.PRINT_STATEMENT:
@@ -259,12 +260,33 @@ module Compiler {
 						abstractSyntaxTree.insertLeafNode(root, astNodeTypes.STRING_EXPRESSION);
 						break;
 
+					case cstNodeTypes.BOOLEAN_EXPRESSION:
+
+						if(this.contains(this, "==")) {
+
+							interiorNodePath = astNodeTypes.EQUAL;
+							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+						}
+
+						else if(this.contains(this, "!=")) {
+
+							interiorNodePath = astNodeTypes.NOT_EQUAL;
+							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+						}
+
+						else {
+							interiorNodePath = astNodeTypes.BOOLEAN_EXPRESSION;
+						}
+
+						break;
+
 					default:
 
 						wentDownALevel = false;
 						break;
 				}
 
+				// TODO: Consilidate cases that are the same result
 				switch(interiorNodePath) {
 
 					case astNodeTypes.VAR_DECLARATION:
@@ -296,6 +318,16 @@ module Compiler {
 						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
 							abstractSyntaxTree.insertLeafNode(root);
 						}
+
+						break;
+
+					case astNodeTypes.BOOLEAN_EXPRESSION:
+
+						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
+							abstractSyntaxTree.insertLeafNode(root);
+						}
+
+						wentDownALevel = false;
 
 						break;
 
@@ -337,6 +369,15 @@ module Compiler {
 						}
 
 						break;
+
+						case astNodeTypes.EQUAL:
+						case astNodeTypes.NOT_EQUAL:
+
+							if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
+								abstractSyntaxTree.insertLeafNode(root);
+							}
+
+							break;
 
 					default:
 
