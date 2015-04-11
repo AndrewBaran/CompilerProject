@@ -91,7 +91,10 @@ var cstNodeTypes = {
 };
 
 var astNodeTypes = {
-	BLOCK: "BLOCK"
+	BLOCK: "BLOCK",
+	VAR_DECLARATION: "Variable Declaration",
+	ASSIGNMENT_STATEMENT: "Assignment Statement",
+	PRINT_STATEMENT: "Print Statement"
 };
 
 

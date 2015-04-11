@@ -71,12 +71,13 @@ module Compiler {
 
 				if(!this.testMode) {
 
-					Control.displayCompilerResults(lexResult, parseResult, semanticResult);
 					Control.displaySymbolTable(symbolTable);
 					Control.displayAST(abstractSyntaxTree);
 				}
 
 			}
+			
+			Control.displayCompilerResults(lexResult, parseResult, semanticResult);
 
 			// TODO: Return the AND of each compilation result
 			return lexResult && parseResult && semanticResult;

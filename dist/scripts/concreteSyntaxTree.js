@@ -160,8 +160,10 @@ var Compiler;
             }
         };
 
-        CSTNode.prototype.buildInOrder = function (root, abstractSyntaxTree) {
+        CSTNode.prototype.buildInOrder = function (root, abstractSyntaxTree, interiorNodePath) {
             if (root !== null) {
+                Compiler.Logger.log("Current: [ " + root.getValue() + " ] | Path taken: " + interiorNodePath, "ast");
+
                 var wentDownALevel = true;
 
                 switch (root.getValue()) {
@@ -169,13 +171,44 @@ var Compiler;
                         abstractSyntaxTree.insertInteriorNode(astNodeTypes.BLOCK);
                         break;
 
+                    case cstNodeTypes.VAR_DECLARATION:
+                        interiorNodePath = astNodeTypes.VAR_DECLARATION;
+                        abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        break;
+
+                    case cstNodeTypes.ASSIGNMENT_STATEMENT:
+                        interiorNodePath = astNodeTypes.ASSIGNMENT_STATEMENT;
+                        abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        break;
+
+                    case cstNodeTypes.PRINT_STATEMENT:
+                        interiorNodePath = astNodeTypes.PRINT_STATEMENT;
+                        abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        break;
+
                     default:
                         wentDownALevel = false;
                         break;
                 }
 
+                switch (interiorNodePath) {
+                    case astNodeTypes.VAR_DECLARATION:
+                        if (root.getNodeType() === treeNodeTypes.LEAF) {
+                            abstractSyntaxTree.insertLeafNode(root.getType(), root.getValue(), root.getLineNumber());
+                        }
+
+                        break;
+
+                    case astNodeTypes.ASSIGNMENT_STATEMENT:
+                        if (root.getNodeType() === treeNodeTypes.LEAF && root.getValue() !== "=") {
+                            abstractSyntaxTree.insertLeafNode(root.getType(), root.getValue(), root.getLineNumber());
+                        }
+
+                        break;
+                }
+
                 for (var i = 0; i < root.childList.length; i++) {
-                    root.buildInOrder(root.childList[i], abstractSyntaxTree);
+                    root.buildInOrder(root.childList[i], abstractSyntaxTree, interiorNodePath);
                 }
 
                 if (wentDownALevel) {

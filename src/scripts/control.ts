@@ -227,6 +227,7 @@ module Compiler {
 				this.clearLog();
 				this.clearCST();
 				this.clearAST();
+				this.clearCompilerResults();
 
 				if(testResult) {
 

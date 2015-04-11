@@ -52,11 +52,12 @@ var Compiler;
 
             if (semanticResult) {
                 if (!this.testMode) {
-                    _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
                     _Compiler.Control.displaySymbolTable(symbolTable);
                     _Compiler.Control.displayAST(abstractSyntaxTree);
                 }
             }
+
+            _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
 
             // TODO: Return the AND of each compilation result
             return lexResult && parseResult && semanticResult;

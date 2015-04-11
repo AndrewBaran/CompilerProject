@@ -8,11 +8,8 @@ Game plan:
 		Children have a link to their right sibling (like a B-tree)
 		Children have a link to their parent
 
-	Block:
-		Interior node of { }
-		Move down to new level on tree
 	VarDecl:
-		Interior node if VarDecl
+		Interior node of VarDecl
 		Children:
 			Left: type
 			Right: variable
@@ -79,11 +76,34 @@ module Compiler {
 			}
 		}
 
-		public addLeafNode(): void {
+		public insertLeafNode(type: string, value: string, lineNumber: number): void {
 
 			// TODO: Remove after testing
-			Logger.log("Not implemented yet", "ast");
-			Logger.log("Inserting leaf node", "ast");
+			Logger.log("Type: " + type + " | Value: " + value + " | Line #: " + lineNumber, "ast");
+
+			if(this.root === null) {
+
+				var errorMessage: string = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
+
+				Logger.log(errorMessage);
+				throw errorMessage;	
+			}
+
+			else {
+
+				var node: ASTNode = new ASTNode();
+
+				node.setTokenType(type);
+				node.setValue(value);
+				node.setLineNumber(lineNumber);
+				node.setParent(this.currentNode);
+				node.setNodeType(treeNodeTypes.LEAF);
+
+				var nextTreeLevel: number = this.currentNode.getTreeLevel() + 1;
+				node.setTreeLevel(nextTreeLevel);
+
+				this.currentNode.addChild(node);
+			}
 
 		}
 
@@ -95,7 +115,8 @@ module Compiler {
 
 				if(parent !== null) {
 
-					Logger.log("Moving to parent");
+					// TODO: Remove after testing
+					Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
 					this.currentNode = parent;
 				}
 
@@ -125,10 +146,16 @@ module Compiler {
 	class ASTNode {
 
 		private value: string;
+
 		private typeInfo: string;
+		private leftTreeType: string;
+		private rightTreeType: string;
 
 		private nodeType: string;
+		private tokenType: string;
+
 		private treeLevel: number;
+		private lineNumber: number;
 
 		private leftmostSibling: ASTNode;
 		private rightSibling: ASTNode;
@@ -139,9 +166,16 @@ module Compiler {
 		constructor() {
 
 			this.value = "";
+
 			this.typeInfo = "";
+			this.leftTreeType = "";
+			this.rightTreeType = "";
+
+			this.nodeType = "";
+			this.tokenType = "";
 
 			this.treeLevel = 0;
+			this.lineNumber = -1;
 
 			this.leftmostSibling = null;
 			this.rightSibling = null;
@@ -166,6 +200,22 @@ module Compiler {
 			this.typeInfo = typeInfo;
 		}
 
+		public getLeftTreeType(): string {
+			return this.leftTreeType;
+		}
+
+		public setLeftTreeType(leftTreeType: string): void {
+			this.leftTreeType = leftTreeType;
+		}
+
+		public getRightTreeType(): string {
+			return this.rightTreeType;
+		}
+
+		public setRightTreeType(rightTreeType: string): void {
+			this.rightTreeType = rightTreeType;
+		}
+
 		public getNodeType(): string {
 			return this.nodeType;
 		}
@@ -174,12 +224,28 @@ module Compiler {
 			this.nodeType = nodeType;
 		}
 
+		public getTokenType(): string {
+			return this.tokenType;
+		}
+
+		public setTokenType(tokenType: string): void {
+			this.tokenType = tokenType;
+		}
+
 		public getTreeLevel(): number {
 			return this.treeLevel;
 		}
 
 		public setTreeLevel(treeLevel): void {
 			this.treeLevel = treeLevel;
+		}
+
+		public getLineNumber(): number {
+			return this.lineNumber;
+		}
+
+		public setLineNumber(lineNumber: number): void {
+			this.lineNumber = lineNumber;
 		}
 
 		public getLeftmostSibling(): ASTNode {

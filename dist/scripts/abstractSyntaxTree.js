@@ -5,11 +5,8 @@ Statements are children of a block node in the order that they are declared
 Children have a link to the leftmost child
 Children have a link to their right sibling (like a B-tree)
 Children have a link to their parent
-Block:
-Interior node of { }
-Move down to new level on tree
 VarDecl:
-Interior node if VarDecl
+Interior node of VarDecl
 Children:
 Left: type
 Right: variable
@@ -62,10 +59,29 @@ var Compiler;
             }
         };
 
-        AbstractSyntaxTree.prototype.addLeafNode = function () {
+        AbstractSyntaxTree.prototype.insertLeafNode = function (type, value, lineNumber) {
             // TODO: Remove after testing
-            Compiler.Logger.log("Not implemented yet", "ast");
-            Compiler.Logger.log("Inserting leaf node", "ast");
+            Compiler.Logger.log("Type: " + type + " | Value: " + value + " | Line #: " + lineNumber, "ast");
+
+            if (this.root === null) {
+                var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            } else {
+                var node = new ASTNode();
+
+                node.setTokenType(type);
+                node.setValue(value);
+                node.setLineNumber(lineNumber);
+                node.setParent(this.currentNode);
+                node.setNodeType(treeNodeTypes.LEAF);
+
+                var nextTreeLevel = this.currentNode.getTreeLevel() + 1;
+                node.setTreeLevel(nextTreeLevel);
+
+                this.currentNode.addChild(node);
+            }
         };
 
         AbstractSyntaxTree.prototype.moveToParent = function () {
@@ -73,7 +89,8 @@ var Compiler;
                 var parent = this.currentNode.getParent();
 
                 if (parent !== null) {
-                    Compiler.Logger.log("Moving to parent");
+                    // TODO: Remove after testing
+                    Compiler.Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
                     this.currentNode = parent;
                 } else {
                     var errorMessage = "Error! Current AST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";
@@ -99,9 +116,16 @@ var Compiler;
     var ASTNode = (function () {
         function ASTNode() {
             this.value = "";
+
             this.typeInfo = "";
+            this.leftTreeType = "";
+            this.rightTreeType = "";
+
+            this.nodeType = "";
+            this.tokenType = "";
 
             this.treeLevel = 0;
+            this.lineNumber = -1;
 
             this.leftmostSibling = null;
             this.rightSibling = null;
@@ -125,6 +149,22 @@ var Compiler;
             this.typeInfo = typeInfo;
         };
 
+        ASTNode.prototype.getLeftTreeType = function () {
+            return this.leftTreeType;
+        };
+
+        ASTNode.prototype.setLeftTreeType = function (leftTreeType) {
+            this.leftTreeType = leftTreeType;
+        };
+
+        ASTNode.prototype.getRightTreeType = function () {
+            return this.rightTreeType;
+        };
+
+        ASTNode.prototype.setRightTreeType = function (rightTreeType) {
+            this.rightTreeType = rightTreeType;
+        };
+
         ASTNode.prototype.getNodeType = function () {
             return this.nodeType;
         };
@@ -133,12 +173,28 @@ var Compiler;
             this.nodeType = nodeType;
         };
 
+        ASTNode.prototype.getTokenType = function () {
+            return this.tokenType;
+        };
+
+        ASTNode.prototype.setTokenType = function (tokenType) {
+            this.tokenType = tokenType;
+        };
+
         ASTNode.prototype.getTreeLevel = function () {
             return this.treeLevel;
         };
 
         ASTNode.prototype.setTreeLevel = function (treeLevel) {
             this.treeLevel = treeLevel;
+        };
+
+        ASTNode.prototype.getLineNumber = function () {
+            return this.lineNumber;
+        };
+
+        ASTNode.prototype.setLineNumber = function (lineNumber) {
+            this.lineNumber = lineNumber;
         };
 
         ASTNode.prototype.getLeftmostSibling = function () {

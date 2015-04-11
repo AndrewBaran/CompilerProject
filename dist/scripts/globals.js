@@ -90,7 +90,10 @@ var cstNodeTypes = {
 };
 
 var astNodeTypes = {
-    BLOCK: "BLOCK"
+    BLOCK: "BLOCK",
+    VAR_DECLARATION: "Variable Declaration",
+    ASSIGNMENT_STATEMENT: "Assignment Statement",
+    PRINT_STATEMENT: "Print Statement"
 };
 
 var _Constants = { MAX_SCOPE_ENTRIES: 26 };
