@@ -68,6 +68,9 @@ module Compiler {
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
 			var compileResult: boolean = Compiler.compile(code);
 
+            // TODO: Remove after testing AST
+            document.getElementById("textboxAST").focus();
+
 			this.enableButtons();
 		}
 

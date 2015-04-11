@@ -407,6 +407,8 @@ module Compiler {
 				for(var i: number = 0; i < root.childList.length; i++) {
 
 					childResult = root.contains(root.childList[i], desiredValue);
+
+					// Logical OR, so 1 or more occurrences of desired value results in true
 					result = result || childResult;
 				}
 

@@ -31,7 +31,7 @@ Project 2 Checklist
 	- [x] Display the CST
 - [ ] Write a semantic analyzer that scope-checks and type-checks the CST for our grammar
 	- [ ] Create and display a symbol table with type and scope information
-	- [ ] Create and display the abstract syntax tree (AST)
+	- [x] Create and display the abstract syntax tree (AST)
 - [ ] Type-check the source code using the AST to catch:
 	- [ ] Undeclared identifiers
 	- [ ] Redeclared identifiers in the same scope
