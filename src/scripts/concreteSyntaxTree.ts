@@ -238,6 +238,18 @@ module Compiler {
 
 						break;
 
+					case cstNodeTypes.IF_STATEMENT:
+
+						interiorNodePath = astNodeTypes.IF_STATEMENT;
+						abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
+						break;
+
+					case cstNodeTypes.WHILE_STATEMENT:
+
+						interiorNodePath = astNodeTypes.WHILE_STATEMENT;
+						abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
 					case cstNodeTypes.INT_EXPRESSION:
 
 						// Add plus subtree
@@ -258,6 +270,7 @@ module Compiler {
 
 						interiorNodePath = astNodeTypes.STRING_EXPRESSION;
 						abstractSyntaxTree.insertLeafNode(root, astNodeTypes.STRING_EXPRESSION);
+
 						break;
 
 					case cstNodeTypes.BOOLEAN_EXPRESSION:
@@ -280,13 +293,14 @@ module Compiler {
 
 						break;
 
+
 					default:
 
 						wentDownALevel = false;
 						break;
 				}
 
-				// TODO: Consilidate cases that are the same result
+				// TODO: Consilidate cases that are the same operations
 				switch(interiorNodePath) {
 
 					case astNodeTypes.VAR_DECLARATION:
@@ -319,6 +333,8 @@ module Compiler {
 							abstractSyntaxTree.insertLeafNode(root);
 						}
 
+						wentDownALevel = false;
+
 						break;
 
 					case astNodeTypes.BOOLEAN_EXPRESSION:
@@ -333,7 +349,22 @@ module Compiler {
 
 					case astNodeTypes.ADD:
 
-						// TODO: This may be wrong
+						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
+							abstractSyntaxTree.insertLeafNode(root);
+						}
+
+						break;
+
+					case astNodeTypes.IF_STATEMENT:
+
+						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
+							abstractSyntaxTree.insertLeafNode(root);
+						}
+
+						break;
+
+					case astNodeTypes.WHILE_STATEMENT:
+
 						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
 							abstractSyntaxTree.insertLeafNode(root);
 						}
@@ -368,16 +399,18 @@ module Compiler {
 							}
 						}
 
+						wentDownALevel = false;
+
 						break;
 
-						case astNodeTypes.EQUAL:
-						case astNodeTypes.NOT_EQUAL:
+					case astNodeTypes.EQUAL:
+					case astNodeTypes.NOT_EQUAL:
 
-							if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
-								abstractSyntaxTree.insertLeafNode(root);
-							}
+						if(root.getNodeType() === treeNodeTypes.LEAF && !Utils.isIgnoredLeaf(root.getValue())) {
+							abstractSyntaxTree.insertLeafNode(root);
+						}
 
-							break;
+						break;
 
 					default:
 

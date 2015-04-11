@@ -95,6 +95,8 @@ var astNodeTypes = {
     ASSIGNMENT_STATEMENT: "Assignment Statement",
     PRINT_STATEMENT: "Print Statement",
     STRING_EXPRESSION: "String Expression",
+    IF_STATEMENT: "If Statement",
+    WHILE_STATEMENT: "While Statement",
     ADD: "Add",
     DIGIT: "Digit",
     EQUAL: "Equal",

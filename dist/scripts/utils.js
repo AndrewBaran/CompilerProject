@@ -4,7 +4,7 @@ var Compiler;
         function Utils() {
         }
         Utils.isIgnoredLeaf = function (nodeValue) {
-            var ignoredLeafValues = ["=", "\"", "+", "(", ")", "print", "==", "!="];
+            var ignoredLeafValues = ["=", "\"", "+", "(", ")", "print", "==", "!=", "if", "{", "}", "while"];
             var leafMatched = false;
 
             for (var i = 0; i < ignoredLeafValues.length; i++) {
