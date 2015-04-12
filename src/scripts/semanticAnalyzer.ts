@@ -17,6 +17,8 @@ module Compiler {
 			this.scopeCheck();
 			this.typeCheck();
 
+            this.printWarnings();
+
 			return this.abstractSyntaxTree;
 		}
 
@@ -41,6 +43,10 @@ module Compiler {
 		private static typeCheck(): void {
 
 			Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
+		}
+
+		private static printWarnings(): void {
+            this.symbolTable.printWarnings();
 		}
 
 	}

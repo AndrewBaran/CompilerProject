@@ -8,7 +8,6 @@ var Compiler;
             this.lineNumber = -1;
 
             this.isInitialized = false;
-            this.isUsed = false;
 
             this.numReferences = 0;
         }
@@ -46,6 +45,14 @@ var Compiler;
 
         SymbolTableEntry.prototype.hasEntry = function (idName) {
             return false;
+        };
+
+        SymbolTableEntry.prototype.getIsInitialized = function () {
+            return this.isInitialized;
+        };
+
+        SymbolTableEntry.prototype.setIsInitialized = function () {
+            this.isInitialized = true;
         };
 
         SymbolTableEntry.prototype.getNumReferences = function () {

@@ -109,7 +109,6 @@ module Compiler {
 		public printPreOrder(): void {
 
 			// TODO: Remove after testing
-			Logger.log("", "ast");
 			Logger.log("Displaying AST", "ast");
 			Logger.log("----------------------", "ast");
 
@@ -293,8 +292,6 @@ module Compiler {
 
                     case astNodeTypes.BLOCK:
 
-                        Logger.log("Opening scope");
-
                         symbolTable.openScope();
                         newScope = true;
 
@@ -340,8 +337,6 @@ module Compiler {
                 }
 
                 if(newScope) {
-
-                    Logger.log("Closing scope");
                     symbolTable.closeScope();
                 }
 			}

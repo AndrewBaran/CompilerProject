@@ -95,6 +95,25 @@ var Compiler;
         ScopeTable.prototype.getChildList = function () {
             return this.childScopeList;
         };
+
+        ScopeTable.prototype.printWarnings = function (currentScopeTable) {
+            for (var idValue = 'a'.charCodeAt(0); idValue <= 'z'.charCodeAt(0); idValue++) {
+                var idChar = String.fromCharCode(idValue);
+                var hashIndex = this.hashID(idChar);
+
+                if (currentScopeTable.entryTable[hashIndex] !== null) {
+                    var entry = currentScopeTable.entryTable[hashIndex];
+
+                    if (entry.getNumReferences() === 1) {
+                        Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
+                    }
+                }
+            }
+
+            for (var i = 0; i < currentScopeTable.childScopeList.length; i++) {
+                currentScopeTable.printWarnings(currentScopeTable.childScopeList[i]);
+            }
+        };
         return ScopeTable;
     })();
     Compiler.ScopeTable = ScopeTable;

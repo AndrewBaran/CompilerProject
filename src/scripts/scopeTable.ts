@@ -120,5 +120,28 @@ module Compiler {
 			return this.childScopeList;
 		}
 
+        public printWarnings(currentScopeTable: ScopeTable): void {
+
+            for(var idValue: number = 'a'.charCodeAt(0); idValue <= 'z'.charCodeAt(0); idValue++) {
+
+                var idChar: string = String.fromCharCode(idValue);
+                var hashIndex: number = this.hashID(idChar);
+
+                if(currentScopeTable.entryTable[hashIndex] !== null) {
+
+                    var entry: SymbolTableEntry = currentScopeTable.entryTable[hashIndex];
+
+                    if(entry.getNumReferences() === 1) {
+                        Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
+                    }
+                }
+
+            }
+
+            for (var i: number = 0; i < currentScopeTable.childScopeList.length; i++) {
+                currentScopeTable.printWarnings(currentScopeTable.childScopeList[i]);
+            }
+        }
+
 	}
 }

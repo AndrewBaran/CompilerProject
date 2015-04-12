@@ -81,7 +81,6 @@ var Compiler;
 
         AbstractSyntaxTree.prototype.printPreOrder = function () {
             // TODO: Remove after testing
-            Compiler.Logger.log("", "ast");
             Compiler.Logger.log("Displaying AST", "ast");
             Compiler.Logger.log("----------------------", "ast");
 
@@ -232,8 +231,6 @@ var Compiler;
 
                 switch (root.getValue()) {
                     case astNodeTypes.BLOCK:
-                        Compiler.Logger.log("Opening scope");
-
                         symbolTable.openScope();
                         newScope = true;
 
@@ -272,7 +269,6 @@ var Compiler;
                 }
 
                 if (newScope) {
-                    Compiler.Logger.log("Closing scope");
                     symbolTable.closeScope();
                 }
             }

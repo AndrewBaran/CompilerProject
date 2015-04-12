@@ -64,5 +64,9 @@ module Compiler {
             return result;
 		}
 
+		public printWarnings(): void {
+            SymbolTable.defaultScopeTable.printWarnings(SymbolTable.defaultScopeTable);
+		}
+
 	}
 }

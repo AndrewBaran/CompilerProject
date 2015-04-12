@@ -8,7 +8,6 @@ module Compiler {
 		private lineNumber: number;
 
         private isInitialized: boolean;
-        private isUsed: boolean;
 
         private numReferences: number;
 
@@ -20,7 +19,6 @@ module Compiler {
 			this.lineNumber = -1;
 
             this.isInitialized = false;
-            this.isUsed = false;
 
             this.numReferences = 0;
 		}
@@ -59,6 +57,14 @@ module Compiler {
 
 		public hasEntry(idName: string): boolean {
             return false;
+		}
+
+		public getIsInitialized(): boolean {
+            return this.isInitialized;
+		}
+
+		public setIsInitialized(): void {
+            this.isInitialized = true;
 		}
 
 		public getNumReferences(): number {

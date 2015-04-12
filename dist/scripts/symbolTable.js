@@ -47,6 +47,10 @@ var Compiler;
             var result = this.currentScopeTable.hasEntry(idName, astNode);
             return result;
         };
+
+        SymbolTable.prototype.printWarnings = function () {
+            SymbolTable.defaultScopeTable.printWarnings(SymbolTable.defaultScopeTable);
+        };
         return SymbolTable;
     })();
     Compiler.SymbolTable = SymbolTable;

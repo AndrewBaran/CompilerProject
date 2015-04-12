@@ -37,7 +37,7 @@ Project 2 Checklist
 	- [x] Redeclared identifiers in the same scope
 	- [ ] Type mismatches
 - [ ] Issue warnings about:
-	- [ ] Declared but unused identifiers
+	- [x] Declared but unused identifiers
 	- [ ] Use of uninitialized variables, but do not treat them as errors
 - [ ] Issue verbose output functionality that traces the semantic analysis stages
 	- [ ] When you detect an error, report it in helpful detail, including where it was found 

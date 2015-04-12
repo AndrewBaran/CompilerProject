@@ -13,6 +13,8 @@ var Compiler;
             this.scopeCheck();
             this.typeCheck();
 
+            this.printWarnings();
+
             return this.abstractSyntaxTree;
         };
 
@@ -33,6 +35,10 @@ var Compiler;
 
         SemanticAnalyzer.typeCheck = function () {
             Compiler.Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
+        };
+
+        SemanticAnalyzer.printWarnings = function () {
+            this.symbolTable.printWarnings();
         };
         return SemanticAnalyzer;
     })();
