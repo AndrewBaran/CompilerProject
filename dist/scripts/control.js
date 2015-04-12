@@ -158,6 +158,10 @@ var Compiler;
 
                     var lineCell = row.insertCell(-1);
                     lineCell.innerHTML = entry.getLineNumber().toString();
+
+                    // TODO: Remove after testing
+                    var numReferencesCell = row.insertCell(-1);
+                    numReferencesCell.innerHTML = entry.getNumReferences().toString();
                 }
             }
 

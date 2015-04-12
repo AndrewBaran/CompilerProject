@@ -95,7 +95,6 @@ var Compiler;
     })();
     Compiler.AbstractSyntaxTree = AbstractSyntaxTree;
 
-    // TODO: Do I need a lot of these fields?
     var ASTNode = (function () {
         function ASTNode() {
             this.value = "";
@@ -229,14 +228,14 @@ var Compiler;
 
         ASTNode.prototype.buildSymbolTablePreOrder = function (root, symbolTable, pathTaken) {
             if (root !== null) {
-                var newBlock = false;
+                var newScope = false;
 
                 switch (root.getValue()) {
                     case astNodeTypes.BLOCK:
-                        Compiler.Logger.log("Block found, start new scope");
+                        Compiler.Logger.log("Opening scope");
 
                         symbolTable.openScope();
-                        newBlock = true;
+                        newScope = true;
 
                         break;
 
@@ -248,7 +247,7 @@ var Compiler;
                         var insertResult = symbolTable.insertEntry(id, type, lineNumber);
 
                         if (!insertResult) {
-                            var errorMessage = "Error! Duplicate declaration of id " + id + " on line " + lineNumber + ".";
+                            var errorMessage = "Error! Duplicate declaration of id " + id + " on line " + lineNumber;
 
                             Compiler.Logger.log(errorMessage);
                             throw errorMessage;
@@ -259,13 +258,10 @@ var Compiler;
 
                 if (root.getTokenType() === "T_ID") {
                     var id = root.getValue();
-
-                    Compiler.Logger.log("Checking if " + id + " is in symbol table.");
-
                     var result = symbolTable.hasEntry(id, root);
 
                     if (!result) {
-                        var errorMessage = "Error! " + id + " was not found in the symbol table.";
+                        var errorMessage = "Error! The id " + id + " on line " + root.getLineNumber() + " was not declared before its use.";
                         Compiler.Logger.log(errorMessage);
                         throw errorMessage;
                     }
@@ -275,8 +271,8 @@ var Compiler;
                     this.buildSymbolTablePreOrder(root.childList[i], symbolTable, pathTaken);
                 }
 
-                if (newBlock) {
-                    Compiler.Logger.log("Block ended, closing scope");
+                if (newScope) {
+                    Compiler.Logger.log("Closing scope");
                     symbolTable.closeScope();
                 }
             }

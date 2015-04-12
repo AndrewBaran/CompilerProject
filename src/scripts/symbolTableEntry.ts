@@ -10,14 +10,19 @@ module Compiler {
         private isInitialized: boolean;
         private isUsed: boolean;
 
+        private numReferences: number;
+
 		constructor() {
 
 			this.entryNumber = -1;
 			this.idName = "";
 			this.idType = "";
 			this.lineNumber = -1;
+
             this.isInitialized = false;
             this.isUsed = false;
+
+            this.numReferences = 0;
 		}
 
 		public getEntryNumber(): number {
@@ -54,6 +59,14 @@ module Compiler {
 
 		public hasEntry(idName: string): boolean {
             return false;
+		}
+
+		public getNumReferences(): number {
+            return this.numReferences;
+		}
+
+		public incrementNumReferences(): void {
+            this.numReferences++;
 		}
 	}
 }

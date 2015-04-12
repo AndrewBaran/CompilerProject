@@ -62,7 +62,6 @@ module Compiler {
 		// Checks if id is in the symbol table; if it is, it links the AST to that symbol table entry
 		public hasEntry(idName: string, astNode: ASTNode): boolean {
 
-			// Check current scope
             var currentScope: ScopeTable = this;
             var idFound: boolean = false;
 
@@ -70,16 +69,15 @@ module Compiler {
 
 	            var hashIndex: number = this.hashID(idName);
 
-	            if(this.entryTable[hashIndex] === null) {
-
-                    Logger.log("Not in this table level: " + currentScope.getScopeLevel() + ".");
+	            if(currentScope.entryTable[hashIndex] === null) {
                     currentScope = currentScope.getParent();
 	            }
 
 	            else {
-                    Logger.log(idName + " is in table level: " + currentScope.getScopeLevel());
 
-                    var entry: SymbolTableEntry = this.entryTable[hashIndex];
+                    var entry: SymbolTableEntry = currentScope.entryTable[hashIndex];
+                    entry.incrementNumReferences();
+
                     astNode.setSymbolTableEntry(entry);
 
                     idFound = true;

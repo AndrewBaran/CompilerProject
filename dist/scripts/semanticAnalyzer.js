@@ -16,7 +16,6 @@ var Compiler;
             return this.abstractSyntaxTree;
         };
 
-        // TODO: Add Symbol table
         SemanticAnalyzer.setupAnalysisEnvironment = function (symbolTable) {
             this.abstractSyntaxTree = new Compiler.AbstractSyntaxTree();
             this.symbolTable = symbolTable;

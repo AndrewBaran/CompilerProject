@@ -20,7 +20,6 @@ module Compiler {
 			return this.abstractSyntaxTree;
 		}
 
-		// TODO: Add Symbol table
 		private static setupAnalysisEnvironment(symbolTable: SymbolTable): void {
 
 			this.abstractSyntaxTree = new AbstractSyntaxTree();

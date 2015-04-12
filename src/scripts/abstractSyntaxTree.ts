@@ -123,7 +123,6 @@ module Compiler {
 	}
 
 
-	// TODO: Do I need a lot of these fields?
 	export class ASTNode {
 
 		private value: string;
@@ -288,16 +287,16 @@ module Compiler {
 
 			if(root !== null) {
 
-                var newBlock: boolean = false;
+                var newScope: boolean = false;
 
 				switch(root.getValue()) {
 
                     case astNodeTypes.BLOCK:
 
-                        Logger.log("Block found, start new scope");
+                        Logger.log("Opening scope");
 
                         symbolTable.openScope();
-                        newBlock = true;
+                        newScope = true;
 
                         break;
 
@@ -311,27 +310,26 @@ module Compiler {
 
                         if(!insertResult) {
 
-                            var errorMessage: string = "Error! Duplicate declaration of id " + id + " on line " + lineNumber + ".";
+                            var errorMessage: string = "Error! Duplicate declaration of id " + id + " on line " + lineNumber;
 
                             Logger.log(errorMessage);
                             throw errorMessage;
                         }
 
                         break;
+
+                    // TODO: Set flag that says it was initialized
 				}
 
 
                 if(root.getTokenType() === "T_ID") {
 
                     var id: string = root.getValue();
-
-                    Logger.log("Checking if " + id + " is in symbol table.");
-
                     var result = symbolTable.hasEntry(id, root);
 
                     if(!result) {
 
-                    	var errorMessage: string = "Error! " + id + " was not found in the symbol table."
+                        var errorMessage: string = "Error! The id " + id + " on line " + root.getLineNumber() + " was not declared before its use.";
                         Logger.log(errorMessage);
                         throw errorMessage;
                     }
@@ -341,9 +339,9 @@ module Compiler {
                 	this.buildSymbolTablePreOrder(root.childList[i], symbolTable, pathTaken);
                 }
 
-                if(newBlock) {
+                if(newScope) {
 
-                    Logger.log("Block ended, closing scope");
+                    Logger.log("Closing scope");
                     symbolTable.closeScope();
                 }
 			}

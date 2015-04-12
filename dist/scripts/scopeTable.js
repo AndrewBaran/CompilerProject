@@ -43,20 +43,18 @@ var Compiler;
 
         // Checks if id is in the symbol table; if it is, it links the AST to that symbol table entry
         ScopeTable.prototype.hasEntry = function (idName, astNode) {
-            // Check current scope
             var currentScope = this;
             var idFound = false;
 
             while (currentScope !== null && !idFound) {
                 var hashIndex = this.hashID(idName);
 
-                if (this.entryTable[hashIndex] === null) {
-                    Compiler.Logger.log("Not in this table level: " + currentScope.getScopeLevel() + ".");
+                if (currentScope.entryTable[hashIndex] === null) {
                     currentScope = currentScope.getParent();
                 } else {
-                    Compiler.Logger.log(idName + " is in table level: " + currentScope.getScopeLevel());
+                    var entry = currentScope.entryTable[hashIndex];
+                    entry.incrementNumReferences();
 
-                    var entry = this.entryTable[hashIndex];
                     astNode.setSymbolTableEntry(entry);
 
                     idFound = true;
