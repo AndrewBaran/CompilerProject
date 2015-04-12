@@ -7,12 +7,17 @@ module Compiler {
 		private idType: string;
 		private lineNumber: number;
 
+        private isInitialized: boolean;
+        private isUsed: boolean;
+
 		constructor() {
 
 			this.entryNumber = -1;
 			this.idName = "";
 			this.idType = "";
 			this.lineNumber = -1;
+            this.isInitialized = false;
+            this.isUsed = false;
 		}
 
 		public getEntryNumber(): number {
@@ -45,6 +50,10 @@ module Compiler {
 
 		public setLineNumber(lineNumber: number): void {
 			this.lineNumber = lineNumber;
+		}
+
+		public hasEntry(idName: string): boolean {
+            return false;
 		}
 	}
 }

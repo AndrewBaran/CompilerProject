@@ -3,6 +3,7 @@ module Compiler {
 	export class SemanticAnalyzer {
 
 		private static abstractSyntaxTree: AbstractSyntaxTree;
+        private static symbolTable: SymbolTable;
 
 
 		public static analyze(concreteSyntaxTree: ConcreteSyntaxTree, symbolTable: SymbolTable): AbstractSyntaxTree {
@@ -10,7 +11,7 @@ module Compiler {
 			Logger.log("Performing Semantic Analysis");
 			Logger.log("");
 
-			this.setupAnalysisEnvironment();
+			this.setupAnalysisEnvironment(symbolTable);
 
 			this.createAST(concreteSyntaxTree);
 			this.scopeCheck();
@@ -20,8 +21,10 @@ module Compiler {
 		}
 
 		// TODO: Add Symbol table
-		private static setupAnalysisEnvironment(): void {
+		private static setupAnalysisEnvironment(symbolTable: SymbolTable): void {
+
 			this.abstractSyntaxTree = new AbstractSyntaxTree();
+            this.symbolTable = symbolTable;
 		}
 
 		private static createAST(concreteSyntaxTree: ConcreteSyntaxTree): void {
@@ -32,7 +35,8 @@ module Compiler {
 
 		private static scopeCheck(): void {
 
-			Logger.log("Performing Scope Checking (NOT IMPLEMENTED)");
+			Logger.log("Performing Scope Checking");
+            this.abstractSyntaxTree.buildSymbolTable(this.symbolTable);
 		}
 
 		private static typeCheck(): void {

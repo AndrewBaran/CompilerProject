@@ -6,6 +6,8 @@ var Compiler;
             this.idName = "";
             this.idType = "";
             this.lineNumber = -1;
+            this.isInitialized = false;
+            this.isUsed = false;
         }
         SymbolTableEntry.prototype.getEntryNumber = function () {
             return this.entryNumber;
@@ -37,6 +39,10 @@ var Compiler;
 
         SymbolTableEntry.prototype.setLineNumber = function (lineNumber) {
             this.lineNumber = lineNumber;
+        };
+
+        SymbolTableEntry.prototype.hasEntry = function (idName) {
+            return false;
         };
         return SymbolTableEntry;
     })();

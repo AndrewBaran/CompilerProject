@@ -34,7 +34,7 @@ Project 2 Checklist
 	- [x] Create and display the abstract syntax tree (AST)
 - [ ] Type-check the source code using the AST to catch:
 	- [ ] Undeclared identifiers
-	- [ ] Redeclared identifiers in the same scope
+	- [x] Redeclared identifiers in the same scope
 	- [ ] Type mismatches
 - [ ] Issue warnings about:
 	- [ ] Declared but unused identifiers

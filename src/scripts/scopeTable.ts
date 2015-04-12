@@ -21,20 +21,21 @@ module Compiler {
 
 			this.nextAvailableIndex = 0;
 
-			this.scopeLevel = 0;
+			this.scopeLevel = -1;
 
 			this.parentScope = null;
 			this.childScopeList = [];
 		}
 
-		public insertEntry(token: Token, typeValue: string): boolean {
+		public insertEntry(idName: string, typeInfo: string, lineNumber: number): boolean {
 
 			var entry: SymbolTableEntry = new SymbolTableEntry();
 			entry.setEntryNumber(this.nextAvailableIndex++);
-			entry.setIdName(token.getValue());
-			entry.setIdType(typeValue);
+			entry.setIdName(idName);
+			entry.setIdType(typeInfo);
+            entry.setLineNumber(lineNumber);
 
-			var hashIndex: number = this.hashID(entry.getIdName());
+			var hashIndex: number = this.hashID(idName);
 
 			if(this.entryTable[hashIndex] === null) {
 
@@ -56,6 +57,36 @@ module Compiler {
 			hashValue = hashValue - firstLowerCaseValue;
 
 			return hashValue;
+		}
+
+		// Checks if id is in the symbol table; if it is, it links the AST to that symbol table entry
+		public hasEntry(idName: string, astNode: ASTNode): boolean {
+
+			// Check current scope
+            var currentScope: ScopeTable = this;
+            var idFound: boolean = false;
+
+            while(currentScope !== null && !idFound) {
+
+	            var hashIndex: number = this.hashID(idName);
+
+	            if(this.entryTable[hashIndex] === null) {
+
+                    Logger.log("Not in this table level: " + currentScope.getScopeLevel() + ".");
+                    currentScope = currentScope.getParent();
+	            }
+
+	            else {
+                    Logger.log(idName + " is in table level: " + currentScope.getScopeLevel());
+
+                    var entry: SymbolTableEntry = this.entryTable[hashIndex];
+                    astNode.setSymbolTableEntry(entry);
+
+                    idFound = true;
+	            }
+            }
+
+            return idFound;
 		}
 
 		public addChildScope(child: ScopeTable): void {

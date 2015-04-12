@@ -10,18 +10,19 @@ var Compiler;
 
             this.nextAvailableIndex = 0;
 
-            this.scopeLevel = 0;
+            this.scopeLevel = -1;
 
             this.parentScope = null;
             this.childScopeList = [];
         }
-        ScopeTable.prototype.insertEntry = function (token, typeValue) {
+        ScopeTable.prototype.insertEntry = function (idName, typeInfo, lineNumber) {
             var entry = new Compiler.SymbolTableEntry();
             entry.setEntryNumber(this.nextAvailableIndex++);
-            entry.setIdName(token.getValue());
-            entry.setIdType(typeValue);
+            entry.setIdName(idName);
+            entry.setIdType(typeInfo);
+            entry.setLineNumber(lineNumber);
 
-            var hashIndex = this.hashID(entry.getIdName());
+            var hashIndex = this.hashID(idName);
 
             if (this.entryTable[hashIndex] === null) {
                 this.entryTable[hashIndex] = entry;
@@ -38,6 +39,31 @@ var Compiler;
             hashValue = hashValue - firstLowerCaseValue;
 
             return hashValue;
+        };
+
+        // Checks if id is in the symbol table; if it is, it links the AST to that symbol table entry
+        ScopeTable.prototype.hasEntry = function (idName, astNode) {
+            // Check current scope
+            var currentScope = this;
+            var idFound = false;
+
+            while (currentScope !== null && !idFound) {
+                var hashIndex = this.hashID(idName);
+
+                if (this.entryTable[hashIndex] === null) {
+                    Compiler.Logger.log("Not in this table level: " + currentScope.getScopeLevel() + ".");
+                    currentScope = currentScope.getParent();
+                } else {
+                    Compiler.Logger.log(idName + " is in table level: " + currentScope.getScopeLevel());
+
+                    var entry = this.entryTable[hashIndex];
+                    astNode.setSymbolTableEntry(entry);
+
+                    idFound = true;
+                }
+            }
+
+            return idFound;
         };
 
         ScopeTable.prototype.addChildScope = function (child) {

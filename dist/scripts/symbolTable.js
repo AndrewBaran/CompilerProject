@@ -11,16 +11,8 @@ var Compiler;
             SymbolTable.defaultScopeTable.setScopeLevel(-1);
         };
 
-        SymbolTable.prototype.insertEntry = function (token, typeValue) {
-            var result = false;
-
-            if (token.getType() === 12 /* T_ID */) {
-                result = this.currentScopeTable.insertEntry(token, typeValue);
-            } else {
-                Compiler.Logger.log("Error! Attempt to insert " + token.getTokenName() + " into symbol table was made.");
-                result = false;
-            }
-
+        SymbolTable.prototype.insertEntry = function (idName, typeInfo, lineNumber) {
+            var result = this.currentScopeTable.insertEntry(idName, typeInfo, lineNumber);
             return result;
         };
 
@@ -49,6 +41,11 @@ var Compiler;
 
         SymbolTable.prototype.getCurrentScope = function () {
             return this.currentScopeTable;
+        };
+
+        SymbolTable.prototype.hasEntry = function (idName, astNode) {
+            var result = this.currentScopeTable.hasEntry(idName, astNode);
+            return result;
         };
         return SymbolTable;
     })();

@@ -7,8 +7,7 @@ var Compiler;
         }
         AbstractSyntaxTree.prototype.insertInteriorNode = function (value) {
             // TODO: Remove after testing
-            Compiler.Logger.log("Inserting interior node: " + value, "ast");
-
+            // Logger.log("Inserting interior node: " + value, "ast");
             var node = new ASTNode();
             node.setValue(value);
             node.setNodeType(treeNodeTypes.INTERIOR);
@@ -28,8 +27,8 @@ var Compiler;
         };
 
         AbstractSyntaxTree.prototype.insertLeafNode = function (cstNode, newType) {
-            Compiler.Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
-
+            // TODO: Remove after testing
+            // Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
 
@@ -65,7 +64,7 @@ var Compiler;
 
                 if (parent !== null) {
                     // TODO: Remove after testing
-                    Compiler.Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
+                    // Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
                     this.currentNode = parent;
                 } else {
                     var errorMessage = "Error! Current AST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";
@@ -88,6 +87,10 @@ var Compiler;
 
             this.root.printPreOrder(this.root);
         };
+
+        AbstractSyntaxTree.prototype.buildSymbolTable = function (symbolTable) {
+            this.root.buildSymbolTablePreOrder(this.root, symbolTable);
+        };
         return AbstractSyntaxTree;
     })();
     Compiler.AbstractSyntaxTree = AbstractSyntaxTree;
@@ -107,9 +110,9 @@ var Compiler;
             this.treeLevel = 0;
             this.lineNumber = -1;
 
-            this.leftmostSibling = null;
-            this.rightSibling = null;
             this.parent = null;
+
+            this.symbolTableEntry = null;
 
             this.childList = [];
         }
@@ -177,20 +180,12 @@ var Compiler;
             this.lineNumber = lineNumber;
         };
 
-        ASTNode.prototype.getLeftmostSibling = function () {
-            return this.leftmostSibling;
+        ASTNode.prototype.getSymbolTableEntry = function () {
+            return this.symbolTableEntry;
         };
 
-        ASTNode.prototype.setLeftmostSibling = function (leftmostSibling) {
-            this.leftmostSibling = leftmostSibling;
-        };
-
-        ASTNode.prototype.getRightSibling = function () {
-            return this.rightSibling;
-        };
-
-        ASTNode.prototype.setRightSibling = function (rightSibling) {
-            this.rightSibling = rightSibling;
+        ASTNode.prototype.setSymbolTableEntry = function (symbolTableEntry) {
+            this.symbolTableEntry = symbolTableEntry;
         };
 
         ASTNode.prototype.getParent = function () {
@@ -228,6 +223,61 @@ var Compiler;
 
                 for (var i = 0; i < root.childList.length; i++) {
                     root.printPreOrder(root.childList[i]);
+                }
+            }
+        };
+
+        ASTNode.prototype.buildSymbolTablePreOrder = function (root, symbolTable, pathTaken) {
+            if (root !== null) {
+                var newBlock = false;
+
+                switch (root.getValue()) {
+                    case astNodeTypes.BLOCK:
+                        Compiler.Logger.log("Block found, start new scope");
+
+                        symbolTable.openScope();
+                        newBlock = true;
+
+                        break;
+
+                    case astNodeTypes.VAR_DECLARATION:
+                        var id = root.childList[1].getValue();
+                        var lineNumber = root.childList[1].getLineNumber();
+                        var type = root.childList[0].getValue();
+
+                        var insertResult = symbolTable.insertEntry(id, type, lineNumber);
+
+                        if (!insertResult) {
+                            var errorMessage = "Error! Duplicate declaration of id " + id + " on line " + lineNumber + ".";
+
+                            Compiler.Logger.log(errorMessage);
+                            throw errorMessage;
+                        }
+
+                        break;
+                }
+
+                if (root.getTokenType() === "T_ID") {
+                    var id = root.getValue();
+
+                    Compiler.Logger.log("Checking if " + id + " is in symbol table.");
+
+                    var result = symbolTable.hasEntry(id, root);
+
+                    if (!result) {
+                        var errorMessage = "Error! " + id + " was not found in the symbol table.";
+                        Compiler.Logger.log(errorMessage);
+                        throw errorMessage;
+                    }
+                }
+
+                for (var i = 0; i < root.childList.length; i++) {
+                    this.buildSymbolTablePreOrder(root.childList[i], symbolTable, pathTaken);
+                }
+
+                if (newBlock) {
+                    Compiler.Logger.log("Block ended, closing scope");
+                    symbolTable.closeScope();
                 }
             }
         };

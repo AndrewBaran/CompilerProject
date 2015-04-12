@@ -20,20 +20,9 @@ module Compiler {
 			SymbolTable.defaultScopeTable.setScopeLevel(-1);
 		}
 
-		public insertEntry(token: Token, typeValue: string): boolean {
+		public insertEntry(idName: string, typeInfo: string, lineNumber: number): boolean {
 
-			var result: boolean = false;
-
-			if(token.getType() === TokenType.T_ID) {
-				result = this.currentScopeTable.insertEntry(token, typeValue);
-			}
-
-			else {
-
-				Logger.log("Error! Attempt to insert " + token.getTokenName() + " into symbol table was made.");
-				result = false;
-			}
-
+			var result: boolean = this.currentScopeTable.insertEntry(idName, typeInfo, lineNumber);
 			return result;
 		}
 
@@ -67,6 +56,12 @@ module Compiler {
 
 		public getCurrentScope(): ScopeTable {
 			return this.currentScopeTable;
+		}
+
+		public hasEntry(idName: string, astNode: ASTNode): boolean {
+            
+            var result: boolean = this.currentScopeTable.hasEntry(idName, astNode);
+            return result;
 		}
 
 	}

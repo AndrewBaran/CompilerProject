@@ -14,7 +14,7 @@ module Compiler {
 		public insertInteriorNode(value: string): void {
 
 			// TODO: Remove after testing
-			Logger.log("Inserting interior node: " + value, "ast");
+			// Logger.log("Inserting interior node: " + value, "ast");
 
 			var node: ASTNode = new ASTNode();
 			node.setValue(value);
@@ -40,7 +40,8 @@ module Compiler {
 
 		public insertLeafNode(cstNode: CSTNode, newType?: string): void {
 
-			Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
+			// TODO: Remove after testing
+			// Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
 
 			if(this.root === null) {
 
@@ -87,7 +88,7 @@ module Compiler {
 				if(parent !== null) {
 
 					// TODO: Remove after testing
-					Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
+					// Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
 					this.currentNode = parent;
 				}
 
@@ -115,6 +116,10 @@ module Compiler {
 			this.root.printPreOrder(this.root);
 		}
 
+		public buildSymbolTable(symbolTable: SymbolTable): void {
+            this.root.buildSymbolTablePreOrder(this.root, symbolTable);
+		}
+
 	}
 
 
@@ -137,6 +142,8 @@ module Compiler {
 		private rightSibling: ASTNode;
 		private parent: ASTNode;
 
+        private symbolTableEntry: SymbolTableEntry;
+
 		private childList: ASTNode [];
 
 		constructor() {
@@ -153,9 +160,9 @@ module Compiler {
 			this.treeLevel = 0;
 			this.lineNumber = -1;
 
-			this.leftmostSibling = null;
-			this.rightSibling = null;
 			this.parent = null;
+
+            this.symbolTableEntry = null;
 
 			this.childList = [];
 		}
@@ -224,20 +231,12 @@ module Compiler {
 			this.lineNumber = lineNumber;
 		}
 
-		public getLeftmostSibling(): ASTNode {
-			return this.leftmostSibling;
+		public getSymbolTableEntry(): SymbolTableEntry {
+            return this.symbolTableEntry;
 		}
 
-		public setLeftmostSibling(leftmostSibling: ASTNode): void {
-			this.leftmostSibling = leftmostSibling;
-		}
-
-		public getRightSibling(): ASTNode {
-			return this.rightSibling;
-		}
-
-		public setRightSibling(rightSibling: ASTNode): void {
-			this.rightSibling = rightSibling;
+		public setSymbolTableEntry(symbolTableEntry: SymbolTableEntry): void {
+            this.symbolTableEntry = symbolTableEntry;
 		}
 
 		public getParent(): ASTNode {
@@ -282,6 +281,71 @@ module Compiler {
 				for(var i: number = 0; i < root.childList.length; i++) {
 					root.printPreOrder(root.childList[i]);
 				}
+			}
+		}
+
+		public buildSymbolTablePreOrder(root: ASTNode, symbolTable: SymbolTable, pathTaken?: string): void {
+
+			if(root !== null) {
+
+                var newBlock: boolean = false;
+
+				switch(root.getValue()) {
+
+                    case astNodeTypes.BLOCK:
+
+                        Logger.log("Block found, start new scope");
+
+                        symbolTable.openScope();
+                        newBlock = true;
+
+                        break;
+
+                    case astNodeTypes.VAR_DECLARATION:
+
+                        var id: string = root.childList[1].getValue();
+                        var lineNumber: number = root.childList[1].getLineNumber();
+                        var type: string = root.childList[0].getValue();
+
+                        var insertResult = symbolTable.insertEntry(id, type, lineNumber);
+
+                        if(!insertResult) {
+
+                            var errorMessage: string = "Error! Duplicate declaration of id " + id + " on line " + lineNumber + ".";
+
+                            Logger.log(errorMessage);
+                            throw errorMessage;
+                        }
+
+                        break;
+				}
+
+
+                if(root.getTokenType() === "T_ID") {
+
+                    var id: string = root.getValue();
+
+                    Logger.log("Checking if " + id + " is in symbol table.");
+
+                    var result = symbolTable.hasEntry(id, root);
+
+                    if(!result) {
+
+                    	var errorMessage: string = "Error! " + id + " was not found in the symbol table."
+                        Logger.log(errorMessage);
+                        throw errorMessage;
+                    }
+                }
+
+                for(var i: number = 0; i < root.childList.length; i++) {
+                	this.buildSymbolTablePreOrder(root.childList[i], symbolTable, pathTaken);
+                }
+
+                if(newBlock) {
+
+                    Logger.log("Block ended, closing scope");
+                    symbolTable.closeScope();
+                }
 			}
 		}
 

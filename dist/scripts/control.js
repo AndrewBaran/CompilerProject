@@ -66,7 +66,7 @@ var Compiler;
             var compileResult = Compiler.Compiler.compile(code);
 
             // TODO: Remove after testing AST
-            document.getElementById("textboxAST").focus();
+            document.getElementById("textboxLog").focus();
 
             this.enableButtons();
         };
