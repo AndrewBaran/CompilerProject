@@ -80,15 +80,15 @@ var Compiler;
         };
 
         AbstractSyntaxTree.prototype.printPreOrder = function () {
-            // TODO: Remove after testing
-            Compiler.Logger.log("Displaying AST", "ast");
-            Compiler.Logger.log("----------------------", "ast");
-
             this.root.printPreOrder(this.root);
         };
 
         AbstractSyntaxTree.prototype.buildSymbolTable = function (symbolTable) {
             this.root.buildSymbolTablePreOrder(this.root, symbolTable);
+        };
+
+        AbstractSyntaxTree.prototype.typeCheck = function (symbolTable) {
+            this.root.typeCheck(this.root, symbolTable);
         };
         return AbstractSyntaxTree;
     })();
@@ -257,7 +257,7 @@ var Compiler;
                         var result = symbolTable.hasEntry(id, root, astNodeTypes.ASSIGNMENT_STATEMENT);
 
                         if (!result) {
-                            var errorMessage = "Error! The id " + id + " on line " + root.childList[0].getLineNumber() + " was used without being declared";
+                            var errorMessage = "Error! The id " + id + " on line " + root.childList[0].getLineNumber() + " was used before being declared";
 
                             Compiler.Logger.log(errorMessage);
                             throw errorMessage;
@@ -271,7 +271,7 @@ var Compiler;
                     var result = symbolTable.hasEntry(id, root);
 
                     if (!result) {
-                        var errorMessage = "Error! The id " + id + " on line " + root.getLineNumber() + " was used without being declared";
+                        var errorMessage = "Error! The id " + id + " on line " + root.getLineNumber() + " was used before being declared";
 
                         Compiler.Logger.log(errorMessage);
                         throw errorMessage;
@@ -285,6 +285,83 @@ var Compiler;
                 if (newScope) {
                     symbolTable.closeScope();
                 }
+            }
+        };
+
+        ASTNode.prototype.typeCheck = function (root, symbolTable) {
+            Compiler.Logger.log("Type checking " + root.getValue());
+
+            if (root.getNodeType() === treeNodeTypes.LEAF) {
+                var tokenValue = TokenType[root.getTokenType()];
+
+                if (root.getTokenType() === "String Expression") {
+                    tokenValue = 27 /* T_STRING_EXPRESSION */;
+                }
+
+                var parentNode = root.getParent();
+
+                switch (tokenValue) {
+                    case 17 /* T_INT */:
+                    case 18 /* T_STRING */:
+                    case 19 /* T_BOOLEAN */:
+                        Compiler.Logger.log("Type is " + root.getValue());
+                        var type = root.getValue();
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
+                        break;
+
+                    case 12 /* T_ID */:
+                        var type = root.getSymbolTableEntry().getIdType();
+                        Compiler.Logger.log("Id of type " + type);
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
+                        break;
+
+                    case 11 /* T_DIGIT */:
+                        var type = types.INT;
+                        Compiler.Logger.log("Digit => Int");
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
+                        break;
+
+                    case 27 /* T_STRING_EXPRESSION */:
+                        Compiler.Logger.log("String");
+                        var type = types.STRING;
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            for (var i = 0; i < root.childList.length; i++) {
+                root.typeCheck(root.childList[i], symbolTable);
+            }
+
+            Compiler.Logger.log("Node: " + root.getValue());
+            Compiler.Logger.log("Left type: " + root.getLeftTreeType());
+            Compiler.Logger.log("Right type: " + root.getRightTreeType());
+        };
+
+        ASTNode.prototype.setSynthesizedType = function (typeFromChild) {
+            if (this.getLeftTreeType() === "") {
+                this.setLeftTreeType(typeFromChild);
+            } else if (this.getRightTreeType() === "") {
+                this.setRightTreeType(typeFromChild);
+            } else {
+                var errorMessage = "Error! Attempt was made to synthesize a type to a parent with its left and right types already set.";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             }
         };
         return ASTNode;

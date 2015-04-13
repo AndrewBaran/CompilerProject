@@ -35,6 +35,7 @@ var Compiler;
 
         SemanticAnalyzer.typeCheck = function () {
             Compiler.Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
+            this.abstractSyntaxTree.typeCheck(this.symbolTable);
         };
 
         SemanticAnalyzer.printWarnings = function () {

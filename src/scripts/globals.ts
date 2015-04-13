@@ -65,7 +65,8 @@ enum TokenType {
 	T_EXCLAMATION_POINT, // !
 	T_FALSE, // false
 	T_TRUE, // true
-	T_WHITE_SPACE // space char in strings
+	T_WHITE_SPACE, // space char in strings
+    T_STRING_EXPRESSION
 }
 
 var treeNodeTypes = {
@@ -104,6 +105,12 @@ var astNodeTypes = {
 	NOT_EQUAL: "Not Equal",
 	BOOLEAN_EXPRESSION: "Boolean Expression"
 };
+
+var types = {
+    INT: "int",
+    STRING: "string",
+    BOOLEAN: "boolean"
+}
 
 
 interface Constants {

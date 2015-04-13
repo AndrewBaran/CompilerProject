@@ -375,8 +375,7 @@ module Compiler {
 						break;
 
 					default:
-
-						// TODO: Do I need this?
+                    
 						break;
 
 				}

@@ -43,6 +43,7 @@ module Compiler {
 		private static typeCheck(): void {
 
 			Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
+            this.abstractSyntaxTree.typeCheck(this.symbolTable);
 		}
 
 		private static printWarnings(): void {

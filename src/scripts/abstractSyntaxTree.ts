@@ -107,16 +107,15 @@ module Compiler {
 		}
 
 		public printPreOrder(): void {
-
-			// TODO: Remove after testing
-			Logger.log("Displaying AST", "ast");
-			Logger.log("----------------------", "ast");
-
 			this.root.printPreOrder(this.root);
 		}
 
 		public buildSymbolTable(symbolTable: SymbolTable): void {
             this.root.buildSymbolTablePreOrder(this.root, symbolTable);
+		}
+
+		public typeCheck(symbolTable: SymbolTable): void {
+            this.root.typeCheck(this.root, symbolTable);
 		}
 
 	}
@@ -136,8 +135,6 @@ module Compiler {
 		private treeLevel: number;
 		private lineNumber: number;
 
-		private leftmostSibling: ASTNode;
-		private rightSibling: ASTNode;
 		private parent: ASTNode;
 
         private symbolTableEntry: SymbolTableEntry;
@@ -322,7 +319,7 @@ module Compiler {
 
                         if(!result) {
 
-                            var errorMessage: string = "Error! The id " + id + " on line " + root.childList[0].getLineNumber() + " was used without being declared";
+                            var errorMessage: string = "Error! The id " + id + " on line " + root.childList[0].getLineNumber() + " was used before being declared";
 
                             Logger.log(errorMessage);
                             throw errorMessage;
@@ -339,7 +336,7 @@ module Compiler {
 
                     if(!result) {
 
-                        var errorMessage: string = "Error! The id " + id + " on line " + root.getLineNumber() + " was used without being declared";
+                        var errorMessage: string = "Error! The id " + id + " on line " + root.getLineNumber() + " was used before being declared";
 
                         Logger.log(errorMessage);
                         throw errorMessage;
@@ -354,6 +351,98 @@ module Compiler {
                     symbolTable.closeScope();
                 }
 			}
+		}
+
+		public typeCheck(root: ASTNode, symbolTable: SymbolTable): void {
+
+            Logger.log("Type checking " + root.getValue());
+
+            if(root.getNodeType() === treeNodeTypes.LEAF) {
+
+                var tokenValue: number = TokenType[root.getTokenType()];
+
+                if(root.getTokenType() === "String Expression") {
+                    tokenValue = TokenType.T_STRING_EXPRESSION;
+                }
+
+                var parentNode: ASTNode = root.getParent();
+
+                switch(tokenValue) {
+
+                	case TokenType.T_INT:
+                	case TokenType.T_STRING:
+                    case TokenType.T_BOOLEAN:
+
+                        Logger.log("Type is " + root.getValue());
+                        var type: string = root.getValue();
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
+                        break;
+
+                    case TokenType.T_ID:
+
+                        var type: string = root.getSymbolTableEntry().getIdType();
+                        Logger.log("Id of type " + type);
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
+                        break;
+
+                    case TokenType.T_DIGIT:
+
+                        var type: string = types.INT;
+                        Logger.log("Digit => Int");
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
+                        break;
+
+                    case TokenType.T_STRING_EXPRESSION:
+
+                        Logger.log("String");
+                        var type: string = types.STRING;
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+                        break;
+
+                    default:
+
+                        break;
+                }
+            }
+
+            for(var i: number = 0; i < root.childList.length; i++) {
+                root.typeCheck(root.childList[i], symbolTable);
+            }
+
+
+            Logger.log("Node: " + root.getValue());
+            Logger.log("Left type: " + root.getLeftTreeType());
+            Logger.log("Right type: " + root.getRightTreeType());
+		}
+
+		public setSynthesizedType(typeFromChild: string): void {
+
+            if(this.getLeftTreeType() === "") {
+                this.setLeftTreeType(typeFromChild);
+            }
+
+            else if(this.getRightTreeType() === "") {
+                this.setRightTreeType(typeFromChild);
+            }
+
+            else {
+
+                var errorMessage: string = "Error! Attempt was made to synthesize a type to a parent with its left and right types already set.";
+
+                Logger.log(errorMessage);
+                throw errorMessage;
+            }
 		}
 
 	}

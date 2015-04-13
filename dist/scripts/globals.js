@@ -65,6 +65,7 @@ var TokenType;
     TokenType[TokenType["T_FALSE"] = 24] = "T_FALSE";
     TokenType[TokenType["T_TRUE"] = 25] = "T_TRUE";
     TokenType[TokenType["T_WHITE_SPACE"] = 26] = "T_WHITE_SPACE";
+    TokenType[TokenType["T_STRING_EXPRESSION"] = 27] = "T_STRING_EXPRESSION";
 })(TokenType || (TokenType = {}));
 
 var treeNodeTypes = {
@@ -102,6 +103,12 @@ var astNodeTypes = {
     EQUAL: "Equal",
     NOT_EQUAL: "Not Equal",
     BOOLEAN_EXPRESSION: "Boolean Expression"
+};
+
+var types = {
+    INT: "int",
+    STRING: "string",
+    BOOLEAN: "boolean"
 };
 
 var _Constants = { MAX_SCOPE_ENTRIES: 26 };
