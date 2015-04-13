@@ -19,6 +19,8 @@ module Compiler {
 
             this.printWarnings();
 
+            Logger.log("Semantic Analysis Complete");
+
 			return this.abstractSyntaxTree;
 		}
 
@@ -42,7 +44,7 @@ module Compiler {
 
 		private static typeCheck(): void {
 
-			Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
+			Logger.log("Performing Type Checking (Still testing)");
             this.abstractSyntaxTree.typeCheck(this.symbolTable);
 		}
 

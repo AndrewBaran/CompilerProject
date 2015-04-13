@@ -13,9 +13,6 @@ module Compiler {
 
 		public insertInteriorNode(value: string): void {
 
-			// TODO: Remove after testing
-			// Logger.log("Inserting interior node: " + value, "ast");
-
 			var node: ASTNode = new ASTNode();
 			node.setValue(value);
 			node.setNodeType(treeNodeTypes.INTERIOR);
@@ -39,9 +36,6 @@ module Compiler {
 		}
 
 		public insertLeafNode(cstNode: CSTNode, newType?: string): void {
-
-			// TODO: Remove after testing
-			// Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
 
 			if(this.root === null) {
 
@@ -86,9 +80,6 @@ module Compiler {
 				var parent: ASTNode = this.currentNode.getParent();
 
 				if(parent !== null) {
-
-					// TODO: Remove after testing
-					// Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
 					this.currentNode = parent;
 				}
 
@@ -263,7 +254,6 @@ module Compiler {
 					indentDashes += "-";
 				}
 
-				// Interior node
 				if(root.getNodeType() === treeNodeTypes.INTERIOR) {
 					Logger.log(indentDashes + "< " + root.getValue() + " >", "ast");
 				}
@@ -355,8 +345,6 @@ module Compiler {
 
 		public typeCheck(root: ASTNode, symbolTable: SymbolTable): void {
 
-            Logger.log("Type checking " + root.getValue());
-
             if(root.getNodeType() === treeNodeTypes.LEAF) {
 
                 var tokenValue: number = TokenType[root.getTokenType()];
@@ -373,7 +361,6 @@ module Compiler {
                 	case TokenType.T_STRING:
                     case TokenType.T_BOOLEAN:
 
-                        Logger.log("Type is " + root.getValue());
                         var type: string = root.getValue();
 
                         parentNode.setSynthesizedType(type);
@@ -384,7 +371,6 @@ module Compiler {
                     case TokenType.T_ID:
 
                         var type: string = root.getSymbolTableEntry().getIdType();
-                        Logger.log("Id of type " + type);
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
@@ -394,7 +380,6 @@ module Compiler {
                     case TokenType.T_DIGIT:
 
                         var type: string = types.INT;
-                        Logger.log("Digit => Int");
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
@@ -403,11 +388,20 @@ module Compiler {
 
                     case TokenType.T_STRING_EXPRESSION:
 
-                        Logger.log("String");
                         var type: string = types.STRING;
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
+                        break;
+
+                    case TokenType.T_TRUE:
+                    case TokenType.T_FALSE:
+
+                        var type: string = types.BOOLEAN;
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
                         break;
 
                     default:
@@ -420,10 +414,42 @@ module Compiler {
                 root.typeCheck(root.childList[i], symbolTable);
             }
 
+            if(root.getNodeType() === treeNodeTypes.INTERIOR && root.getValue() !== astNodeTypes.BLOCK) {
 
-            Logger.log("Node: " + root.getValue());
-            Logger.log("Left type: " + root.getLeftTreeType());
-            Logger.log("Right type: " + root.getRightTreeType());
+                var leftType: string = root.getLeftTreeType();
+                var rightType: string = root.getRightTreeType();
+
+                var parentNode: ASTNode = root.getParent();
+
+	            Logger.log("Node: " + root.getValue());
+	            Logger.log("Left type: " + root.getLeftTreeType());
+	            Logger.log("Right type: " + root.getRightTreeType());
+                Logger.log("Parent: " + parentNode.getValue());
+
+                if(leftType !== "" && rightType !== "") {
+
+                    if(leftType === rightType) {
+
+                        if(parentNode.getValue() !== astNodeTypes.BLOCK) {
+
+	                        Logger.log("Parent ( " + parentNode.getValue() + " ) getting the synthesized value of " + leftType);
+	                        parentNode.setSynthesizedType(leftType);
+                        }
+
+                        root.setTypeInfo(leftType);
+                    }
+
+                    else {
+
+                        var errorMessage: string = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ". Type " + leftType + " does not match the type " + rightType;
+
+                        Logger.log(errorMessage);
+                        throw errorMessage;
+                    }
+                }
+
+            }
+
 		}
 
 		public setSynthesizedType(typeFromChild: string): void {

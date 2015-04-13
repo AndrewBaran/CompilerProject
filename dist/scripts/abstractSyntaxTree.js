@@ -6,8 +6,6 @@ var Compiler;
             this.currentNode = null;
         }
         AbstractSyntaxTree.prototype.insertInteriorNode = function (value) {
-            // TODO: Remove after testing
-            // Logger.log("Inserting interior node: " + value, "ast");
             var node = new ASTNode();
             node.setValue(value);
             node.setNodeType(treeNodeTypes.INTERIOR);
@@ -27,8 +25,6 @@ var Compiler;
         };
 
         AbstractSyntaxTree.prototype.insertLeafNode = function (cstNode, newType) {
-            // TODO: Remove after testing
-            // Logger.log("Inserting leaf node: " + cstNode.getValue(), "ast");
             if (this.root === null) {
                 var errorMessage = "Error! Cannot insert leaf node [ " + node.getValue() + " ] as the root node.";
 
@@ -63,8 +59,6 @@ var Compiler;
                 var parent = this.currentNode.getParent();
 
                 if (parent !== null) {
-                    // TODO: Remove after testing
-                    // Logger.log("Moving from " + this.currentNode.getValue() + " to parent: " + parent.getValue(), "ast");
                     this.currentNode = parent;
                 } else {
                     var errorMessage = "Error! Current AST node (" + this.currentNode.getValue() + ") does not have a parent to move to.";
@@ -212,7 +206,6 @@ var Compiler;
                     indentDashes += "-";
                 }
 
-                // Interior node
                 if (root.getNodeType() === treeNodeTypes.INTERIOR) {
                     Compiler.Logger.log(indentDashes + "< " + root.getValue() + " >", "ast");
                 } else {
@@ -289,8 +282,6 @@ var Compiler;
         };
 
         ASTNode.prototype.typeCheck = function (root, symbolTable) {
-            Compiler.Logger.log("Type checking " + root.getValue());
-
             if (root.getNodeType() === treeNodeTypes.LEAF) {
                 var tokenValue = TokenType[root.getTokenType()];
 
@@ -304,7 +295,6 @@ var Compiler;
                     case 17 /* T_INT */:
                     case 18 /* T_STRING */:
                     case 19 /* T_BOOLEAN */:
-                        Compiler.Logger.log("Type is " + root.getValue());
                         var type = root.getValue();
 
                         parentNode.setSynthesizedType(type);
@@ -314,7 +304,6 @@ var Compiler;
 
                     case 12 /* T_ID */:
                         var type = root.getSymbolTableEntry().getIdType();
-                        Compiler.Logger.log("Id of type " + type);
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
@@ -323,7 +312,6 @@ var Compiler;
 
                     case 11 /* T_DIGIT */:
                         var type = types.INT;
-                        Compiler.Logger.log("Digit => Int");
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
@@ -331,11 +319,19 @@ var Compiler;
                         break;
 
                     case 27 /* T_STRING_EXPRESSION */:
-                        Compiler.Logger.log("String");
                         var type = types.STRING;
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
+                        break;
+
+                    case 25 /* T_TRUE */:
+                    case 24 /* T_FALSE */:
+                        var type = types.BOOLEAN;
+
+                        parentNode.setSynthesizedType(type);
+                        root.setTypeInfo(type);
+
                         break;
 
                     default:
@@ -347,9 +343,33 @@ var Compiler;
                 root.typeCheck(root.childList[i], symbolTable);
             }
 
-            Compiler.Logger.log("Node: " + root.getValue());
-            Compiler.Logger.log("Left type: " + root.getLeftTreeType());
-            Compiler.Logger.log("Right type: " + root.getRightTreeType());
+            if (root.getNodeType() === treeNodeTypes.INTERIOR && root.getValue() !== astNodeTypes.BLOCK) {
+                var leftType = root.getLeftTreeType();
+                var rightType = root.getRightTreeType();
+
+                var parentNode = root.getParent();
+
+                Compiler.Logger.log("Node: " + root.getValue());
+                Compiler.Logger.log("Left type: " + root.getLeftTreeType());
+                Compiler.Logger.log("Right type: " + root.getRightTreeType());
+                Compiler.Logger.log("Parent: " + parentNode.getValue());
+
+                if (leftType !== "" && rightType !== "") {
+                    if (leftType === rightType) {
+                        if (parentNode.getValue() !== astNodeTypes.BLOCK) {
+                            Compiler.Logger.log("Parent ( " + parentNode.getValue() + " ) getting the synthesized value of " + leftType);
+                            parentNode.setSynthesizedType(leftType);
+                        }
+
+                        root.setTypeInfo(leftType);
+                    } else {
+                        var errorMessage = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ". Type " + leftType + " does not match the type " + rightType;
+
+                        Compiler.Logger.log(errorMessage);
+                        throw errorMessage;
+                    }
+                }
+            }
         };
 
         ASTNode.prototype.setSynthesizedType = function (typeFromChild) {

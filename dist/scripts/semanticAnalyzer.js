@@ -15,6 +15,8 @@ var Compiler;
 
             this.printWarnings();
 
+            Compiler.Logger.log("Semantic Analysis Complete");
+
             return this.abstractSyntaxTree;
         };
 
@@ -34,7 +36,7 @@ var Compiler;
         };
 
         SemanticAnalyzer.typeCheck = function () {
-            Compiler.Logger.log("Performing Type Checking (NOT IMPLEMENTED)");
+            Compiler.Logger.log("Performing Type Checking (Still testing)");
             this.abstractSyntaxTree.typeCheck(this.symbolTable);
         };
 
