@@ -30,7 +30,7 @@ Project 2 Checklist
 - [x] Modify your parser to create a concrete syntax tree (CST) while parsing
 	- [x] Display the CST
 - [ ] Write a semantic analyzer that scope-checks and type-checks the CST for our grammar
-	- [ ] Create and display a symbol table with type and scope information
+	- [x] Create and display a symbol table with type and scope information
 	- [x] Create and display the abstract syntax tree (AST)
 - [ ] Type-check the source code using the AST to catch:
 	- [x] Undeclared identifiers
@@ -38,7 +38,7 @@ Project 2 Checklist
 	- [ ] Type mismatches
 - [ ] Issue warnings about:
 	- [x] Declared but unused identifiers
-	- [ ] Use of uninitialized variables, but do not treat them as errors
+	- [x] Use of uninitialized variables, but do not treat them as errors
 - [ ] Issue verbose output functionality that traces the semantic analysis stages
 	- [ ] When you detect an error, report it in helpful detail, including where it was found 
 
