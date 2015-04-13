@@ -43,8 +43,8 @@ var Compiler;
             return this.currentScopeTable;
         };
 
-        SymbolTable.prototype.hasEntry = function (idName, astNode) {
-            var result = this.currentScopeTable.hasEntry(idName, astNode);
+        SymbolTable.prototype.hasEntry = function (idName, astNode, optionalPath) {
+            var result = this.currentScopeTable.hasEntry(idName, astNode, optionalPath);
             return result;
         };
 

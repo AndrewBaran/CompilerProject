@@ -42,7 +42,7 @@ var Compiler;
         };
 
         // Checks if id is in the symbol table; if it is, it links the AST to that symbol table entry
-        ScopeTable.prototype.hasEntry = function (idName, astNode) {
+        ScopeTable.prototype.hasEntry = function (idName, astNode, optionalPath) {
             var currentScope = this;
             var idFound = false;
 
@@ -54,6 +54,10 @@ var Compiler;
                 } else {
                     var entry = currentScope.entryTable[hashIndex];
                     entry.incrementNumReferences();
+
+                    if (optionalPath !== undefined && optionalPath === astNodeTypes.ASSIGNMENT_STATEMENT) {
+                        entry.setIsInitialized();
+                    }
 
                     astNode.setSymbolTableEntry(entry);
 
@@ -106,6 +110,10 @@ var Compiler;
 
                     if (entry.getNumReferences() === 1) {
                         Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
+                    }
+
+                    if (!entry.getIsInitialized()) {
+                        Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was never initialized");
                     }
                 }
             }

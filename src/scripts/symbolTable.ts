@@ -58,9 +58,9 @@ module Compiler {
 			return this.currentScopeTable;
 		}
 
-		public hasEntry(idName: string, astNode: ASTNode): boolean {
+		public hasEntry(idName: string, astNode: ASTNode, optionalPath?: string): boolean {
             
-            var result: boolean = this.currentScopeTable.hasEntry(idName, astNode);
+            var result: boolean = this.currentScopeTable.hasEntry(idName, astNode, optionalPath);
             return result;
 		}
 

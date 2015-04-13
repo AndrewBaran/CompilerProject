@@ -251,6 +251,19 @@ var Compiler;
                         }
 
                         break;
+
+                    case astNodeTypes.ASSIGNMENT_STATEMENT:
+                        var id = root.childList[0].getValue();
+                        var result = symbolTable.hasEntry(id, root, astNodeTypes.ASSIGNMENT_STATEMENT);
+
+                        if (!result) {
+                            var errorMessage = "Error! The id " + id + " on line " + root.childList[0].getLineNumber() + " was used without being declared";
+
+                            Compiler.Logger.log(errorMessage);
+                            throw errorMessage;
+                        }
+
+                        break;
                 }
 
                 if (root.getTokenType() === "T_ID") {
@@ -258,7 +271,8 @@ var Compiler;
                     var result = symbolTable.hasEntry(id, root);
 
                     if (!result) {
-                        var errorMessage = "Error! The id " + id + " on line " + root.getLineNumber() + " was not declared before its use.";
+                        var errorMessage = "Error! The id " + id + " on line " + root.getLineNumber() + " was used without being declared";
+
                         Compiler.Logger.log(errorMessage);
                         throw errorMessage;
                     }

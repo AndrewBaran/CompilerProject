@@ -60,7 +60,7 @@ module Compiler {
 		}
 
 		// Checks if id is in the symbol table; if it is, it links the AST to that symbol table entry
-		public hasEntry(idName: string, astNode: ASTNode): boolean {
+		public hasEntry(idName: string, astNode: ASTNode, optionalPath?: string): boolean {
 
             var currentScope: ScopeTable = this;
             var idFound: boolean = false;
@@ -77,6 +77,10 @@ module Compiler {
 
                     var entry: SymbolTableEntry = currentScope.entryTable[hashIndex];
                     entry.incrementNumReferences();
+
+                    if(optionalPath !== undefined && optionalPath === astNodeTypes.ASSIGNMENT_STATEMENT) {
+                        entry.setIsInitialized();
+                    }
 
                     astNode.setSymbolTableEntry(entry);
 
@@ -133,6 +137,10 @@ module Compiler {
 
                     if(entry.getNumReferences() === 1) {
                         Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
+                    }
+
+                    if(!entry.getIsInitialized()) {
+                        Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was never initialized");
                     }
                 }
 

@@ -315,18 +315,32 @@ module Compiler {
 
                         break;
 
-                    // TODO: Set flag that says it was initialized
+                    case astNodeTypes.ASSIGNMENT_STATEMENT:
+
+                        var id: string = root.childList[0].getValue();
+                        var result: boolean = symbolTable.hasEntry(id, root, astNodeTypes.ASSIGNMENT_STATEMENT);
+
+                        if(!result) {
+
+                            var errorMessage: string = "Error! The id " + id + " on line " + root.childList[0].getLineNumber() + " was used without being declared";
+
+                            Logger.log(errorMessage);
+                            throw errorMessage;
+                        }
+
+                        break;
 				}
 
 
                 if(root.getTokenType() === "T_ID") {
 
                     var id: string = root.getValue();
-                    var result = symbolTable.hasEntry(id, root);
+                    var result: boolean = symbolTable.hasEntry(id, root);
 
                     if(!result) {
 
-                        var errorMessage: string = "Error! The id " + id + " on line " + root.getLineNumber() + " was not declared before its use.";
+                        var errorMessage: string = "Error! The id " + id + " on line " + root.getLineNumber() + " was used without being declared";
+
                         Logger.log(errorMessage);
                         throw errorMessage;
                     }
