@@ -17,9 +17,10 @@ module Compiler {
 			this.scopeCheck();
 			this.typeCheck();
 
-            this.printWarnings();
-
+            Logger.log("");
             Logger.log("Semantic Analysis Complete");
+
+            this.printWarnings();
 
 			return this.abstractSyntaxTree;
 		}
@@ -44,12 +45,14 @@ module Compiler {
 
 		private static typeCheck(): void {
 
-			Logger.log("Performing Type Checking (Still testing)");
+			Logger.log("Performing Type Checking");
             this.abstractSyntaxTree.typeCheck(this.symbolTable);
 		}
 
 		private static printWarnings(): void {
-            this.symbolTable.printWarnings();
+            
+            var warningCount: number = this.symbolTable.printWarnings();
+            Logger.log("Semantic Analysis produced 0 errors and " + warningCount + " warning(s)");
 		}
 
 	}

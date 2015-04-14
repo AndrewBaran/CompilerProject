@@ -13,9 +13,10 @@ var Compiler;
             this.scopeCheck();
             this.typeCheck();
 
-            this.printWarnings();
-
+            Compiler.Logger.log("");
             Compiler.Logger.log("Semantic Analysis Complete");
+
+            this.printWarnings();
 
             return this.abstractSyntaxTree;
         };
@@ -36,12 +37,13 @@ var Compiler;
         };
 
         SemanticAnalyzer.typeCheck = function () {
-            Compiler.Logger.log("Performing Type Checking (Still testing)");
+            Compiler.Logger.log("Performing Type Checking");
             this.abstractSyntaxTree.typeCheck(this.symbolTable);
         };
 
         SemanticAnalyzer.printWarnings = function () {
-            this.symbolTable.printWarnings();
+            var warningCount = this.symbolTable.printWarnings();
+            Compiler.Logger.log("Semantic Analysis produced 0 errors and " + warningCount + " warning(s)");
         };
         return SemanticAnalyzer;
     })();

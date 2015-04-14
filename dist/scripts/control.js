@@ -65,9 +65,6 @@ var Compiler;
             var code = document.getElementById("textboxInputCode").value;
             var compileResult = Compiler.Compiler.compile(code);
 
-            // TODO: Remove after testing AST
-            document.getElementById("textboxLog").focus();
-
             this.enableButtons();
         };
 
@@ -158,10 +155,6 @@ var Compiler;
 
                     var lineCell = row.insertCell(-1);
                     lineCell.innerHTML = entry.getLineNumber().toString();
-
-                    // TODO: Remove after testing
-                    var numReferencesCell = row.insertCell(-1);
-                    numReferencesCell.innerHTML = entry.getNumReferences().toString();
                 }
             }
 

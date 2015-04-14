@@ -55,10 +55,6 @@ module Compiler {
 			this.lineNumber = lineNumber;
 		}
 
-		public hasEntry(idName: string): boolean {
-            return false;
-		}
-
 		public getIsInitialized(): boolean {
             return this.isInitialized;
 		}

@@ -259,7 +259,7 @@ var Compiler;
                         break;
                 }
 
-                if (root.getTokenType() === "T_ID") {
+                if (TokenType[root.getTokenType()] === 12 /* T_ID */) {
                     var id = root.getValue();
                     var result = symbolTable.hasEntry(id, root);
 
@@ -343,27 +343,30 @@ var Compiler;
                 root.typeCheck(root.childList[i], symbolTable);
             }
 
+            // Propagate type info up the tree by combining type info from nodes children
             if (root.getNodeType() === treeNodeTypes.INTERIOR && root.getValue() !== astNodeTypes.BLOCK) {
                 var leftType = root.getLeftTreeType();
                 var rightType = root.getRightTreeType();
 
                 var parentNode = root.getParent();
 
-                Compiler.Logger.log("Node: " + root.getValue());
-                Compiler.Logger.log("Left type: " + root.getLeftTreeType());
-                Compiler.Logger.log("Right type: " + root.getRightTreeType());
-                Compiler.Logger.log("Parent: " + parentNode.getValue());
-
                 if (leftType !== "" && rightType !== "") {
                     if (leftType === rightType) {
                         if (parentNode.getValue() !== astNodeTypes.BLOCK) {
-                            Compiler.Logger.log("Parent ( " + parentNode.getValue() + " ) getting the synthesized value of " + leftType);
-                            parentNode.setSynthesizedType(leftType);
+                            // leftType == rightType, so either is fine
+                            var typeToPropagate = leftType;
+
+                            // Propagate boolean result from comparison
+                            if (root.getValue() === astNodeTypes.EQUAL || root.getValue() === astNodeTypes.NOT_EQUAL) {
+                                typeToPropagate = types.BOOLEAN;
+                            }
+
+                            parentNode.setSynthesizedType(typeToPropagate);
                         }
 
                         root.setTypeInfo(leftType);
                     } else {
-                        var errorMessage = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ". Type " + leftType + " does not match the type " + rightType;
+                        var errorMessage = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ": Id " + root.childList[0].getValue() + " with type " + leftType + " on LHS does not match the type " + rightType + " on the RHS of the expression";
 
                         Compiler.Logger.log(errorMessage);
                         throw errorMessage;

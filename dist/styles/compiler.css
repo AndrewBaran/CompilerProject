@@ -20,6 +20,11 @@ textarea.noResize
 	overflow: auto;
 }
 
+#tokenAndSymbolRow
+{
+	margin-top: 10px;
+}
+
 #treeRow
 {
 	margin-top: 10px;

@@ -43,10 +43,6 @@ var Compiler;
             this.lineNumber = lineNumber;
         };
 
-        SymbolTableEntry.prototype.hasEntry = function (idName) {
-            return false;
-        };
-
         SymbolTableEntry.prototype.getIsInitialized = function () {
             return this.isInitialized;
         };

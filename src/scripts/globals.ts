@@ -32,6 +32,7 @@ var _testCodeList = [
     {name: "Boolean 1", code: "{\n\tboolean b\n\tb = true\n\tb = false\n} $"},
     {name: "Boolean 2", code: "{\n\tboolean b\n\tb = (true == true)\n\tb = (false != false)\n} $"},
     {name: "Boolean 3", code: "{\n\tboolean b\n\tb = (true == (true != (false == false)))\n} $"},
+    {name: "Boolean 4", code: "{\n\tint a\n\ta = 1\n\n\tboolean b\n\tb = (true == (true != (false == (true != (false != (a == a))))))\n\n\tprint(b)\n} $"},
     {name: "Scope 1", code: "{\n\tint a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\t{\n\t\tint c\n\n\t\tc = 3\n\t\ta = 8\n\t\tb = 9\n\t}\n} $"},
     {name: "Scope 2", code: "{\n\tint x\n\tx = 1\n\n\t{\n\n\t\tint x\n\t\tx = 2\n\n\t\t{\n\t\t\tx = 5\n\t\t}\n\n\t\tprint(x)\n\t}\n\n\tprint(x)\n} $"},
     {name: "Everything 1", code: "{\n\tint a\n\ta = 1\n\n\tstring s\n\ts = \"test string\"\n\n\tboolean b\n\tb = (true == true)\n\n\tprint(\"print one\")\n\tprint(1)\n\n\tprint(\"print true\")\n\tprint(true)\n\n\tif(a == 1)\n\t{\n\t\tprint(\"a is one\")\n\t}\n\n\twhile(a != 9)\n\t{\n\t\tprint(\"a is \")\n\t\tprint(a)\n\t\ta = 1 + a\n\t}\n} $"}

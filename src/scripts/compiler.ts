@@ -77,9 +77,10 @@ module Compiler {
 
 			}
 			
+			// TODO: Add Code Gen Result for Project 3
 			Control.displayCompilerResults(lexResult, parseResult, semanticResult);
 
-			// TODO: Return the AND of each compilation result
+			// TODO: Add Code Gen Result for Project 3
 			return lexResult && parseResult && semanticResult;
 		}
 

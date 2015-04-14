@@ -64,8 +64,10 @@ module Compiler {
             return result;
 		}
 
-		public printWarnings(): void {
-            SymbolTable.defaultScopeTable.printWarnings(SymbolTable.defaultScopeTable);
+		public printWarnings(): number {
+            
+            var warningCount: number = SymbolTable.defaultScopeTable.printWarnings(SymbolTable.defaultScopeTable);
+            return warningCount;
 		}
 
 	}

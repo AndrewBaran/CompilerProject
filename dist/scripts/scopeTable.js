@@ -101,6 +101,8 @@ var Compiler;
         };
 
         ScopeTable.prototype.printWarnings = function (currentScopeTable) {
+            var warningCount = 0;
+
             for (var idValue = 'a'.charCodeAt(0); idValue <= 'z'.charCodeAt(0); idValue++) {
                 var idChar = String.fromCharCode(idValue);
                 var hashIndex = this.hashID(idChar);
@@ -110,17 +112,21 @@ var Compiler;
 
                     if (entry.getNumReferences() === 1) {
                         Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
+                        warningCount++;
                     }
 
                     if (!entry.getIsInitialized()) {
                         Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was never initialized");
+                        warningCount++;
                     }
                 }
             }
 
             for (var i = 0; i < currentScopeTable.childScopeList.length; i++) {
-                currentScopeTable.printWarnings(currentScopeTable.childScopeList[i]);
+                warningCount += currentScopeTable.printWarnings(currentScopeTable.childScopeList[i]);
             }
+
+            return warningCount;
         };
         return ScopeTable;
     })();

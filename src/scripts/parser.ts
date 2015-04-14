@@ -11,12 +11,13 @@ module Compiler {
 
 			this.setupParsingEnvironment(tokenList);
 
-			Logger.log("Parsing the code");
+			Logger.log("Performing Parsing");
 			Logger.log("");
 
 			this.parseProgram();
 
-			Logger.log("Parsing done");
+            Logger.log("");
+			Logger.log("Parsing Complete");
 			Logger.log("");
 
 			return this.concreteSyntaxTree;

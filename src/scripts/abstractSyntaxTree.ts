@@ -319,7 +319,7 @@ module Compiler {
 				}
 
 
-                if(root.getTokenType() === "T_ID") {
+                if(TokenType[root.getTokenType()] === TokenType.T_ID) {
 
                     var id: string = root.getValue();
                     var result: boolean = symbolTable.hasEntry(id, root);
@@ -410,10 +410,12 @@ module Compiler {
                 }
             }
 
+            // Recurse through children, setting types for leaf nodes
             for(var i: number = 0; i < root.childList.length; i++) {
                 root.typeCheck(root.childList[i], symbolTable);
             }
 
+            // Propagate type info up the tree by combining type info from nodes children
             if(root.getNodeType() === treeNodeTypes.INTERIOR && root.getValue() !== astNodeTypes.BLOCK) {
 
                 var leftType: string = root.getLeftTreeType();
@@ -421,19 +423,21 @@ module Compiler {
 
                 var parentNode: ASTNode = root.getParent();
 
-	            Logger.log("Node: " + root.getValue());
-	            Logger.log("Left type: " + root.getLeftTreeType());
-	            Logger.log("Right type: " + root.getRightTreeType());
-                Logger.log("Parent: " + parentNode.getValue());
-
                 if(leftType !== "" && rightType !== "") {
 
                     if(leftType === rightType) {
 
                         if(parentNode.getValue() !== astNodeTypes.BLOCK) {
 
-	                        Logger.log("Parent ( " + parentNode.getValue() + " ) getting the synthesized value of " + leftType);
-	                        parentNode.setSynthesizedType(leftType);
+                            // leftType == rightType, so either is fine
+                            var typeToPropagate: string = leftType;
+
+                            // Propagate boolean result from comparison
+                            if(root.getValue() === astNodeTypes.EQUAL || root.getValue() === astNodeTypes.NOT_EQUAL) {
+                                typeToPropagate = types.BOOLEAN;
+                            }
+
+	                        parentNode.setSynthesizedType(typeToPropagate);
                         }
 
                         root.setTypeInfo(leftType);
@@ -441,13 +445,12 @@ module Compiler {
 
                     else {
 
-                        var errorMessage: string = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ". Type " + leftType + " does not match the type " + rightType;
+                        var errorMessage: string = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ": Id " + root.childList[0].getValue() + " with type " + leftType + " on LHS does not match the type " + rightType + " on the RHS of the expression";
 
                         Logger.log(errorMessage);
                         throw errorMessage;
                     }
                 }
-
             }
 
 		}

@@ -68,9 +68,6 @@ module Compiler {
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
 			var compileResult: boolean = Compiler.compile(code);
 
-            // TODO: Remove after testing AST
-            document.getElementById("textboxLog").focus();
-
 			this.enableButtons();
 		}
 
@@ -171,10 +168,6 @@ module Compiler {
 
 					var lineCell = row.insertCell(-1);
 					lineCell.innerHTML = entry.getLineNumber().toString();
-
-					// TODO: Remove after testing
-                    var numReferencesCell = row.insertCell(-1);
-                    numReferencesCell.innerHTML = entry.getNumReferences().toString();
 				}
 
 			}

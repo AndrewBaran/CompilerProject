@@ -6,12 +6,13 @@ var Compiler;
         Parser.parseCode = function (tokenList) {
             this.setupParsingEnvironment(tokenList);
 
-            Compiler.Logger.log("Parsing the code");
+            Compiler.Logger.log("Performing Parsing");
             Compiler.Logger.log("");
 
             this.parseProgram();
 
-            Compiler.Logger.log("Parsing done");
+            Compiler.Logger.log("");
+            Compiler.Logger.log("Parsing Complete");
             Compiler.Logger.log("");
 
             return this.concreteSyntaxTree;
