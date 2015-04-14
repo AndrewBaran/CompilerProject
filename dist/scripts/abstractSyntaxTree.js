@@ -218,9 +218,10 @@ var Compiler;
             }
         };
 
-        ASTNode.prototype.buildSymbolTablePreOrder = function (root, symbolTable, pathTaken) {
+        ASTNode.prototype.buildSymbolTablePreOrder = function (root, symbolTable) {
             if (root !== null) {
                 var newScope = false;
+                var optionalPath = "";
 
                 switch (root.getValue()) {
                     case astNodeTypes.BLOCK:
@@ -236,8 +237,10 @@ var Compiler;
 
                         var insertResult = symbolTable.insertEntry(id, type, lineNumber);
 
+                        optionalPath = astNodeTypes.VAR_DECLARATION;
+
                         if (!insertResult) {
-                            var errorMessage = "Error! Duplicate declaration of id " + id + " on line " + lineNumber;
+                            var errorMessage = "Error! Duplicate declaration of id " + id + " found on line " + lineNumber;
 
                             Compiler.Logger.log(errorMessage);
                             throw errorMessage;
@@ -261,7 +264,7 @@ var Compiler;
 
                 if (TokenType[root.getTokenType()] === 12 /* T_ID */) {
                     var id = root.getValue();
-                    var result = symbolTable.hasEntry(id, root);
+                    var result = symbolTable.hasEntry(id, root, optionalPath);
 
                     if (!result) {
                         var errorMessage = "Error! The id " + id + " on line " + root.getLineNumber() + " was used before being declared";
@@ -272,7 +275,7 @@ var Compiler;
                 }
 
                 for (var i = 0; i < root.childList.length; i++) {
-                    this.buildSymbolTablePreOrder(root.childList[i], symbolTable, pathTaken);
+                    this.buildSymbolTablePreOrder(root.childList[i], symbolTable);
                 }
 
                 if (newScope) {
@@ -366,7 +369,7 @@ var Compiler;
 
                         root.setTypeInfo(leftType);
                     } else {
-                        var errorMessage = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ": Id " + root.childList[0].getValue() + " with type " + leftType + " on LHS does not match the type " + rightType + " on the RHS of the expression";
+                        var errorMessage = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ": " + root.childList[0].getValue() + " with the type " + leftType + " on the LHS does not match the type " + rightType + " on the RHS of the expression";
 
                         Compiler.Logger.log(errorMessage);
                         throw errorMessage;

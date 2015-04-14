@@ -17,7 +17,6 @@ module Compiler {
 			this.scopeCheck();
 			this.typeCheck();
 
-            Logger.log("");
             Logger.log("Semantic Analysis Complete");
 
             this.printWarnings();
@@ -32,27 +31,36 @@ module Compiler {
 		}
 
 		private static createAST(concreteSyntaxTree: ConcreteSyntaxTree): void {
-
-			Logger.log("Creating the Abstract Syntax Tree");
 			this.abstractSyntaxTree = concreteSyntaxTree.buildAST();
 		}
 
 		private static scopeCheck(): void {
-
-			Logger.log("Performing Scope Checking");
             this.abstractSyntaxTree.buildSymbolTable(this.symbolTable);
 		}
 
 		private static typeCheck(): void {
-
-			Logger.log("Performing Type Checking");
             this.abstractSyntaxTree.typeCheck(this.symbolTable);
 		}
 
 		private static printWarnings(): void {
             
-            var warningCount: number = this.symbolTable.printWarnings();
+            this.symbolTable.detectWarnings();
+
+            var warningCount: number = _semanticWarnings.length;
+
             Logger.log("Semantic Analysis produced 0 errors and " + warningCount + " warning(s)");
+            Logger.log("");
+
+            if(warningCount > 0) {
+
+                Logger.log("Warnings");
+                Logger.log("-----------------");
+
+                for(var i: number = 0; i < warningCount; i++) {
+                    Logger.log(_semanticWarnings[i]);
+                }
+            }
+
 		}
 
 	}

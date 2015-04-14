@@ -269,11 +269,12 @@ module Compiler {
 			}
 		}
 
-		public buildSymbolTablePreOrder(root: ASTNode, symbolTable: SymbolTable, pathTaken?: string): void {
+		public buildSymbolTablePreOrder(root: ASTNode, symbolTable: SymbolTable): void {
 
 			if(root !== null) {
 
                 var newScope: boolean = false;
+                var optionalPath: string = "";
 
 				switch(root.getValue()) {
 
@@ -292,9 +293,11 @@ module Compiler {
 
                         var insertResult = symbolTable.insertEntry(id, type, lineNumber);
 
+                        optionalPath = astNodeTypes.VAR_DECLARATION;
+
                         if(!insertResult) {
 
-                            var errorMessage: string = "Error! Duplicate declaration of id " + id + " on line " + lineNumber;
+                            var errorMessage: string = "Error! Duplicate declaration of id " + id + " found on line " + lineNumber;
 
                             Logger.log(errorMessage);
                             throw errorMessage;
@@ -322,7 +325,7 @@ module Compiler {
                 if(TokenType[root.getTokenType()] === TokenType.T_ID) {
 
                     var id: string = root.getValue();
-                    var result: boolean = symbolTable.hasEntry(id, root);
+                    var result: boolean = symbolTable.hasEntry(id, root, optionalPath);
 
                     if(!result) {
 
@@ -334,7 +337,7 @@ module Compiler {
                 }
 
                 for(var i: number = 0; i < root.childList.length; i++) {
-                	this.buildSymbolTablePreOrder(root.childList[i], symbolTable, pathTaken);
+                	this.buildSymbolTablePreOrder(root.childList[i], symbolTable);
                 }
 
                 if(newScope) {
@@ -445,7 +448,7 @@ module Compiler {
 
                     else {
 
-                        var errorMessage: string = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ": Id " + root.childList[0].getValue() + " with type " + leftType + " on LHS does not match the type " + rightType + " on the RHS of the expression";
+                        var errorMessage: string = "Error! Type mismatch on line " + root.childList[0].getLineNumber() + ": " + root.childList[0].getValue() + " with the type " + leftType + " on the LHS does not match the type " + rightType + " on the RHS of the expression";
 
                         Logger.log(errorMessage);
                         throw errorMessage;

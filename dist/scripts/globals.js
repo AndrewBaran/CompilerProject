@@ -113,3 +113,5 @@ var types = {
 };
 
 var _Constants = { MAX_SCOPE_ENTRIES: 26 };
+
+var _semanticWarnings = [];

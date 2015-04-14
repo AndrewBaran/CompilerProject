@@ -55,8 +55,17 @@ var Compiler;
                     var entry = currentScope.entryTable[hashIndex];
                     entry.incrementNumReferences();
 
-                    if (optionalPath !== undefined && optionalPath === astNodeTypes.ASSIGNMENT_STATEMENT) {
+                    if (optionalPath === astNodeTypes.ASSIGNMENT_STATEMENT) {
                         entry.setIsInitialized();
+                    }
+
+                    var parentNode = astNode.getParent();
+
+                    if (optionalPath !== astNodeTypes.VAR_DECLARATION && parentNode.getValue() !== astNodeTypes.VAR_DECLARATION) {
+                        if (!entry.getIsInitialized()) {
+                            var warningMessage = "Warning! The id " + entry.getIdName() + " on line " + astNode.getLineNumber() + " was used before being initialized first";
+                            _semanticWarnings.push(warningMessage);
+                        }
                     }
 
                     astNode.setSymbolTableEntry(entry);
@@ -100,9 +109,7 @@ var Compiler;
             return this.childScopeList;
         };
 
-        ScopeTable.prototype.printWarnings = function (currentScopeTable) {
-            var warningCount = 0;
-
+        ScopeTable.prototype.detectWarnings = function (currentScopeTable) {
             for (var idValue = 'a'.charCodeAt(0); idValue <= 'z'.charCodeAt(0); idValue++) {
                 var idChar = String.fromCharCode(idValue);
                 var hashIndex = this.hashID(idChar);
@@ -111,22 +118,20 @@ var Compiler;
                     var entry = currentScopeTable.entryTable[hashIndex];
 
                     if (entry.getNumReferences() === 1) {
-                        Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
-                        warningCount++;
+                        var warningMessage = "Warning! The id " + entry.getIdName() + " declared on line " + entry.getLineNumber() + " was declared, but never used";
+                        _semanticWarnings.push(warningMessage);
                     }
 
                     if (!entry.getIsInitialized()) {
-                        Compiler.Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was never initialized");
-                        warningCount++;
+                        var warningMessage = "Warning! The id " + entry.getIdName() + " declared on line " + entry.getLineNumber() + " was never initialized";
+                        _semanticWarnings.push(warningMessage);
                     }
                 }
             }
 
             for (var i = 0; i < currentScopeTable.childScopeList.length; i++) {
-                warningCount += currentScopeTable.printWarnings(currentScopeTable.childScopeList[i]);
+                currentScopeTable.detectWarnings(currentScopeTable.childScopeList[i]);
             }
-
-            return warningCount;
         };
         return ScopeTable;
     })();

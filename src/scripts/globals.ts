@@ -119,3 +119,5 @@ interface Constants {
 }
 
 var _Constants: Constants = {MAX_SCOPE_ENTRIES: 26};
+
+var _semanticWarnings: string [] = [];

@@ -48,9 +48,8 @@ var Compiler;
             return result;
         };
 
-        SymbolTable.prototype.printWarnings = function () {
-            var warningCount = SymbolTable.defaultScopeTable.printWarnings(SymbolTable.defaultScopeTable);
-            return warningCount;
+        SymbolTable.prototype.detectWarnings = function () {
+            SymbolTable.defaultScopeTable.detectWarnings(SymbolTable.defaultScopeTable);
         };
         return SymbolTable;
     })();

@@ -78,8 +78,19 @@ module Compiler {
                     var entry: SymbolTableEntry = currentScope.entryTable[hashIndex];
                     entry.incrementNumReferences();
 
-                    if(optionalPath !== undefined && optionalPath === astNodeTypes.ASSIGNMENT_STATEMENT) {
+                    if(optionalPath === astNodeTypes.ASSIGNMENT_STATEMENT) {
                         entry.setIsInitialized();
+                    }
+
+                    var parentNode: ASTNode = astNode.getParent();
+
+                    if(optionalPath !== astNodeTypes.VAR_DECLARATION && parentNode.getValue() !== astNodeTypes.VAR_DECLARATION) {
+
+                        if(!entry.getIsInitialized()) {
+
+                            var warningMessage: string = "Warning! The id " + entry.getIdName() + " on line " + astNode.getLineNumber() + " was used before being initialized first";
+                            _semanticWarnings.push(warningMessage);
+                        }
                     }
 
                     astNode.setSymbolTableEntry(entry);
@@ -124,9 +135,7 @@ module Compiler {
 			return this.childScopeList;
 		}
 
-        public printWarnings(currentScopeTable: ScopeTable): number {
-
-            var warningCount: number = 0;
+        public detectWarnings(currentScopeTable: ScopeTable): void {
 
             for(var idValue: number = 'a'.charCodeAt(0); idValue <= 'z'.charCodeAt(0); idValue++) {
 
@@ -139,24 +148,22 @@ module Compiler {
 
                     if(entry.getNumReferences() === 1) {
 
-                        Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was declared, but never used");
-                        warningCount++;
+                        var warningMessage: string = "Warning! The id " + entry.getIdName() + " declared on line " + entry.getLineNumber() + " was declared, but never used";
+                        _semanticWarnings.push(warningMessage);
                     }
 
                     if(!entry.getIsInitialized()) {
 
-                        Logger.log("Warning! The id " + entry.getIdName() + " on line " + entry.getLineNumber() + " was never initialized");
-                        warningCount++;
+                        var warningMessage: string = "Warning! The id " + entry.getIdName() + " declared on line " + entry.getLineNumber() + " was never initialized";
+                        _semanticWarnings.push(warningMessage);
                     }
                 }
 
             }
 
-            for (var i: number = 0; i < currentScopeTable.childScopeList.length; i++) {
-                warningCount += currentScopeTable.printWarnings(currentScopeTable.childScopeList[i]);
+            for(var i: number = 0; i < currentScopeTable.childScopeList.length; i++) {
+                currentScopeTable.detectWarnings(currentScopeTable.childScopeList[i]);
             }
-
-            return warningCount;
         }
 
 	}

@@ -11,6 +11,7 @@ module Compiler {
 			this.clearCompilerResults();
 			this.clearCST();
 			this.clearAST();
+            this.clearSemanticWarnings();
 
 			// Reset any tables that were created on the last run
 			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
@@ -42,6 +43,10 @@ module Compiler {
 			document.getElementById("divCompilerResults").innerHTML = "";
 		}
 
+		private static clearSemanticWarnings(): void {
+            _semanticWarnings = [];
+		}
+
 		private static enableButtons(): void {
 
 			document.getElementById("buttonCompile").disabled = false;
@@ -63,6 +68,7 @@ module Compiler {
 			this.clearCompilerResults();
 			this.clearCST();
 			this.clearAST();
+            this.clearSemanticWarnings();
 
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
@@ -228,6 +234,7 @@ module Compiler {
 				this.clearCST();
 				this.clearAST();
 				this.clearCompilerResults();
+                this.clearSemanticWarnings();
 
 				if(testResult) {
 

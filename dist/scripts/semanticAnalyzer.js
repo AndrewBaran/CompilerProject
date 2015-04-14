@@ -13,7 +13,6 @@ var Compiler;
             this.scopeCheck();
             this.typeCheck();
 
-            Compiler.Logger.log("");
             Compiler.Logger.log("Semantic Analysis Complete");
 
             this.printWarnings();
@@ -27,23 +26,33 @@ var Compiler;
         };
 
         SemanticAnalyzer.createAST = function (concreteSyntaxTree) {
-            Compiler.Logger.log("Creating the Abstract Syntax Tree");
             this.abstractSyntaxTree = concreteSyntaxTree.buildAST();
         };
 
         SemanticAnalyzer.scopeCheck = function () {
-            Compiler.Logger.log("Performing Scope Checking");
             this.abstractSyntaxTree.buildSymbolTable(this.symbolTable);
         };
 
         SemanticAnalyzer.typeCheck = function () {
-            Compiler.Logger.log("Performing Type Checking");
             this.abstractSyntaxTree.typeCheck(this.symbolTable);
         };
 
         SemanticAnalyzer.printWarnings = function () {
-            var warningCount = this.symbolTable.printWarnings();
+            this.symbolTable.detectWarnings();
+
+            var warningCount = _semanticWarnings.length;
+
             Compiler.Logger.log("Semantic Analysis produced 0 errors and " + warningCount + " warning(s)");
+            Compiler.Logger.log("");
+
+            if (warningCount > 0) {
+                Compiler.Logger.log("Warnings");
+                Compiler.Logger.log("-----------------");
+
+                for (var i = 0; i < warningCount; i++) {
+                    Compiler.Logger.log(_semanticWarnings[i]);
+                }
+            }
         };
         return SemanticAnalyzer;
     })();
