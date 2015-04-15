@@ -354,6 +354,8 @@ var Compiler;
                 var parentNode = root.getParent();
 
                 if (leftType !== "" && rightType !== "") {
+                    Compiler.Logger.log("Checking if " + leftType + " is type compatible with " + rightType + " on line " + root.childList[0].getLineNumber());
+
                     if (leftType === rightType) {
                         if (parentNode.getValue() !== astNodeTypes.BLOCK) {
                             // leftType == rightType, so either is fine

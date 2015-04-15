@@ -428,6 +428,8 @@ module Compiler {
 
                 if(leftType !== "" && rightType !== "") {
 
+                    Logger.log("Checking if " + leftType + " is type compatible with " + rightType + " on line " + root.childList[0].getLineNumber());
+
                     if(leftType === rightType) {
 
                         if(parentNode.getValue() !== astNodeTypes.BLOCK) {
