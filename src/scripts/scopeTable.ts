@@ -39,7 +39,7 @@ module Compiler {
 
 			if(this.entryTable[hashIndex] === null) {
 
-                Logger.log("Inserting id " + idName + " from line " + lineNumber + " into symbol table");
+                Logger.logVerbose("Inserting id " + idName + " from line " + lineNumber + " into symbol table");
 
 				this.entryTable[hashIndex] = entry;
 				return true;
@@ -67,7 +67,7 @@ module Compiler {
             var currentScope: ScopeTable = this;
             var idFound: boolean = false;
 
-            Logger.log("Checking if id " + idName + " is in the symbol table");
+            Logger.logVerbose("Checking if id " + idName + " is in the symbol table");
 
             while(currentScope !== null && !idFound) {
 
@@ -79,7 +79,7 @@ module Compiler {
 
 	            else {
 
-                    Logger.log("The id " + idName + " at the scope level " + currentScope.getScopeLevel() + " was in the symbol table");
+                    Logger.logVerbose("The id " + idName + " at the scope level " + currentScope.getScopeLevel() + " was in the symbol table");
 
                     var entry: SymbolTableEntry = currentScope.entryTable[hashIndex];
                     entry.incrementNumReferences();

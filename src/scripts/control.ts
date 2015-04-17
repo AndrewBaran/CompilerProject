@@ -2,6 +2,8 @@ module Compiler {
 
 	export class Control {
 
+        public static verboseMode: boolean = false;
+
 		// Clears out the code and log textboxes when the page is loaded
 		public static clearData(): void {
 
@@ -119,6 +121,21 @@ module Compiler {
 
 			(<HTMLInputElement> document.getElementById("textboxInputCode")).value = code;
 		}
+
+        public static toggleVerboseMode(button): void {
+
+            this.verboseMode = this.verboseMode ? false : true;
+
+            // Green button
+            if(this.verboseMode) {
+                document.getElementById("buttonVerbose").className = "btn btn-success btn-mid";
+            }
+
+            // Red button
+            else {
+                document.getElementById("buttonVerbose").className = "btn btn-danger btn-md";
+            }
+        }
 
 		// Displays tokens produced from lex
 		public static displayTokenTable(tokenList: TokenInfo[]): void {

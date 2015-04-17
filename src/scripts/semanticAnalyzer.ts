@@ -17,6 +17,7 @@ module Compiler {
 			this.scopeCheck();
 			this.typeCheck();
 
+            Logger.logVerbose("");
             Logger.log("Semantic Analysis Complete");
 
             this.printWarnings();

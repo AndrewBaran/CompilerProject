@@ -13,6 +13,7 @@ var Compiler;
             this.scopeCheck();
             this.typeCheck();
 
+            Compiler.Logger.logVerbose("");
             Compiler.Logger.log("Semantic Analysis Complete");
 
             this.printWarnings();

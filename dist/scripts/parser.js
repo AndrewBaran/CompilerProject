@@ -11,8 +11,9 @@ var Compiler;
 
             this.parseProgram();
 
-            Compiler.Logger.log("");
+            Compiler.Logger.logVerbose("");
             Compiler.Logger.log("Parsing Complete");
+            Compiler.Logger.log("Parsing produced 0 errors and 0 warnings");
             Compiler.Logger.log("");
 
             return this.concreteSyntaxTree;
@@ -39,11 +40,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting a left brace");
+            Compiler.Logger.logVerbose("Expecting a left brace");
 
             if (token.getType() === 4 /* T_LBRACE */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a left brace!");
+                Compiler.Logger.logVerbose("Got a left brace!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -51,11 +52,11 @@ var Compiler;
 
                 tokenInfo = this.getTokenInfo();
                 token = tokenInfo.token;
-                Compiler.Logger.log("Expecting a right brace!");
+                Compiler.Logger.logVerbose("Expecting a right brace!");
 
                 if (token.getType() === 5 /* T_RBRACE */) {
                     this.consumeToken();
-                    Compiler.Logger.log("Got a right brace!");
+                    Compiler.Logger.logVerbose("Got a right brace!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
                 } else {
@@ -72,11 +73,11 @@ var Compiler;
         Parser.parseEOF = function () {
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting an EOF");
+            Compiler.Logger.logVerbose("Expecting an EOF");
 
             if (token.getType() === 8 /* T_EOF */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got an EOF!");
+                Compiler.Logger.logVerbose("Got an EOF!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
             } else {
@@ -162,21 +163,21 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting a print");
+            Compiler.Logger.logVerbose("Expecting a print");
 
             if (token.getType() === 7 /* T_PRINT */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a print!");
+                Compiler.Logger.logVerbose("Got a print!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
                 tokenInfo = this.getTokenInfo();
                 token = tokenInfo.token;
-                Compiler.Logger.log("Expecting a left paren");
+                Compiler.Logger.logVerbose("Expecting a left paren");
 
                 if (token.getType() === 2 /* T_LPAREN */) {
                     this.consumeToken();
-                    Compiler.Logger.log("Got a left paren!");
+                    Compiler.Logger.logVerbose("Got a left paren!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -184,11 +185,11 @@ var Compiler;
 
                     tokenInfo = this.getTokenInfo();
                     token = tokenInfo.token;
-                    Compiler.Logger.log("Expecting a right paren");
+                    Compiler.Logger.logVerbose("Expecting a right paren");
 
                     if (token.getType() === 3 /* T_RPAREN */) {
                         this.consumeToken();
-                        Compiler.Logger.log("Got a right paren!");
+                        Compiler.Logger.logVerbose("Got a right paren!");
 
                         this.concreteSyntaxTree.insertLeafNode(tokenInfo);
                     } else {
@@ -212,11 +213,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting an = ");
+            Compiler.Logger.logVerbose("Expecting an = ");
 
             if (token.getType() === 20 /* T_SINGLE_EQUALS */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a = !");
+                Compiler.Logger.logVerbose("Got a = !");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -244,11 +245,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting a while");
+            Compiler.Logger.logVerbose("Expecting a while");
 
             if (token.getType() === 9 /* T_WHILE */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a while!");
+                Compiler.Logger.logVerbose("Got a while!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -267,11 +268,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting an if");
+            Compiler.Logger.logVerbose("Expecting an if");
 
             if (token.getType() === 10 /* T_IF */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got an if!");
+                Compiler.Logger.logVerbose("Got an if!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -327,11 +328,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting a digit");
+            Compiler.Logger.logVerbose("Expecting a digit");
 
             if (token.getType() === 11 /* T_DIGIT */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a digit!");
+                Compiler.Logger.logVerbose("Got a digit!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -353,11 +354,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting a quotation mark");
+            Compiler.Logger.logVerbose("Expecting a quotation mark");
 
             if (token.getType() === 6 /* T_QUOTE */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a quotation mark!");
+                Compiler.Logger.logVerbose("Got a quotation mark!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -365,11 +366,11 @@ var Compiler;
 
                 tokenInfo = this.getTokenInfo();
                 token = tokenInfo.token;
-                Compiler.Logger.log("Expecting a quotation mark");
+                Compiler.Logger.logVerbose("Expecting a quotation mark");
 
                 if (token.getType() === 6 /* T_QUOTE */) {
                     this.consumeToken();
-                    Compiler.Logger.log("Got a quotation mark!");
+                    Compiler.Logger.logVerbose("Got a quotation mark!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
                 } else {
@@ -388,12 +389,12 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Potentially expecting a left paren, true, or false");
+            Compiler.Logger.logVerbose("Potentially expecting a left paren, true, or false");
 
             switch (token.getType()) {
                 case 2 /* T_LPAREN */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a left paren!");
+                    Compiler.Logger.logVerbose("Got a left paren!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -403,11 +404,11 @@ var Compiler;
 
                     tokenInfo = this.getTokenInfo();
                     token = tokenInfo.token;
-                    Compiler.Logger.log("Expecting a right paren");
+                    Compiler.Logger.logVerbose("Expecting a right paren");
 
                     if (token.getType() === 3 /* T_RPAREN */) {
                         this.consumeToken();
-                        Compiler.Logger.log("Got a right paren!");
+                        Compiler.Logger.logVerbose("Got a right paren!");
 
                         this.concreteSyntaxTree.insertLeafNode(tokenInfo);
                     } else {
@@ -418,7 +419,7 @@ var Compiler;
 
                 case 25 /* T_TRUE */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a true!");
+                    Compiler.Logger.logVerbose("Got a true!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -426,7 +427,7 @@ var Compiler;
 
                 case 24 /* T_FALSE */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a false!");
+                    Compiler.Logger.logVerbose("Got a false!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -448,12 +449,12 @@ var Compiler;
         Parser.parseType = function () {
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting a type");
+            Compiler.Logger.logVerbose("Expecting a type");
 
             switch (token.getType()) {
                 case 17 /* T_INT */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got an int type!");
+                    Compiler.Logger.logVerbose("Got an int type!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -461,7 +462,7 @@ var Compiler;
 
                 case 18 /* T_STRING */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a string type!");
+                    Compiler.Logger.logVerbose("Got a string type!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -469,7 +470,7 @@ var Compiler;
 
                 case 19 /* T_BOOLEAN */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a boolean type!");
+                    Compiler.Logger.logVerbose("Got a boolean type!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -485,11 +486,11 @@ var Compiler;
         Parser.parseId = function () {
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Expecting an id");
+            Compiler.Logger.logVerbose("Expecting an id");
 
             if (token.getType() === 12 /* T_ID */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got an id!");
+                Compiler.Logger.logVerbose("Got an id!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
             } else {
@@ -503,11 +504,11 @@ var Compiler;
 
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Potentially expecting a string character");
+            Compiler.Logger.logVerbose("Potentially expecting a string character");
 
             if (token.getType() === 13 /* T_CHAR */ || token.getType() === 26 /* T_WHITE_SPACE */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a string character!");
+                Compiler.Logger.logVerbose("Got a string character!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -523,11 +524,11 @@ var Compiler;
         Parser.parseIntOperator = function () {
             var tokenInfo = this.getTokenInfo();
             var token = tokenInfo.token;
-            Compiler.Logger.log("Potentially expecting a plus operator");
+            Compiler.Logger.logVerbose("Potentially expecting a plus operator");
 
             if (token.getType() === 14 /* T_PLUS */) {
                 this.consumeToken();
-                Compiler.Logger.log("Got a plus operator!");
+                Compiler.Logger.logVerbose("Got a plus operator!");
 
                 this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -545,7 +546,7 @@ var Compiler;
             switch (token.getType()) {
                 case 21 /* T_DOUBLE_EQUALS */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a double equals!");
+                    Compiler.Logger.logVerbose("Got a double equals!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 
@@ -553,7 +554,7 @@ var Compiler;
 
                 case 22 /* T_NOT_EQUALS */:
                     this.consumeToken();
-                    Compiler.Logger.log("Got a not equals!");
+                    Compiler.Logger.logVerbose("Got a not equals!");
 
                     this.concreteSyntaxTree.insertLeafNode(tokenInfo);
 

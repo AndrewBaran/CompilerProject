@@ -25,7 +25,7 @@ var Compiler;
             var hashIndex = this.hashID(idName);
 
             if (this.entryTable[hashIndex] === null) {
-                Compiler.Logger.log("Inserting id " + idName + " from line " + lineNumber + " into symbol table");
+                Compiler.Logger.logVerbose("Inserting id " + idName + " from line " + lineNumber + " into symbol table");
 
                 this.entryTable[hashIndex] = entry;
                 return true;
@@ -48,7 +48,7 @@ var Compiler;
             var currentScope = this;
             var idFound = false;
 
-            Compiler.Logger.log("Checking if id " + idName + " is in the symbol table");
+            Compiler.Logger.logVerbose("Checking if id " + idName + " is in the symbol table");
 
             while (currentScope !== null && !idFound) {
                 var hashIndex = this.hashID(idName);
@@ -56,7 +56,7 @@ var Compiler;
                 if (currentScope.entryTable[hashIndex] === null) {
                     currentScope = currentScope.getParent();
                 } else {
-                    Compiler.Logger.log("The id " + idName + " at the scope level " + currentScope.getScopeLevel() + " was in the symbol table");
+                    Compiler.Logger.logVerbose("The id " + idName + " at the scope level " + currentScope.getScopeLevel() + " was in the symbol table");
 
                     var entry = currentScope.entryTable[hashIndex];
                     entry.incrementNumReferences();

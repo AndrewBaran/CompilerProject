@@ -24,6 +24,15 @@ var Compiler;
             var logContents = document.getElementById(textboxName);
             logContents.value = logContents.value + logMessage + "\n";
         };
+
+        Logger.logVerbose = function (logMessage) {
+            var textboxName = "textboxLog";
+
+            if (Compiler.Control.verboseMode) {
+                var logContents = document.getElementById(textboxName);
+                logContents.value = logContents.value + logMessage + "\n";
+            }
+        };
         return Logger;
     })();
     Compiler.Logger = Logger;

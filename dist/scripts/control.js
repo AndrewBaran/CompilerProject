@@ -113,6 +113,17 @@ var Compiler;
             document.getElementById("textboxInputCode").value = code;
         };
 
+        Control.toggleVerboseMode = function (button) {
+            this.verboseMode = this.verboseMode ? false : true;
+
+            // Green button
+            if (this.verboseMode) {
+                document.getElementById("buttonVerbose").className = "btn btn-success btn-mid";
+            } else {
+                document.getElementById("buttonVerbose").className = "btn btn-danger btn-md";
+            }
+        };
+
         // Displays tokens produced from lex
         Control.displayTokenTable = function (tokenList) {
             var tableName = "tokenTable";
@@ -259,6 +270,7 @@ var Compiler;
 
             resultDiv.innerHTML = results;
         };
+        Control.verboseMode = false;
         return Control;
     })();
     Compiler.Control = Control;

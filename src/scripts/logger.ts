@@ -28,5 +28,18 @@ module Compiler {
 			var logContents = <HTMLInputElement> document.getElementById(textboxName);
 			logContents.value = logContents.value + logMessage + "\n";
 		}
+
+		public static logVerbose(logMessage: string): void {
+
+            var textboxName: string = "textboxLog";
+
+            if(Control.verboseMode) {
+
+				var logContents = <HTMLInputElement> document.getElementById(textboxName);
+				logContents.value = logContents.value + logMessage + "\n";
+            }
+
+		}
+
 	}
 }
