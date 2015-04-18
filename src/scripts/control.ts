@@ -14,6 +14,7 @@ module Compiler {
 			this.clearCST();
 			this.clearAST();
             this.clearSemanticWarnings();
+            this.clearCodeGen();
 
 			// Reset any tables that were created on the last run
 			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
@@ -49,6 +50,10 @@ module Compiler {
             _semanticWarnings = [];
 		}
 
+		private static clearCodeGen(): void {
+            (<HTMLInputElement> document.getElementById("textboxCodeGen")).value = "";
+		}
+
 		private static enableButtons(): void {
 
 			document.getElementById("buttonCompile").disabled = false;
@@ -71,6 +76,7 @@ module Compiler {
 			this.clearCST();
 			this.clearAST();
             this.clearSemanticWarnings();
+            this.clearCodeGen();
 
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
@@ -228,6 +234,29 @@ module Compiler {
 			abstractSyntaxTree.printPreOrder();
 		}
 
+		public static displayCodeGen(codeList: string []): void {
+
+            var codeString: string = "";
+
+            for(var i: number = 0; i < codeList.length; i++) {
+
+                codeString += codeList[i];
+
+                if(!((i + 1) == codeList.length)) {
+	                codeString += " ";
+                }
+            }
+
+            var codeGenTextbox = <HTMLInputElement> document.getElementById("textboxCodeGen");
+            codeGenTextbox.value = codeString;
+		}
+
+		public static selectCodeGen(textArea): void {
+
+            textArea.focus();
+            textArea.select();
+		}
+
 
 		// Executes each unit test and displays the result
 		private static runTests(): void {
@@ -252,6 +281,7 @@ module Compiler {
 				this.clearAST();
 				this.clearCompilerResults();
                 this.clearSemanticWarnings();
+	            this.clearCodeGen();
 
 				if(testResult) {
 
@@ -284,8 +314,7 @@ module Compiler {
 
 		}
 
-		// TODO: Add Code Gen results in Project 3
-		public static displayCompilerResults(lex: boolean, parse: boolean, semantic: boolean): void {
+		public static displayCompilerResults(lex: boolean, parse: boolean, semantic: boolean, codeGen: boolean): void {
 
 			var resultDiv = document.getElementById("divCompilerResults");
 
@@ -301,6 +330,10 @@ module Compiler {
 
 			results += "Semantic: ";
 			results += semantic ? "<b>Passed</b>" : "<b>Failed</b>";
+			results += " | ";
+
+            results += "Code Gen: ";
+            results += codeGen ? "<b>Passed</b>" : "<b>Failed</b>";
 
 			resultDiv.innerHTML = results;
 		}

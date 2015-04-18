@@ -32,6 +32,7 @@
 	<script type="text/javascript" src="dist/scripts/concreteSyntaxTree.js"></script>
 	<script type="text/javascript" src="dist/scripts/abstractSyntaxTree.js"></script>
 	<script type="text/javascript" src="dist/scripts/semanticAnalyzer.js"></script>
+	<script type="text/javascript" src="dist/scripts/codeGenerator.js"></script>
    
 </head>
 
@@ -184,6 +185,23 @@
 						rows="8"
 						spellcheck="false"
 						readonly="readonly"></textarea>
+
+		</div>
+
+	</div>
+
+	<div class="row" id="codeGenRow">
+
+		<div class="col-sm-12 text-center" id="divCodeGen">
+
+			<label>6502a Code</label>
+			<textarea name="textboxCodeGen"
+						class="form-control noResize"
+						id="textboxCodeGen"
+						rows="5"
+						spellcheck="false"
+						readonly="readonly"
+						onclick="Compiler.Control.selectCodeGen(this);"></textarea>
 
 		</div>
 

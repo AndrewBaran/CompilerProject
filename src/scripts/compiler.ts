@@ -9,6 +9,7 @@ module Compiler {
 			var lexResult: boolean = false;
 			var parseResult: boolean = false;
 			var semanticResult: boolean = false;
+            var codeGenResult: boolean = false;
 
 			var tokenList: TokenInfo [] = [];
 			var symbolTable: SymbolTable = new SymbolTable(); 
@@ -75,13 +76,25 @@ module Compiler {
 					Control.displayAST(abstractSyntaxTree);
 				}
 
+				try {
+
+                    var codeList: string[] = CodeGenerator.generateCode(abstractSyntaxTree, symbolTable);
+                    codeGenResult = true;
+				}
+
+				catch(exception) {
+                    codeGenResult = false;
+				}
+
+			}
+
+			if(codeGenResult) {
+                Control.displayCodeGen(codeList);
 			}
 			
-			// TODO: Add Code Gen Result for Project 3
-			Control.displayCompilerResults(lexResult, parseResult, semanticResult);
+			Control.displayCompilerResults(lexResult, parseResult, semanticResult, codeGenResult);
 
-			// TODO: Add Code Gen Result for Project 3
-			return lexResult && parseResult && semanticResult;
+			return lexResult && parseResult && semanticResult && codeGenResult;
 		}
 
 		public static setTestMode(isTestMode: boolean): void {

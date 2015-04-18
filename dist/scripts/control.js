@@ -12,6 +12,7 @@ var Compiler;
             this.clearCST();
             this.clearAST();
             this.clearSemanticWarnings();
+            this.clearCodeGen();
 
             // Reset any tables that were created on the last run
             var tablesToClear = ["tokenTable", "symbolTable"];
@@ -47,6 +48,10 @@ var Compiler;
             _semanticWarnings = [];
         };
 
+        Control.clearCodeGen = function () {
+            document.getElementById("textboxCodeGen").value = "";
+        };
+
         Control.enableButtons = function () {
             document.getElementById("buttonCompile").disabled = false;
             document.getElementById("buttonTest").disabled = false;
@@ -66,6 +71,7 @@ var Compiler;
             this.clearCST();
             this.clearAST();
             this.clearSemanticWarnings();
+            this.clearCodeGen();
 
             // Compile the program
             var code = document.getElementById("textboxInputCode").value;
@@ -203,6 +209,26 @@ var Compiler;
             abstractSyntaxTree.printPreOrder();
         };
 
+        Control.displayCodeGen = function (codeList) {
+            var codeString = "";
+
+            for (var i = 0; i < codeList.length; i++) {
+                codeString += codeList[i];
+
+                if (!((i + 1) == codeList.length)) {
+                    codeString += " ";
+                }
+            }
+
+            var codeGenTextbox = document.getElementById("textboxCodeGen");
+            codeGenTextbox.value = codeString;
+        };
+
+        Control.selectCodeGen = function (textArea) {
+            textArea.focus();
+            textArea.select();
+        };
+
         // Executes each unit test and displays the result
         Control.runTests = function () {
             var unitTestsPassed = 0;
@@ -224,6 +250,7 @@ var Compiler;
                 this.clearAST();
                 this.clearCompilerResults();
                 this.clearSemanticWarnings();
+                this.clearCodeGen();
 
                 if (testResult) {
                     unitTestsPassed++;
@@ -251,8 +278,7 @@ var Compiler;
             }
         };
 
-        // TODO: Add Code Gen results in Project 3
-        Control.displayCompilerResults = function (lex, parse, semantic) {
+        Control.displayCompilerResults = function (lex, parse, semantic, codeGen) {
             var resultDiv = document.getElementById("divCompilerResults");
 
             var results = "Compilation Results <br />";
@@ -267,6 +293,10 @@ var Compiler;
 
             results += "Semantic: ";
             results += semantic ? "<b>Passed</b>" : "<b>Failed</b>";
+            results += " | ";
+
+            results += "Code Gen: ";
+            results += codeGen ? "<b>Passed</b>" : "<b>Failed</b>";
 
             resultDiv.innerHTML = results;
         };

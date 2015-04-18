@@ -7,6 +7,7 @@ var Compiler;
             var lexResult = false;
             var parseResult = false;
             var semanticResult = false;
+            var codeGenResult = false;
 
             var tokenList = [];
             var symbolTable = new _Compiler.SymbolTable();
@@ -55,13 +56,22 @@ var Compiler;
                     _Compiler.Control.displaySymbolTable(symbolTable);
                     _Compiler.Control.displayAST(abstractSyntaxTree);
                 }
+
+                try  {
+                    var codeList = _Compiler.CodeGenerator.generateCode(abstractSyntaxTree, symbolTable);
+                    codeGenResult = true;
+                } catch (exception) {
+                    codeGenResult = false;
+                }
             }
 
-            // TODO: Add Code Gen Result for Project 3
-            _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult);
+            if (codeGenResult) {
+                _Compiler.Control.displayCodeGen(codeList);
+            }
 
-            // TODO: Add Code Gen Result for Project 3
-            return lexResult && parseResult && semanticResult;
+            _Compiler.Control.displayCompilerResults(lexResult, parseResult, semanticResult, codeGenResult);
+
+            return lexResult && parseResult && semanticResult && codeGenResult;
         };
 
         Compiler.setTestMode = function (isTestMode) {

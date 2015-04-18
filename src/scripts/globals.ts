@@ -116,8 +116,10 @@ var types = {
 
 interface Constants {
 	MAX_SCOPE_ENTRIES: number;
+    MAX_CODE_SIZE: number;
 }
 
-var _Constants: Constants = {MAX_SCOPE_ENTRIES: 26};
+var _Constants: Constants = {MAX_SCOPE_ENTRIES: 26, MAX_CODE_SIZE: 256};
+
 
 var _semanticWarnings: string [] = [];

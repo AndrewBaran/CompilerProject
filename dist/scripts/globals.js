@@ -112,6 +112,6 @@ var types = {
     BOOLEAN: "boolean"
 };
 
-var _Constants = { MAX_SCOPE_ENTRIES: 26 };
+var _Constants = { MAX_SCOPE_ENTRIES: 26, MAX_CODE_SIZE: 256 };
 
 var _semanticWarnings = [];
