@@ -97,6 +97,10 @@ module Compiler {
 			return this.currentNode;
 		}
 
+        public getRoot(): ASTNode {
+            return this.root;
+        }
+
 		public printPreOrder(): void {
 			this.root.printPreOrder(this.root);
 		}

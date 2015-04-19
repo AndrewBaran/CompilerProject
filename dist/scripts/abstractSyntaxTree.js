@@ -73,6 +73,10 @@ var Compiler;
             return this.currentNode;
         };
 
+        AbstractSyntaxTree.prototype.getRoot = function () {
+            return this.root;
+        };
+
         AbstractSyntaxTree.prototype.printPreOrder = function () {
             this.root.printPreOrder(this.root);
         };
