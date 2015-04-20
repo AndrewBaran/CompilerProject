@@ -1,0 +1,20 @@
+Andrew Baran
+Professor Labouseur
+Design of Compilers
+April 20, 2015
+
+Lab 7:
+
+Dragon:
+
+6.3.1.
+
+Starting from a position 0, positions are relative:
+x : float : +0
+p : record : +4
+	p.x : float : +4
+	p.y : float : +8
+q : record : +12
+	q.tag : int : +12
+	q.x : float : +16
+	q.y : float : +20
