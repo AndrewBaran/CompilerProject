@@ -8,7 +8,11 @@ var Compiler;
             Compiler.Logger.log("");
 
             this.setupEnvironment(abstractSyntaxTree, symbolTable);
+
             this.buildCode(abstractSyntaxTree.getRoot());
+            this.setCode("00"); // Program break
+
+            this.backPatchCode();
 
             Compiler.Logger.logVerbose("");
             Compiler.Logger.log("Code Generation Completed");
@@ -68,7 +72,16 @@ var Compiler;
                     break;
 
                 case astNodeTypes.PRINT_STATEMENT:
-                    Compiler.Logger.log("Print statement");
+                    var type = root.getTypeInfo();
+                    Compiler.Logger.log("Print statement for type: " + type);
+
+                    if (type === "") {
+                        var error = "Error! Print didn't get a synthesized type.";
+
+                        Compiler.Logger.log(error);
+                        throw error;
+                    }
+
                     break;
 
                 default:
@@ -80,6 +93,7 @@ var Compiler;
             }
         };
 
+        // TODO: Case where string declared, then int/bool causes int/bool to skip a space in static space
         CodeGenerator.varDeclarationTemplate = function (type, idName) {
             Compiler.Logger.log("Template for variable declaration");
 
@@ -103,15 +117,26 @@ var Compiler;
                 this.setCode(tempName);
                 this.setCode("XX");
             } else {
-                Compiler.Logger.log("String declaration (NOT IMPLEMENTED)");
+                // TODO: Remove after testing
+                Compiler.Logger.log("String declaration");
+
+                var tempName = "T" + this.tempTable.length.toString();
+
+                var newEntry = new TempTableEntry();
+                newEntry.tempName = tempName;
+                newEntry.idName = idName;
+                newEntry.addressOffset = -1;
+
+                this.tempTable.push(newEntry);
             }
         };
 
         CodeGenerator.assignmentDeclarationTemplate = function (idName, idType, value) {
             if (idType === types.INT) {
-                Compiler.Logger.log("Assignment of int");
+                Compiler.Logger.log("Int assignment (NOT IMPLEMENTED)");
             } else if (idType === types.BOOLEAN) {
-                // TODO: Convert value to 0 (false) or 1 (true) or use string rep of true / false
+                // TODO: Convert value to 0 (false) or 1 (true)
+                Compiler.Logger.log("Bool assignment (NOT IMPLEMENTED)");
             } else {
                 Compiler.Logger.log("String assignment (NOT IMPLEMENTED)");
             }
@@ -122,16 +147,45 @@ var Compiler;
             this.currentIndex++;
         };
 
+        CodeGenerator.setCodeAtIndex = function (index, input) {
+            this.codeList[index] = input;
+        };
+
+        CodeGenerator.backPatchCode = function () {
+            // currentIndex should point to beginning of static code
+            var currentCodeByte = "";
+            var staticAreaStart = this.currentIndex;
+
+            for (var cursorIndex = 0; cursorIndex < staticAreaStart; cursorIndex++) {
+                currentCodeByte = this.codeList[cursorIndex];
+
+                // All temp variables start with T
+                if (/^T/.test(currentCodeByte)) {
+                    var substringIndex = parseInt(currentCodeByte.substring(1), 10);
+                    var tempTableEntry = this.tempTable[substringIndex];
+
+                    var newIndex = staticAreaStart + tempTableEntry.addressOffset;
+                    var hexLocation = Compiler.Utils.decimalToHex(newIndex);
+
+                    Compiler.Logger.log("New index for entry " + currentCodeByte + " is: " + hexLocation);
+
+                    this.setCodeAtIndex(cursorIndex, hexLocation);
+                    this.setCodeAtIndex(cursorIndex + 1, "00");
+                }
+            }
+        };
+
         // TODO: Delete after testing
         CodeGenerator.debugPrintTempTable = function () {
             if (this.tempTable.length > 0) {
+                Compiler.Logger.log("");
                 Compiler.Logger.log("Temp Table");
                 Compiler.Logger.log("----------------");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
                     var entry = this.tempTable[i];
 
-                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | +" + entry.addressOffset);
+                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset);
                 }
             }
         };

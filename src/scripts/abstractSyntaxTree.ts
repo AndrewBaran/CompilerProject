@@ -442,11 +442,13 @@ module Compiler {
                             var typeToPropagate: string = leftType;
 
                             // Propagate boolean result from comparison
-                            if(root.getValue() === astNodeTypes.EQUAL || root.getValue() === astNodeTypes.NOT_EQUAL) {
+                            if (root.getValue() === astNodeTypes.EQUAL || root.getValue() === astNodeTypes.NOT_EQUAL) {
                                 typeToPropagate = types.BOOLEAN;
                             }
 
-	                        parentNode.setSynthesizedType(typeToPropagate);
+                            Logger.logVerbose("Propagating the type " + typeToPropagate + " on line " + root.childList[0].getLineNumber() + " up to the parent " + parentNode.getValue());
+
+                            parentNode.setSynthesizedType(typeToPropagate);
                         }
 
                         root.setTypeInfo(leftType);
@@ -459,6 +461,18 @@ module Compiler {
                         Logger.log(errorMessage);
                         throw errorMessage;
                     }
+                }
+
+                else if(leftType !== "" && rightType === "") {
+
+                    Logger.logVerbose("Setting type of " + root.getValue() + " on line " + root.childList[0].getLineNumber() + " to " + leftType);
+                    root.setTypeInfo(leftType);
+                }
+
+                else if(leftType === "" && rightType !== "") {
+
+                    Logger.logVerbose("Setting type of " + root.getValue() + " on line " + root.childList[0].getLineNumber() + " to " + rightType);
+                    root.setTypeInfo(rightType);
                 }
             }
 

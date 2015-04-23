@@ -46,3 +46,24 @@ Final Project Checklist
 =======================
 
 - [ ] Write a code generator that takes your AST and generates 6502a machine code for our grammar 
+	- [x] Variable Declarations
+		- [x] Int
+		- [x] Boolean
+		- [x] String
+	- [ ] Assignment Statements
+		- [ ] Int
+		- [ ] Int Addition
+		- [ ] Boolean
+		- [ ] Boolean Comparisons
+		- [ ] String
+	- [ ] Print Statements
+		- [ ] Int
+		- [ ] Int Addition
+		- [ ] Boolean
+		- [ ] Boolean Comparisons
+		- [ ] String
+	- [ ] While Statements
+	- [ ] If Statements
+	- [ ] Backpatching
+		- [ ] Temp Var Table
+		- [ ] Jump Table

@@ -16,7 +16,11 @@ module Compiler {
             Logger.log("");
 
             this.setupEnvironment(abstractSyntaxTree, symbolTable);
+
             this.buildCode(abstractSyntaxTree.getRoot());
+            this.setCode("00"); // Program break
+
+            this.backPatchCode();
 
             Logger.logVerbose("");
             Logger.log("Code Generation Completed");
@@ -83,7 +87,17 @@ module Compiler {
 
                 case astNodeTypes.PRINT_STATEMENT:
 
-                    Logger.log("Print statement");
+                    var type: string = root.getTypeInfo();
+                    Logger.log("Print statement for type: " + type);
+
+                    if(type === "") {
+
+                        var error: string = "Error! Print didn't get a synthesized type.";
+
+                        Logger.log(error);
+                        throw error;
+                    }
+
                     break;
 
                 default:
@@ -92,11 +106,11 @@ module Compiler {
             }
 
             for(var i: number = 0; i < root.getChildren().length; i++) {
-
                 this.buildCode(root.getChildren()[i]);
             }
         }
 
+        // TODO: Case where string declared, then int/bool causes int/bool to skip a space in static space
         private static varDeclarationTemplate(type: string, idName: string): void {
 
             Logger.log("Template for variable declaration");
@@ -123,9 +137,19 @@ module Compiler {
                 this.setCode("XX");
             }
 
-            // TODO: String case
             else {
-                Logger.log("String declaration (NOT IMPLEMENTED)");
+
+                // TODO: Remove after testing
+                Logger.log("String declaration");
+
+                var tempName: string = "T" + this.tempTable.length.toString();
+
+                var newEntry: TempTableEntry = new TempTableEntry();
+                newEntry.tempName = tempName;
+                newEntry.idName = idName;
+                newEntry.addressOffset = -1;
+
+                this.tempTable.push(newEntry);
             }
 
         }
@@ -134,13 +158,13 @@ module Compiler {
 
             if(idType === types.INT) {
 
-                Logger.log("Assignment of int");
-
+                Logger.log("Int assignment (NOT IMPLEMENTED)");
             }
 
             else if(idType === types.BOOLEAN) {
 
-                // TODO: Convert value to 0 (false) or 1 (true) or use string rep of true / false
+                // TODO: Convert value to 0 (false) or 1 (true)
+                Logger.log("Bool assignment (NOT IMPLEMENTED)");
             }
 
             // String
@@ -156,11 +180,44 @@ module Compiler {
             this.currentIndex++;
         }
 
+        private static setCodeAtIndex(index: number, input: string): void {
+            this.codeList[index] = input;
+        }
+
+        private static backPatchCode(): void {
+
+            // currentIndex should point to beginning of static code
+            var currentCodeByte: string = "";
+            var staticAreaStart: number = this.currentIndex;
+
+            for(var cursorIndex: number = 0; cursorIndex < staticAreaStart; cursorIndex++) {
+
+                currentCodeByte = this.codeList[cursorIndex];
+
+                // All temp variables start with T
+                if(/^T/.test(currentCodeByte)) {
+
+                    var substringIndex: number = parseInt(currentCodeByte.substring(1), 10);
+                    var tempTableEntry: TempTableEntry = this.tempTable[substringIndex];
+
+                    var newIndex: number = staticAreaStart + tempTableEntry.addressOffset;
+                    var hexLocation: string = Utils.decimalToHex(newIndex);
+
+                    Logger.log("New index for entry " + currentCodeByte + " is: " + hexLocation);
+
+                    this.setCodeAtIndex(cursorIndex, hexLocation);
+                    this.setCodeAtIndex(cursorIndex + 1, "00");
+
+                }
+            }
+        }
+
         // TODO: Delete after testing
         private static debugPrintTempTable(): void {
 
             if(this.tempTable.length > 0) {
 
+                Logger.log("");
                 Logger.log("Temp Table");
                 Logger.log("----------------");
 
@@ -168,7 +225,7 @@ module Compiler {
 
                     var entry: TempTableEntry = this.tempTable[i];
 
-                    Logger.log(entry.tempName + " | " + entry.idName + " | +" + entry.addressOffset);
+                    Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset);
                 }
             }
         }

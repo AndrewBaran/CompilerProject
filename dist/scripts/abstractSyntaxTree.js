@@ -370,6 +370,8 @@ var Compiler;
                                 typeToPropagate = types.BOOLEAN;
                             }
 
+                            Compiler.Logger.logVerbose("Propagating the type " + typeToPropagate + " on line " + root.childList[0].getLineNumber() + " up to the parent " + parentNode.getValue());
+
                             parentNode.setSynthesizedType(typeToPropagate);
                         }
 
@@ -380,6 +382,12 @@ var Compiler;
                         Compiler.Logger.log(errorMessage);
                         throw errorMessage;
                     }
+                } else if (leftType !== "" && rightType === "") {
+                    Compiler.Logger.logVerbose("Setting type of " + root.getValue() + " on line " + root.childList[0].getLineNumber() + " to " + leftType);
+                    root.setTypeInfo(leftType);
+                } else if (leftType === "" && rightType !== "") {
+                    Compiler.Logger.logVerbose("Setting type of " + root.getValue() + " on line " + root.childList[0].getLineNumber() + " to " + rightType);
+                    root.setTypeInfo(rightType);
                 }
             }
         };

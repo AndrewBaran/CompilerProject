@@ -16,6 +16,17 @@ var Compiler;
 
             return leafMatched;
         };
+
+        Utils.decimalToHex = function (decimalInput) {
+            var hexResult = decimalInput.toString(16);
+
+            // Pad if necessary
+            if (hexResult.length === 1) {
+                hexResult = "0" + hexResult;
+            }
+
+            return hexResult.toUpperCase();
+        };
         return Utils;
     })();
     Compiler.Utils = Utils;

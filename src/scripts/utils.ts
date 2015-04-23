@@ -19,5 +19,17 @@ module Compiler {
 			return leafMatched;
 		}
 
+        public static decimalToHex(decimalInput: number): string {
+
+            var hexResult: string = decimalInput.toString(16);
+
+            // Pad if necessary
+            if(hexResult.length === 1) {
+                hexResult = "0" + hexResult;
+            }
+
+            return hexResult.toUpperCase(); 
+        }
+
 	}
 }
