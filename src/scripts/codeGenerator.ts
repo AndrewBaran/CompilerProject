@@ -127,6 +127,7 @@ module Compiler {
                 this.setCode("XX");
             }
 
+            // TODO: Not right?
             else {
 
                 // TODO: Remove after testing
@@ -165,14 +166,9 @@ module Compiler {
 
         private static printStatementTemplate(printNode: ASTNode): void {
 
-            var typeToPrint: string = printNode.getTypeInfo();
-
-            Logger.log("Template of print");
-            Logger.log("Printing type " + typeToPrint);
-
             var firstChildNode: ASTNode = printNode.getChildren()[0];
 
-            // Compound expression (addition involved)
+            // TODO: Compound expression (addition or comparisons involved)
             if(firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
 
                 Logger.log("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
@@ -215,7 +211,41 @@ module Compiler {
                 this.setCode("FF");
             }
 
-            // TODO: Add string and boolean cases
+            else if(firstChildNode.getTokenType() === TokenType[TokenType.T_TRUE]){
+
+                // True is equivalent to 1
+                var digitToPrint: string = "01";
+
+                // Load the Y register with the digit being printed
+                this.setCode("A0");
+                this.setCode(digitToPrint);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            }
+
+            else if(firstChildNode.getTokenType() === TokenType[TokenType.T_FALSE]) {
+
+                // False is equivalent to 0
+                var digitToPrint: string = "00";
+
+                // Load the Y register with the digit being printed
+                this.setCode("A0");
+                this.setCode(digitToPrint);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            }
+
+            // TODO: Add string case
             else {
 
             }

@@ -134,14 +134,9 @@ var Compiler;
         };
 
         CodeGenerator.printStatementTemplate = function (printNode) {
-            var typeToPrint = printNode.getTypeInfo();
-
-            Compiler.Logger.log("Template of print");
-            Compiler.Logger.log("Printing type " + typeToPrint);
-
             var firstChildNode = printNode.getChildren()[0];
 
-            // Compound expression (addition involved)
+            // TODO: Compound expression (addition or comparisons involved)
             if (firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
                 Compiler.Logger.log("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
             } else if (firstChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
@@ -166,6 +161,34 @@ var Compiler;
                 this.setCode("AC");
                 this.setCode(tempName);
                 this.setCode("XX");
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            } else if (firstChildNode.getTokenType() === TokenType[25 /* T_TRUE */]) {
+                // True is equivalent to 1
+                var digitToPrint = "01";
+
+                // Load the Y register with the digit being printed
+                this.setCode("A0");
+                this.setCode(digitToPrint);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            } else if (firstChildNode.getTokenType() === TokenType[24 /* T_FALSE */]) {
+                // False is equivalent to 0
+                var digitToPrint = "00";
+
+                // Load the Y register with the digit being printed
+                this.setCode("A0");
+                this.setCode(digitToPrint);
 
                 // Load 1 into X register to get ready to print an int
                 this.setCode("A2");
