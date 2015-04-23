@@ -72,16 +72,7 @@ var Compiler;
                     break;
 
                 case astNodeTypes.PRINT_STATEMENT:
-                    var type = root.getTypeInfo();
-                    Compiler.Logger.log("Print statement for type: " + type);
-
-                    if (type === "") {
-                        var error = "Error! Print didn't get a synthesized type.";
-
-                        Compiler.Logger.log(error);
-                        throw error;
-                    }
-
+                    this.printStatementTemplate(root);
                     break;
 
                 default:
@@ -142,6 +133,50 @@ var Compiler;
             }
         };
 
+        CodeGenerator.printStatementTemplate = function (printNode) {
+            var typeToPrint = printNode.getTypeInfo();
+
+            Compiler.Logger.log("Template of print");
+            Compiler.Logger.log("Printing type " + typeToPrint);
+
+            var firstChildNode = printNode.getChildren()[0];
+
+            // Compound expression (addition involved)
+            if (firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
+                Compiler.Logger.log("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
+            } else if (firstChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
+                // Pad digit with 0 (digits range from 0-9 only)
+                var digitToPrint = "0" + firstChildNode.getValue();
+
+                // Load the Y register with the digit being printed
+                this.setCode("A0");
+                this.setCode(digitToPrint);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            } else if (firstChildNode.getTokenType() === TokenType[12 /* T_ID */]) {
+                var id = firstChildNode.getValue();
+                var tempName = this.getEntryNameById(id);
+
+                // Load the Y register from the memory address of the id
+                this.setCode("AC");
+                this.setCode(tempName);
+                this.setCode("XX");
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            } else {
+            }
+        };
+
         CodeGenerator.setCode = function (input) {
             this.codeList[this.currentIndex] = input;
             this.currentIndex++;
@@ -167,7 +202,9 @@ var Compiler;
                     var newIndex = staticAreaStart + tempTableEntry.addressOffset;
                     var hexLocation = Compiler.Utils.decimalToHex(newIndex);
 
+                    // TODO: Remove after testing (or make verbose only)
                     Compiler.Logger.log("New index for entry " + currentCodeByte + " is: " + hexLocation);
+                    tempTableEntry.resolvedAddress = hexLocation;
 
                     this.setCodeAtIndex(cursorIndex, hexLocation);
                     this.setCodeAtIndex(cursorIndex + 1, "00");
@@ -180,21 +217,49 @@ var Compiler;
             if (this.tempTable.length > 0) {
                 Compiler.Logger.log("");
                 Compiler.Logger.log("Temp Table");
-                Compiler.Logger.log("----------------");
+                Compiler.Logger.log("--------------------------------");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
                     var entry = this.tempTable[i];
 
-                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset);
+                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress);
                 }
+            }
+        };
+
+        CodeGenerator.getEntryNameById = function (idName) {
+            var currentEntry = null;
+            var entryFound = false;
+
+            for (var i = this.tempTable.length - 1; i >= 0 && !entryFound; i--) {
+                currentEntry = this.tempTable[i];
+
+                if (currentEntry.idName === idName) {
+                    entryFound = true;
+                    break;
+                }
+            }
+
+            if (entryFound) {
+                return currentEntry.tempName;
+            } else {
+                var errorMessage = "Error! Id " + idName + " was not found in the temp table";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
             }
         };
         return CodeGenerator;
     })();
     Compiler.CodeGenerator = CodeGenerator;
 
+    // TODO: Remove resolvedAddress after testing
     var TempTableEntry = (function () {
         function TempTableEntry() {
+            this.tempName = "";
+            this.idName = "";
+            this.addressOffset = -1;
+            this.resolvedAddress = "";
         }
         return TempTableEntry;
     })();

@@ -87,17 +87,7 @@ module Compiler {
 
                 case astNodeTypes.PRINT_STATEMENT:
 
-                    var type: string = root.getTypeInfo();
-                    Logger.log("Print statement for type: " + type);
-
-                    if(type === "") {
-
-                        var error: string = "Error! Print didn't get a synthesized type.";
-
-                        Logger.log(error);
-                        throw error;
-                    }
-
+                    this.printStatementTemplate(root);
                     break;
 
                 default:
@@ -173,6 +163,66 @@ module Compiler {
             }
         }
 
+        private static printStatementTemplate(printNode: ASTNode): void {
+
+            var typeToPrint: string = printNode.getTypeInfo();
+
+            Logger.log("Template of print");
+            Logger.log("Printing type " + typeToPrint);
+
+            var firstChildNode: ASTNode = printNode.getChildren()[0];
+
+            // Compound expression (addition involved)
+            if(firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
+
+                Logger.log("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
+            }
+
+            // Single digit
+            else if(firstChildNode.getTokenType() === TokenType[TokenType.T_DIGIT]) {
+
+                // Pad digit with 0 (digits range from 0-9 only)
+                var digitToPrint: string = "0" + firstChildNode.getValue();
+
+                // Load the Y register with the digit being printed
+                this.setCode("A0");
+                this.setCode(digitToPrint);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            }
+
+            // Single ID
+            else if(firstChildNode.getTokenType() === TokenType[TokenType.T_ID]) {
+
+                var id: string = firstChildNode.getValue();
+                var tempName: string = this.getEntryNameById(id);
+
+                // Load the Y register from the memory address of the id
+                this.setCode("AC");
+                this.setCode(tempName);
+                this.setCode("XX");
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
+            }
+
+            // TODO: Add string and boolean cases
+            else {
+
+            }
+
+
+        }
+
 
         private static setCode(input: string): void {
 
@@ -203,7 +253,9 @@ module Compiler {
                     var newIndex: number = staticAreaStart + tempTableEntry.addressOffset;
                     var hexLocation: string = Utils.decimalToHex(newIndex);
 
+                    // TODO: Remove after testing (or make verbose only)
                     Logger.log("New index for entry " + currentCodeByte + " is: " + hexLocation);
+                    tempTableEntry.resolvedAddress = hexLocation;
 
                     this.setCodeAtIndex(cursorIndex, hexLocation);
                     this.setCodeAtIndex(cursorIndex + 1, "00");
@@ -219,27 +271,64 @@ module Compiler {
 
                 Logger.log("");
                 Logger.log("Temp Table");
-                Logger.log("----------------");
+                Logger.log("--------------------------------");
 
                 for(var i: number = 0; i < this.tempTable.length; i++) {
 
                     var entry: TempTableEntry = this.tempTable[i];
 
-                    Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset);
+                    Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress);
                 }
+            }
+        }
+
+        private static getEntryNameById(idName: string): string {
+
+            var currentEntry: TempTableEntry = null;
+            var entryFound: boolean = false;
+
+            // TODO: Search backwards for most recent declaration?
+            for(var i: number = this.tempTable.length - 1; i >= 0 && !entryFound; i--) {
+
+                currentEntry = this.tempTable[i];
+
+                if(currentEntry.idName === idName) {
+
+                    entryFound = true;
+                    break;
+                }
+            }
+
+            if(entryFound) {
+                return currentEntry.tempName;
+            }
+
+            else {
+
+                var errorMessage: string = "Error! Id " + idName + " was not found in the temp table";
+
+                Logger.log(errorMessage);
+                throw errorMessage;
             }
         }
 
     }
 
 
+    // TODO: Remove resolvedAddress after testing
     class TempTableEntry {
 
         public tempName: string;
         public idName: string;
         public addressOffset: number;
+        public resolvedAddress: string;
 
         constructor() {
+
+            this.tempName = "";
+            this.idName = "";
+            this.addressOffset = -1;
+            this.resolvedAddress = "";
 
         }
     }
