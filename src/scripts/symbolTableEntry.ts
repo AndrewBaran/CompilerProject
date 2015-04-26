@@ -6,6 +6,7 @@ module Compiler {
 		private idName: string;
 		private idType: string;
 		private lineNumber: number;
+        private scopeLevel: number;
 
         private isInitialized: boolean;
 
@@ -17,6 +18,7 @@ module Compiler {
 			this.idName = "";
 			this.idType = "";
 			this.lineNumber = -1;
+            this.scopeLevel = -1;
 
             this.isInitialized = false;
 
@@ -54,6 +56,14 @@ module Compiler {
 		public setLineNumber(lineNumber: number): void {
 			this.lineNumber = lineNumber;
 		}
+
+        public getScopeLevel(): number {
+            return this.scopeLevel;
+        }
+
+        public setScopeLevel(scopeLevel: number): void {
+            this.scopeLevel = scopeLevel;
+        }
 
 		public getIsInitialized(): boolean {
             return this.isInitialized;

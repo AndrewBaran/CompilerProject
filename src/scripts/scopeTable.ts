@@ -34,12 +34,13 @@ module Compiler {
 			entry.setIdName(idName);
 			entry.setIdType(typeInfo);
             entry.setLineNumber(lineNumber);
+            entry.setScopeLevel(this.scopeLevel);
 
 			var hashIndex: number = this.hashID(idName);
 
 			if(this.entryTable[hashIndex] === null) {
 
-                Logger.logVerbose("Inserting id " + idName + " from line " + lineNumber + " into symbol table");
+                Logger.logVerbose("Inserting id " + idName + " from line " + lineNumber + " into symbol table at scope: " + entry.getScopeLevel());
 
 				this.entryTable[hashIndex] = entry;
 				return true;

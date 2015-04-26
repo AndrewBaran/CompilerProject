@@ -6,6 +6,7 @@ var Compiler;
             this.idName = "";
             this.idType = "";
             this.lineNumber = -1;
+            this.scopeLevel = -1;
 
             this.isInitialized = false;
 
@@ -41,6 +42,14 @@ var Compiler;
 
         SymbolTableEntry.prototype.setLineNumber = function (lineNumber) {
             this.lineNumber = lineNumber;
+        };
+
+        SymbolTableEntry.prototype.getScopeLevel = function () {
+            return this.scopeLevel;
+        };
+
+        SymbolTableEntry.prototype.setScopeLevel = function (scopeLevel) {
+            this.scopeLevel = scopeLevel;
         };
 
         SymbolTableEntry.prototype.getIsInitialized = function () {

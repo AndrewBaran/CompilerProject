@@ -295,7 +295,7 @@ module Compiler {
                         var lineNumber: number = root.childList[1].getLineNumber();
                         var type: string = root.childList[0].getValue();
 
-                        var insertResult = symbolTable.insertEntry(id, type, lineNumber);
+                        var insertResult: boolean = symbolTable.insertEntry(id, type, lineNumber);
 
                         optionalPath = astNodeTypes.VAR_DECLARATION;
 

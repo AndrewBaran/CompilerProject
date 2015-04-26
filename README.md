@@ -64,7 +64,7 @@ Final Project Checklist
 		- [ ] String
 		- [x] Int Id
 		- [x] Boolean Id
-		- [ ] String Id
+		- [x] String Id
 	- [ ] While Statements
 	- [ ] If Statements
 	- [ ] Backpatching

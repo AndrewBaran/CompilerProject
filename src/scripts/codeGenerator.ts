@@ -50,7 +50,7 @@ module Compiler {
 
             this.tempTable = [];
 
-            this.heapPointer = _Constants.MAX_CODE_SIZE - 1;
+            this.heapPointer = _Constants.MAX_CODE_SIZE;
         }
 
         private static buildCode(root: ASTNode): void {
@@ -67,22 +67,13 @@ module Compiler {
 
                 case astNodeTypes.VAR_DECLARATION:
 
-                    var type: string = root.getChildren()[0].getTypeInfo();
-                    var idName: string = root.getChildren()[1].getValue();
-
-                    this.varDeclarationTemplate(type, idName);
-
+                    this.varDeclarationTemplate(root);
                     break;
 
+                // TODO: Make it so I pass AST node
                 case astNodeTypes.ASSIGNMENT_STATEMENT:
 
-                    var idName: string = root.getChildren()[0].getValue();
-                    var type: string = root.getChildren()[0].getSymbolTableEntry().getIdType();
-
-                    // TODO: Doesn't work for addition chains or boolean expresions
-                    var value: string = root.getChildren()[1].getValue();
-
-                    this.assignmentDeclarationTemplate(idName, type, value);
+                    this.assignmentDeclarationTemplate(root);
 
                     break;
 
@@ -101,7 +92,11 @@ module Compiler {
             }
         }
 
-        private static varDeclarationTemplate(type: string, idName: string): void {
+        private static varDeclarationTemplate(declarationNode: ASTNode): void {
+
+            var type: string = declarationNode.getChildren()[0].getValue();
+            var idName: string = declarationNode.getChildren()[1].getValue();
+            var scopeLevel: number = declarationNode.getChildren()[1].getSymbolTableEntry().getScopeLevel();
 
             if(type === types.INT || type === types.BOOLEAN) {
 
@@ -117,6 +112,7 @@ module Compiler {
                 var newEntry: TempTableEntry = new TempTableEntry();
                 newEntry.tempName = tempName;
                 newEntry.idName = idName;
+                newEntry.scopeLevel = scopeLevel;
                 newEntry.addressOffset = tempOffset;
 
                 this.tempTable.push(newEntry);
@@ -137,6 +133,7 @@ module Compiler {
                 var newEntry: TempTableEntry = new TempTableEntry();
                 newEntry.tempName = tempName;
                 newEntry.idName = idName;
+                newEntry.scopeLevel = scopeLevel;
                 newEntry.addressOffset = tempOffset;
 
                 this.tempTable.push(newEntry);
@@ -144,7 +141,9 @@ module Compiler {
 
         }
 
-        private static assignmentDeclarationTemplate(idName: string, idType: string, value: string) {
+        private static assignmentDeclarationTemplate(assignmentNode: ASTNode): void {
+
+            var idType: string = assignmentNode.getTypeInfo();
 
             if(idType === types.INT) {
 
@@ -161,12 +160,9 @@ module Compiler {
             else {
 
                 Logger.logVerbose("Inserting String Assignment (NOT IMPLEMENTED)");
+                var value: string = assignmentNode.getChildren()[1].getValue();
 
-
-
-
-
-
+                var startAddress: number = this.addToHeap(value);
             }
         }
 
@@ -201,22 +197,34 @@ module Compiler {
             }
 
             // Single ID
-            // TODO: Make it work with strings
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_ID]) {
 
                 Logger.logVerbose("Inserting Print Statement of id with type " + firstChildNode.getSymbolTableEntry().getIdType());
 
                 var id: string = firstChildNode.getValue();
-                var tempName: string = this.getEntryNameById(id);
+                var scopeLevel: number = firstChildNode.getSymbolTableEntry().getScopeLevel();
+                var tempName: string = this.getEntryNameById(id, scopeLevel);
 
                 // Load the Y register from the memory address of the id
                 this.setCode("AC");
                 this.setCode(tempName);
                 this.setCode("XX");
 
-                // Load 1 into X register to get ready to print an int
-                this.setCode("A2");
-                this.setCode("01");
+                var type: string = firstChildNode.getTypeInfo();
+
+                // Load 1 into X register to get ready to print an int / boolean
+                if(type === types.INT || type === types.BOOLEAN) {
+
+                    this.setCode("A2");
+                    this.setCode("01");
+                }
+
+                // Load 2 into X register to get ready to print a string
+                else {
+
+                    this.setCode("A2");
+                    this.setCode("02");
+                }
 
                 // System call
                 this.setCode("FF");
@@ -310,6 +318,21 @@ module Compiler {
             }
         }
 
+        private static addToHeap(stringValue: string): number {
+
+            Logger.logVerbose("Adding the string \"" + stringValue + "\" to the heap");
+
+            // Include null terminator
+            var stringLength: number = stringValue.length + 1;
+            var startAddress: number = this.heapPointer - stringLength;
+
+            Logger.log("Starting address for string " + stringValue + " is " + startAddress);
+
+            // Check if heap clashes with static
+
+            return 255;
+        }
+
         // TODO: Delete after testing
         private static debugPrintTempTable(): void {
 
@@ -318,27 +341,31 @@ module Compiler {
                 Logger.log("");
                 Logger.log("Temp Table");
                 Logger.log("--------------------------------");
+                Logger.log("Name | Id | Offset | Resolved | Scope");
 
                 for(var i: number = 0; i < this.tempTable.length; i++) {
 
                     var entry: TempTableEntry = this.tempTable[i];
 
-                    Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress);
+                    Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress + " | " + entry.scopeLevel);
                 }
             }
         }
 
-        private static getEntryNameById(idName: string): string {
+        private static getEntryNameById(idName: string, scopeLevel: number): string {
+
+            Logger.logVerbose("Looking for id " + idName + " in scope " + scopeLevel);
 
             var currentEntry: TempTableEntry = null;
             var entryFound: boolean = false;
 
-            // TODO: Search backwards for most recent declaration?
             for(var i: number = this.tempTable.length - 1; i >= 0 && !entryFound; i--) {
 
                 currentEntry = this.tempTable[i];
 
-                if(currentEntry.idName === idName) {
+                if(currentEntry.idName === idName && currentEntry.scopeLevel === scopeLevel) {
+
+                    Logger.logVerbose("Id " + idName + " in scope " + scopeLevel + " was found");
 
                     entryFound = true;
                     break;

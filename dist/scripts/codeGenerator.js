@@ -39,7 +39,7 @@ var Compiler;
 
             this.tempTable = [];
 
-            this.heapPointer = _Constants.MAX_CODE_SIZE - 1;
+            this.heapPointer = _Constants.MAX_CODE_SIZE;
         };
 
         CodeGenerator.buildCode = function (root) {
@@ -51,21 +51,11 @@ var Compiler;
                     break;
 
                 case astNodeTypes.VAR_DECLARATION:
-                    var type = root.getChildren()[0].getTypeInfo();
-                    var idName = root.getChildren()[1].getValue();
-
-                    this.varDeclarationTemplate(type, idName);
-
+                    this.varDeclarationTemplate(root);
                     break;
 
                 case astNodeTypes.ASSIGNMENT_STATEMENT:
-                    var idName = root.getChildren()[0].getValue();
-                    var type = root.getChildren()[0].getSymbolTableEntry().getIdType();
-
-                    // TODO: Doesn't work for addition chains or boolean expresions
-                    var value = root.getChildren()[1].getValue();
-
-                    this.assignmentDeclarationTemplate(idName, type, value);
+                    this.assignmentDeclarationTemplate(root);
 
                     break;
 
@@ -82,7 +72,11 @@ var Compiler;
             }
         };
 
-        CodeGenerator.varDeclarationTemplate = function (type, idName) {
+        CodeGenerator.varDeclarationTemplate = function (declarationNode) {
+            var type = declarationNode.getChildren()[0].getValue();
+            var idName = declarationNode.getChildren()[1].getValue();
+            var scopeLevel = declarationNode.getChildren()[1].getSymbolTableEntry().getScopeLevel();
+
             if (type === types.INT || type === types.BOOLEAN) {
                 Compiler.Logger.logVerbose("Inserting Int / Boolean Declaration of id " + idName);
 
@@ -96,6 +90,7 @@ var Compiler;
                 var newEntry = new TempTableEntry();
                 newEntry.tempName = tempName;
                 newEntry.idName = idName;
+                newEntry.scopeLevel = scopeLevel;
                 newEntry.addressOffset = tempOffset;
 
                 this.tempTable.push(newEntry);
@@ -113,13 +108,16 @@ var Compiler;
                 var newEntry = new TempTableEntry();
                 newEntry.tempName = tempName;
                 newEntry.idName = idName;
+                newEntry.scopeLevel = scopeLevel;
                 newEntry.addressOffset = tempOffset;
 
                 this.tempTable.push(newEntry);
             }
         };
 
-        CodeGenerator.assignmentDeclarationTemplate = function (idName, idType, value) {
+        CodeGenerator.assignmentDeclarationTemplate = function (assignmentNode) {
+            var idType = assignmentNode.getTypeInfo();
+
             if (idType === types.INT) {
                 Compiler.Logger.logVerbose("Inserting Integer Assignment (NOT IMPLEMENTED)");
             } else if (idType === types.BOOLEAN) {
@@ -127,6 +125,9 @@ var Compiler;
                 Compiler.Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
             } else {
                 Compiler.Logger.logVerbose("Inserting String Assignment (NOT IMPLEMENTED)");
+                var value = assignmentNode.getChildren()[1].getValue();
+
+                var startAddress = this.addToHeap(value);
             }
         };
 
@@ -156,16 +157,24 @@ var Compiler;
                 Compiler.Logger.logVerbose("Inserting Print Statement of id with type " + firstChildNode.getSymbolTableEntry().getIdType());
 
                 var id = firstChildNode.getValue();
-                var tempName = this.getEntryNameById(id);
+                var scopeLevel = firstChildNode.getSymbolTableEntry().getScopeLevel();
+                var tempName = this.getEntryNameById(id, scopeLevel);
 
                 // Load the Y register from the memory address of the id
                 this.setCode("AC");
                 this.setCode(tempName);
                 this.setCode("XX");
 
-                // Load 1 into X register to get ready to print an int
-                this.setCode("A2");
-                this.setCode("01");
+                var type = firstChildNode.getTypeInfo();
+
+                // Load 1 into X register to get ready to print an int / boolean
+                if (type === types.INT || type === types.BOOLEAN) {
+                    this.setCode("A2");
+                    this.setCode("01");
+                } else {
+                    this.setCode("A2");
+                    this.setCode("02");
+                }
 
                 // System call
                 this.setCode("FF");
@@ -242,29 +251,47 @@ var Compiler;
             }
         };
 
+        CodeGenerator.addToHeap = function (stringValue) {
+            Compiler.Logger.logVerbose("Adding the string \"" + stringValue + "\" to the heap");
+
+            // Include null terminator
+            var stringLength = stringValue.length + 1;
+            var startAddress = this.heapPointer - stringLength;
+
+            Compiler.Logger.log("Starting address for string " + stringValue + " is " + startAddress);
+
+            // Check if heap clashes with static
+            return 255;
+        };
+
         // TODO: Delete after testing
         CodeGenerator.debugPrintTempTable = function () {
             if (this.tempTable.length > 0) {
                 Compiler.Logger.log("");
                 Compiler.Logger.log("Temp Table");
                 Compiler.Logger.log("--------------------------------");
+                Compiler.Logger.log("Name | Id | Offset | Resolved | Scope");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
                     var entry = this.tempTable[i];
 
-                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress);
+                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress + " | " + entry.scopeLevel);
                 }
             }
         };
 
-        CodeGenerator.getEntryNameById = function (idName) {
+        CodeGenerator.getEntryNameById = function (idName, scopeLevel) {
+            Compiler.Logger.logVerbose("Looking for id " + idName + " in scope " + scopeLevel);
+
             var currentEntry = null;
             var entryFound = false;
 
             for (var i = this.tempTable.length - 1; i >= 0 && !entryFound; i--) {
                 currentEntry = this.tempTable[i];
 
-                if (currentEntry.idName === idName) {
+                if (currentEntry.idName === idName && currentEntry.scopeLevel === scopeLevel) {
+                    Compiler.Logger.logVerbose("Id " + idName + " in scope " + scopeLevel + " was found");
+
                     entryFound = true;
                     break;
                 }
