@@ -58,7 +58,7 @@ Final Project Checklist
 		- [x] Boolean Id
 		- [ ] Boolean Comparisons
 		- [x] String
-		- [ ] String Id
+		- [x] String Id
 	- [ ] Print Statements
 		- [x] Int Literal
 		- [ ] Int Addition

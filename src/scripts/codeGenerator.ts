@@ -147,8 +147,6 @@ module Compiler {
 
             if(idType === types.INT) {
 
-                Logger.logVerbose("Inserting Integer Assignment (NOT IMPLEMENTED)");
-
                 var rightChildNode: ASTNode = assignmentNode.getChildren()[1];
 
                 if(rightChildNode.getNodeType() === treeNodeTypes.LEAF) {
@@ -209,8 +207,6 @@ module Compiler {
             }
 
             else if(idType === types.BOOLEAN) {
-
-                Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
 
                 var rightChildNode: ASTNode = assignmentNode.getChildren()[1];
 
@@ -283,28 +279,58 @@ module Compiler {
 
             }
 
-            // TODO: Id to id
             // String
             else {
 
-                var id: string = assignmentNode.getChildren()[0].getValue();
-                var value: string = assignmentNode.getChildren()[1].getValue();
+                var leftChildNode: ASTNode = assignmentNode.getChildren()[0];
+                var rightChildNode: ASTNode = assignmentNode.getChildren()[1];
 
-                Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
+                // Assigning a string literal
+                if(rightChildNode.getTokenType() === TokenType[TokenType.T_STRING_EXPRESSION]) {
 
-                var startAddress: string = Utils.decimalToHex(this.addToHeap(value));
+                    var id: string = leftChildNode.getValue();
+                    var value: string = rightChildNode.getValue();
 
-                var scopeLevel: number = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
-                var tempName: string = this.getEntryNameById(id, scopeLevel);
+                    Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
 
-                // Load accumulator with the address of the string
-                this.setCode("A9");
-                this.setCode(startAddress);
+                    var startAddress: string = Utils.decimalToHex(this.addToHeap(value));
 
-                // Store the value of the accumulator at the address of the string variable
-                this.setCode("8D");
-                this.setCode(tempName);
-                this.setCode("XX");
+                    var scopeLevel: number = leftChildNode.getSymbolTableEntry().getScopeLevel();
+                    var tempName: string = this.getEntryNameById(id, scopeLevel);
+
+                    // Load accumulator with the address of the string
+                    this.setCode("A9");
+                    this.setCode(startAddress);
+
+                    // Store the value of the accumulator at the address of the string variable
+                    this.setCode("8D");
+                    this.setCode(tempName);
+                    this.setCode("XX");
+                }
+
+                // Assigning a string id
+                else if(rightChildNode.getTokenType() === TokenType[TokenType.T_ID]) {
+
+                    var lhsId: string = leftChildNode.getValue();
+                    var lhsScopeLevel: number = leftChildNode.getSymbolTableEntry().getScopeLevel();
+                    var lhsTempName: string = this.getEntryNameById(lhsId, lhsScopeLevel);
+
+                    var rhsId: string = rightChildNode.getValue();
+                    var rhsScopeLevel: number = rightChildNode.getSymbolTableEntry().getScopeLevel();
+                    var rhsTempName: string = this.getEntryNameById(rhsId, rhsScopeLevel);
+
+                    Logger.logVerbose("Inserting String Assignment of id " + rhsId + " to id " + lhsId);
+
+                    // Load accumulator with the address of the rhs string
+                    this.setCode("AD");
+                    this.setCode(rhsTempName);
+                    this.setCode("XX");
+
+                    // Store value in accumulator as the address of the lhs string
+                    this.setCode("8D");
+                    this.setCode(lhsTempName);
+                    this.setCode("XX");
+                }
             }
         }
 
@@ -538,7 +564,6 @@ module Compiler {
                 Logger.log("");
                 Logger.log("Temp Table");
                 Logger.log("--------------------------------");
-                Logger.log("Name | Id | Offset | Resolved | Scope");
 
                 for(var i: number = 0; i < this.tempTable.length; i++) {
 

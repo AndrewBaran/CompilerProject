@@ -120,8 +120,6 @@ var Compiler;
             var idType = assignmentNode.getTypeInfo();
 
             if (idType === types.INT) {
-                Compiler.Logger.logVerbose("Inserting Integer Assignment (NOT IMPLEMENTED)");
-
                 var rightChildNode = assignmentNode.getChildren()[1];
 
                 if (rightChildNode.getNodeType() === treeNodeTypes.LEAF) {
@@ -170,8 +168,6 @@ var Compiler;
                     Compiler.Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
                 }
             } else if (idType === types.BOOLEAN) {
-                Compiler.Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
-
                 var rightChildNode = assignmentNode.getChildren()[1];
 
                 if (rightChildNode.getNodeType() === treeNodeTypes.LEAF) {
@@ -228,24 +224,50 @@ var Compiler;
                     Compiler.Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
                 }
             } else {
-                var id = assignmentNode.getChildren()[0].getValue();
-                var value = assignmentNode.getChildren()[1].getValue();
+                var leftChildNode = assignmentNode.getChildren()[0];
+                var rightChildNode = assignmentNode.getChildren()[1];
 
-                Compiler.Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
+                // Assigning a string literal
+                if (rightChildNode.getTokenType() === TokenType[27 /* T_STRING_EXPRESSION */]) {
+                    var id = leftChildNode.getValue();
+                    var value = rightChildNode.getValue();
 
-                var startAddress = Compiler.Utils.decimalToHex(this.addToHeap(value));
+                    Compiler.Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
 
-                var scopeLevel = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
-                var tempName = this.getEntryNameById(id, scopeLevel);
+                    var startAddress = Compiler.Utils.decimalToHex(this.addToHeap(value));
 
-                // Load accumulator with the address of the string
-                this.setCode("A9");
-                this.setCode(startAddress);
+                    var scopeLevel = leftChildNode.getSymbolTableEntry().getScopeLevel();
+                    var tempName = this.getEntryNameById(id, scopeLevel);
 
-                // Store the value of the accumulator at the address of the string variable
-                this.setCode("8D");
-                this.setCode(tempName);
-                this.setCode("XX");
+                    // Load accumulator with the address of the string
+                    this.setCode("A9");
+                    this.setCode(startAddress);
+
+                    // Store the value of the accumulator at the address of the string variable
+                    this.setCode("8D");
+                    this.setCode(tempName);
+                    this.setCode("XX");
+                } else if (rightChildNode.getTokenType() === TokenType[12 /* T_ID */]) {
+                    var lhsId = leftChildNode.getValue();
+                    var lhsScopeLevel = leftChildNode.getSymbolTableEntry().getScopeLevel();
+                    var lhsTempName = this.getEntryNameById(lhsId, lhsScopeLevel);
+
+                    var rhsId = rightChildNode.getValue();
+                    var rhsScopeLevel = rightChildNode.getSymbolTableEntry().getScopeLevel();
+                    var rhsTempName = this.getEntryNameById(rhsId, rhsScopeLevel);
+
+                    Compiler.Logger.logVerbose("Inserting String Assignment of id " + rhsId + " to id " + lhsId);
+
+                    // Load accumulator with the address of the rhs string
+                    this.setCode("AD");
+                    this.setCode(rhsTempName);
+                    this.setCode("XX");
+
+                    // Store value in accumulator as the address of the lhs string
+                    this.setCode("8D");
+                    this.setCode(lhsTempName);
+                    this.setCode("XX");
+                }
             }
         };
 
@@ -433,7 +455,6 @@ var Compiler;
                 Compiler.Logger.log("");
                 Compiler.Logger.log("Temp Table");
                 Compiler.Logger.log("--------------------------------");
-                Compiler.Logger.log("Name | Id | Offset | Resolved | Scope");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
                     var entry = this.tempTable[i];
