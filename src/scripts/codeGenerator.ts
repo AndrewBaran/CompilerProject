@@ -159,10 +159,24 @@ module Compiler {
             // String
             else {
 
-                Logger.logVerbose("Inserting String Assignment (NOT IMPLEMENTED)");
+                var id: string = assignmentNode.getChildren()[0].getValue();
                 var value: string = assignmentNode.getChildren()[1].getValue();
 
-                var startAddress: number = this.addToHeap(value);
+                Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
+
+                var startAddress: string = Utils.decimalToHex(this.addToHeap(value));
+
+                var scopeLevel: number = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
+                var tempName: string = this.getEntryNameById(id, scopeLevel);
+
+                // Load accumulator with the address of the string
+                this.setCode("A9");
+                this.setCode(startAddress);
+
+                // Store the value of the accumulator at the address of the string variable
+                this.setCode("8D");
+                this.setCode(tempName);
+                this.setCode("XX");
             }
         }
 
@@ -275,14 +289,14 @@ module Compiler {
 
         }
 
-
+        // TODO: Add check to see if static space hits heap space
         private static setCode(input: string): void {
 
             this.codeList[this.currentIndex] = input;
             this.currentIndex++;
         }
 
-        private static setCodeAtIndex(index: number, input: string): void {
+        private static setCodeAtIndex(input: string, index: number): void {
             this.codeList[index] = input;
         }
 
@@ -311,9 +325,8 @@ module Compiler {
 
                     tempTableEntry.resolvedAddress = hexLocation;
 
-                    this.setCodeAtIndex(cursorIndex, hexLocation);
-                    this.setCodeAtIndex(cursorIndex + 1, "00");
-
+                    this.setCodeAtIndex(hexLocation, cursorIndex);
+                    this.setCodeAtIndex("00", cursorIndex + 1);
                 }
             }
         }
@@ -322,15 +335,37 @@ module Compiler {
 
             Logger.logVerbose("Adding the string \"" + stringValue + "\" to the heap");
 
-            // Include null terminator
-            var stringLength: number = stringValue.length + 1;
-            var startAddress: number = this.heapPointer - stringLength;
+            // Add null terminator
+            stringValue = stringValue + "\0";
 
-            Logger.log("Starting address for string " + stringValue + " is " + startAddress);
+            var stringLength: number = stringValue.length;
+            var startHeapAddress: number = this.heapPointer - stringLength;
 
             // Check if heap clashes with static
+            var endStaticSpace: number = this.currentIndex;
 
-            return 255;
+            if(startHeapAddress >= endStaticSpace) {
+
+                Logger.logVerbose("Heap address " + startHeapAddress + " does not clash with static address " + endStaticSpace);
+
+                for(var i: number = 0; i < stringLength; i++) {
+
+                    var hexCode: string = Utils.decimalToHex(stringValue.charCodeAt(i));
+                    this.setCodeAtIndex(hexCode, startHeapAddress + i);
+                }
+
+                this.heapPointer = startHeapAddress;
+            }
+
+            else {
+
+                var errorMessage: string = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"";
+
+                Logger.log(errorMessage);
+                throw errorMessage;
+            }
+
+            return this.heapPointer;
         }
 
         // TODO: Delete after testing

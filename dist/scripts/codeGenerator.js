@@ -124,10 +124,24 @@ var Compiler;
                 // TODO: Convert value to 0 (false) or 1 (true)
                 Compiler.Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
             } else {
-                Compiler.Logger.logVerbose("Inserting String Assignment (NOT IMPLEMENTED)");
+                var id = assignmentNode.getChildren()[0].getValue();
                 var value = assignmentNode.getChildren()[1].getValue();
 
-                var startAddress = this.addToHeap(value);
+                Compiler.Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
+
+                var startAddress = Compiler.Utils.decimalToHex(this.addToHeap(value));
+
+                var scopeLevel = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
+                var tempName = this.getEntryNameById(id, scopeLevel);
+
+                // Load accumulator with the address of the string
+                this.setCode("A9");
+                this.setCode(startAddress);
+
+                // Store the value of the accumulator at the address of the string variable
+                this.setCode("8D");
+                this.setCode(tempName);
+                this.setCode("XX");
             }
         };
 
@@ -214,12 +228,13 @@ var Compiler;
             }
         };
 
+        // TODO: Add check to see if static space hits heap space
         CodeGenerator.setCode = function (input) {
             this.codeList[this.currentIndex] = input;
             this.currentIndex++;
         };
 
-        CodeGenerator.setCodeAtIndex = function (index, input) {
+        CodeGenerator.setCodeAtIndex = function (input, index) {
             this.codeList[index] = input;
         };
 
@@ -245,8 +260,8 @@ var Compiler;
 
                     tempTableEntry.resolvedAddress = hexLocation;
 
-                    this.setCodeAtIndex(cursorIndex, hexLocation);
-                    this.setCodeAtIndex(cursorIndex + 1, "00");
+                    this.setCodeAtIndex(hexLocation, cursorIndex);
+                    this.setCodeAtIndex("00", cursorIndex + 1);
                 }
             }
         };
@@ -254,14 +269,32 @@ var Compiler;
         CodeGenerator.addToHeap = function (stringValue) {
             Compiler.Logger.logVerbose("Adding the string \"" + stringValue + "\" to the heap");
 
-            // Include null terminator
-            var stringLength = stringValue.length + 1;
-            var startAddress = this.heapPointer - stringLength;
+            // Add null terminator
+            stringValue = stringValue + "\0";
 
-            Compiler.Logger.log("Starting address for string " + stringValue + " is " + startAddress);
+            var stringLength = stringValue.length;
+            var startHeapAddress = this.heapPointer - stringLength;
 
             // Check if heap clashes with static
-            return 255;
+            var endStaticSpace = this.currentIndex;
+
+            if (startHeapAddress >= endStaticSpace) {
+                Compiler.Logger.logVerbose("Heap address " + startHeapAddress + " does not clash with static address " + endStaticSpace);
+
+                for (var i = 0; i < stringLength; i++) {
+                    var hexCode = Compiler.Utils.decimalToHex(stringValue.charCodeAt(i));
+                    this.setCodeAtIndex(hexCode, startHeapAddress + i);
+                }
+
+                this.heapPointer = startHeapAddress;
+            } else {
+                var errorMessage = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"";
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            }
+
+            return this.heapPointer;
         };
 
         // TODO: Delete after testing
