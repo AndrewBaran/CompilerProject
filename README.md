@@ -51,22 +51,24 @@ Final Project Checklist
 		- [x] Boolean
 		- [x] String
 	- [ ] Assignment Statements
-		- [ ] Int
+		- [x] Int Literal
+		- [ ] Int Id
 		- [ ] Int Addition
-		- [ ] Boolean
+		- [ ] Boolean Literal
+		- [ ] Boolean Id
 		- [ ] Boolean Comparisons
 		- [x] String
 	- [ ] Print Statements
 		- [x] Int Literal
 		- [ ] Int Addition
+		- [x] Int Id
 		- [x] Boolean Literal
 		- [ ] Boolean Comparisons
-		- [x] String Literal
-		- [x] Int Id
 		- [x] Boolean Id
+		- [x] String Literal
 		- [x] String Id
 	- [ ] While Statements
 	- [ ] If Statements
 	- [ ] Backpatching
-		- [ ] Temp Var Table
+		- [x] Temp Var Table
 		- [ ] Jump Table

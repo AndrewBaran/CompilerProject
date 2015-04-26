@@ -1,5 +1,6 @@
 module Compiler {
 
+    // TODO: Do I need the symbol table?
     export class CodeGenerator {
 
         private static abstractSyntaxTree: AbstractSyntaxTree;
@@ -70,11 +71,9 @@ module Compiler {
                     this.varDeclarationTemplate(root);
                     break;
 
-                // TODO: Make it so I pass AST node
                 case astNodeTypes.ASSIGNMENT_STATEMENT:
 
                     this.assignmentDeclarationTemplate(root);
-
                     break;
 
                 case astNodeTypes.PRINT_STATEMENT:
@@ -143,17 +142,65 @@ module Compiler {
 
         private static assignmentDeclarationTemplate(assignmentNode: ASTNode): void {
 
+            var id: string = assignmentNode.getChildren()[0].getValue();
             var idType: string = assignmentNode.getTypeInfo();
 
             if(idType === types.INT) {
 
                 Logger.logVerbose("Inserting Integer Assignment (NOT IMPLEMENTED)");
+
+                var rightChildNode: ASTNode = assignmentNode.getChildren()[1];
+
+                if(rightChildNode.getNodeType() === treeNodeTypes.LEAF) {
+
+                    var value: string = rightChildNode.getValue();
+
+                    // Assigning a digit
+                    if(rightChildNode.getTokenType() === TokenType[TokenType.T_DIGIT]) {
+
+                        Logger.log("Inserting Integer Assignment of " + value + " to id " + id);
+
+                        // Pad, as we can only have single digit literals
+                        value = "0" + value;
+
+                        // Load the accumulator with the value being stored
+                        this.setCode("A9");
+                        this.setCode(value);
+
+                        var scopeLevel: number = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
+                        var tempName: string = this.getEntryNameById(id, scopeLevel);
+
+                        // Store the accumulator at the address of the id
+                        this.setCode("8D");
+                        this.setCode(tempName);
+                        this.setCode("XX");
+                    }
+
+                    // Assigning an id
+                    else if(rightChildNode.getTokenType() === TokenType[TokenType.T_ID]) {
+
+                        Logger.log("Inserting Integer Assignment of id " + value + " to id " + id + " (NOT IMPLEMENTED)");
+                    }
+                }
+
+                // TODO: Implement
+                else {
+
+                    // Assigning an addition expression
+                    Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
+                }
+
             }
 
             else if(idType === types.BOOLEAN) {
 
                 // TODO: Convert value to 0 (false) or 1 (true)
                 Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
+
+                // Assigning true / false
+                // Assigning an id
+
+                // Assigning a boolean expression
             }
 
             // String

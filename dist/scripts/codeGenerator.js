@@ -1,5 +1,6 @@
 var Compiler;
 (function (Compiler) {
+    // TODO: Do I need the symbol table?
     var CodeGenerator = (function () {
         function CodeGenerator() {
         }
@@ -56,7 +57,6 @@ var Compiler;
 
                 case astNodeTypes.ASSIGNMENT_STATEMENT:
                     this.assignmentDeclarationTemplate(root);
-
                     break;
 
                 case astNodeTypes.PRINT_STATEMENT:
@@ -116,13 +116,48 @@ var Compiler;
         };
 
         CodeGenerator.assignmentDeclarationTemplate = function (assignmentNode) {
+            var id = assignmentNode.getChildren()[0].getValue();
             var idType = assignmentNode.getTypeInfo();
 
             if (idType === types.INT) {
                 Compiler.Logger.logVerbose("Inserting Integer Assignment (NOT IMPLEMENTED)");
+
+                var rightChildNode = assignmentNode.getChildren()[1];
+
+                if (rightChildNode.getNodeType() === treeNodeTypes.LEAF) {
+                    var value = rightChildNode.getValue();
+
+                    // Assigning a digit
+                    if (rightChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
+                        Compiler.Logger.log("Inserting Integer Assignment of " + value + " to id " + id);
+
+                        // Pad, as we can only have single digit literals
+                        value = "0" + value;
+
+                        // Load the accumulator with the value being stored
+                        this.setCode("A9");
+                        this.setCode(value);
+
+                        var scopeLevel = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
+                        var tempName = this.getEntryNameById(id, scopeLevel);
+
+                        // Store the accumulator at the address of the id
+                        this.setCode("8D");
+                        this.setCode(tempName);
+                        this.setCode("XX");
+                    } else if (rightChildNode.getTokenType() === TokenType[12 /* T_ID */]) {
+                        Compiler.Logger.log("Inserting Integer Assignment of id " + value + " to id " + id + " (NOT IMPLEMENTED)");
+                    }
+                } else {
+                    // Assigning an addition expression
+                    Compiler.Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
+                }
             } else if (idType === types.BOOLEAN) {
                 // TODO: Convert value to 0 (false) or 1 (true)
                 Compiler.Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
+                // Assigning true / false
+                // Assigning an id
+                // Assigning a boolean expression
             } else {
                 var id = assignmentNode.getChildren()[0].getValue();
                 var value = assignmentNode.getChildren()[1].getValue();
