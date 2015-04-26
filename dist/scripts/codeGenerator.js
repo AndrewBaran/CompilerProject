@@ -205,7 +205,24 @@ var Compiler;
                         this.setCode(tempName);
                         this.setCode("XX");
                     } else if (rightChildNode.getTokenType() === TokenType[12 /* T_ID */]) {
-                        Compiler.Logger.logVerbose("Inserting Boolean Assignment of id " + rightChildNode.getValue() + " to id " + id + " (NOT IMPLEMENTED)");
+                        var rhsId = rightChildNode.getValue();
+                        var rhsScopeLevel = rightChildNode.getSymbolTableEntry().getScopeLevel();
+                        var rhsTempName = this.getEntryNameById(rhsId, rhsScopeLevel);
+
+                        Compiler.Logger.logVerbose("Inserting Boolean Assignment of id " + rhsId + " to id " + id);
+
+                        // Load the data at the address of the RHS id into the accumulator
+                        this.setCode("AD");
+                        this.setCode(rhsTempName);
+                        this.setCode("XX");
+
+                        var lhsScopeLevel = idNode.getSymbolTableEntry().getScopeLevel();
+                        var lhsTempName = this.getEntryNameById(id, lhsScopeLevel);
+
+                        // Store the data in the accumulator at the address of the LHS id
+                        this.setCode("8D");
+                        this.setCode(lhsTempName);
+                        this.setCode("XX");
                     }
                 } else {
                     Compiler.Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
