@@ -247,6 +247,10 @@ var Compiler;
             // Set up compiler appropriately
             Compiler.Compiler.setTestMode(true);
 
+            // Prevent logging messages that will be cleared regardless
+            var oldVerboseFlag = this.verboseMode;
+            this.verboseMode = false;
+
             for (var i = 0; i < _testCodeList.length; i++) {
                 var programName = _testCodeList[i].name;
                 var code = _testCodeList[i].code;
@@ -268,6 +272,7 @@ var Compiler;
             }
 
             Compiler.Compiler.setTestMode(false);
+            this.verboseMode = oldVerboseFlag;
 
             var sectionTextDelimiter = "-------------------------";
 

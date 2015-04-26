@@ -358,6 +358,7 @@ module Compiler {
 
                 if(root.getTokenType() === "String Expression") {
                     tokenValue = TokenType.T_STRING_EXPRESSION;
+                    root.setTokenType(TokenType[tokenValue]);
                 }
 
                 var parentNode: ASTNode = root.getParent();
@@ -399,6 +400,7 @@ module Compiler {
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
+
                         break;
 
                     case TokenType.T_TRUE:

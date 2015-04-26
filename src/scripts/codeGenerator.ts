@@ -59,7 +59,7 @@ module Compiler {
 
             switch(root.getValue()) {
 
-                // TODO: Actually go down a scope level
+                // TODO: Probably don't need anything here
                 case astNodeTypes.BLOCK:
 
                     Logger.logVerbose("Block node encountered: Going down to a new scope");
@@ -282,8 +282,30 @@ module Compiler {
                 this.setCode("FF");
             }
 
-            // TODO: Add string case
+            else if(firstChildNode.getTokenType() === TokenType[TokenType.T_STRING_EXPRESSION]) {
+
+                var valueToPrint: string = firstChildNode.getValue();
+
+                Logger.logVerbose("Inserting Print Statement of Literal String \"" + valueToPrint + "\"");
+
+                var hexAddress: string = Utils.decimalToHex(this.addToHeap(valueToPrint));
+
+                // Load the Y register with the starting address of the string being printed
+                this.setCode("A0");
+                this.setCode(hexAddress);
+
+                // Load 2 into X register to get ready to print a string
+                this.setCode("A2");
+                this.setCode("02");
+
+                // System call
+                this.setCode("FF");
+            }
+
             else {
+
+                Logger.log("This shouldn't happen. Should have covered all the print statement scenarios");
+                throw "";
             }
 
 
@@ -292,8 +314,20 @@ module Compiler {
         // TODO: Add check to see if static space hits heap space
         private static setCode(input: string): void {
 
-            this.codeList[this.currentIndex] = input;
-            this.currentIndex++;
+            if((this.currentIndex + 1) <= this.heapPointer) {
+
+                this.codeList[this.currentIndex] = input;
+                this.currentIndex++;
+            }
+
+            else {
+
+                var errorMessage: string = "Error! Stack overflow at address " + Utils.decimalToHex(this.currentIndex + 1) + " when attempting to insert the code " + input;
+
+                Logger.log(errorMessage);
+                throw errorMessage;
+            }
+
         }
 
         private static setCodeAtIndex(input: string, index: number): void {

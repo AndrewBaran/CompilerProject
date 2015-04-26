@@ -294,6 +294,7 @@ var Compiler;
 
                 if (root.getTokenType() === "String Expression") {
                     tokenValue = 27 /* T_STRING_EXPRESSION */;
+                    root.setTokenType(TokenType[tokenValue]);
                 }
 
                 var parentNode = root.getParent();
@@ -330,6 +331,7 @@ var Compiler;
 
                         parentNode.setSynthesizedType(type);
                         root.setTypeInfo(type);
+
                         break;
 
                     case 25 /* T_TRUE */:

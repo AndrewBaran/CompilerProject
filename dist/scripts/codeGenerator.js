@@ -224,14 +224,40 @@ var Compiler;
 
                 // System call
                 this.setCode("FF");
+            } else if (firstChildNode.getTokenType() === TokenType[27 /* T_STRING_EXPRESSION */]) {
+                var valueToPrint = firstChildNode.getValue();
+
+                Compiler.Logger.logVerbose("Inserting Print Statement of Literal String \"" + valueToPrint + "\"");
+
+                var hexAddress = Compiler.Utils.decimalToHex(this.addToHeap(valueToPrint));
+
+                // Load the Y register with the starting address of the string being printed
+                this.setCode("A0");
+                this.setCode(hexAddress);
+
+                // Load 2 into X register to get ready to print a string
+                this.setCode("A2");
+                this.setCode("02");
+
+                // System call
+                this.setCode("FF");
             } else {
+                Compiler.Logger.log("This shouldn't happen. Should have covered all the print statement scenarios");
+                throw "";
             }
         };
 
         // TODO: Add check to see if static space hits heap space
         CodeGenerator.setCode = function (input) {
-            this.codeList[this.currentIndex] = input;
-            this.currentIndex++;
+            if ((this.currentIndex + 1) <= this.heapPointer) {
+                this.codeList[this.currentIndex] = input;
+                this.currentIndex++;
+            } else {
+                var errorMessage = "Error! Stack overflow at address " + Compiler.Utils.decimalToHex(this.currentIndex + 1) + " when attempting to insert the code " + input;
+
+                Compiler.Logger.log(errorMessage);
+                throw errorMessage;
+            }
         };
 
         CodeGenerator.setCodeAtIndex = function (input, index) {
