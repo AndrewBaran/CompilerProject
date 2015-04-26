@@ -44,8 +44,6 @@ var Compiler;
         };
 
         CodeGenerator.buildCode = function (root) {
-            Compiler.Logger.log("Node: " + root.getValue());
-
             switch (root.getValue()) {
                 case astNodeTypes.BLOCK:
                     Compiler.Logger.logVerbose("Block node encountered: Going down to a new scope");
@@ -116,7 +114,9 @@ var Compiler;
         };
 
         CodeGenerator.assignmentDeclarationTemplate = function (assignmentNode) {
-            var id = assignmentNode.getChildren()[0].getValue();
+            var idNode = assignmentNode.getChildren()[0];
+            var id = idNode.getValue();
+
             var idType = assignmentNode.getTypeInfo();
 
             if (idType === types.INT) {
@@ -129,7 +129,7 @@ var Compiler;
 
                     // Assigning a digit
                     if (rightChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
-                        Compiler.Logger.log("Inserting Integer Assignment of " + value + " to id " + id);
+                        Compiler.Logger.logVerbose("Inserting Integer Assignment of " + value + " to id " + id);
 
                         // Pad, as we can only have single digit literals
                         value = "0" + value;
@@ -138,7 +138,7 @@ var Compiler;
                         this.setCode("A9");
                         this.setCode(value);
 
-                        var scopeLevel = assignmentNode.getChildren()[0].getSymbolTableEntry().getScopeLevel();
+                        var scopeLevel = idNode.getSymbolTableEntry().getScopeLevel();
                         var tempName = this.getEntryNameById(id, scopeLevel);
 
                         // Store the accumulator at the address of the id
@@ -146,18 +146,53 @@ var Compiler;
                         this.setCode(tempName);
                         this.setCode("XX");
                     } else if (rightChildNode.getTokenType() === TokenType[12 /* T_ID */]) {
-                        Compiler.Logger.log("Inserting Integer Assignment of id " + value + " to id " + id + " (NOT IMPLEMENTED)");
+                        Compiler.Logger.logVerbose("Inserting Integer Assignment of id " + value + " to id " + id + " (NOT IMPLEMENTED)");
                     }
                 } else {
                     // Assigning an addition expression
                     Compiler.Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
                 }
             } else if (idType === types.BOOLEAN) {
-                // TODO: Convert value to 0 (false) or 1 (true)
                 Compiler.Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
-                // Assigning true / false
-                // Assigning an id
-                // Assigning a boolean expression
+
+                var rightChildNode = assignmentNode.getChildren()[1];
+
+                if (rightChildNode.getNodeType() === treeNodeTypes.LEAF) {
+                    // Assigning true
+                    if (rightChildNode.getTokenType() === TokenType[25 /* T_TRUE */]) {
+                        Compiler.Logger.logVerbose("Inserting Boolean Assignment of Literal True to id " + id);
+
+                        // Load the accumulator with the value of 1 (for true)
+                        this.setCode("A9");
+                        this.setCode("01");
+
+                        var scopeLevel = idNode.getSymbolTableEntry().getScopeLevel();
+                        var tempName = this.getEntryNameById(id, scopeLevel);
+
+                        // Store the value of 1 (true) at the address of the id
+                        this.setCode("8D");
+                        this.setCode(tempName);
+                        this.setCode("XX");
+                    } else if (rightChildNode.getTokenType() === TokenType[24 /* T_FALSE */]) {
+                        Compiler.Logger.logVerbose("Inserting Boolean Assignment of Literal False to id " + id);
+
+                        // Load the accumulator with the value of 0 (for false)
+                        this.setCode("A9");
+                        this.setCode("00");
+
+                        var scopeLevel = idNode.getSymbolTableEntry().getScopeLevel();
+                        var tempName = this.getEntryNameById(id, scopeLevel);
+
+                        // Store the value of 0 (false) at the address of the id
+                        this.setCode("8D");
+                        this.setCode(tempName);
+                        this.setCode("XX");
+                    } else if (rightChildNode.getTokenType() === TokenType[12 /* T_ID */]) {
+                        Compiler.Logger.logVerbose("Inserting Boolean Assignment of id " + rightChildNode.getValue() + " to id " + id + " (NOT IMPLEMENTED)");
+                    }
+                } else {
+                    Compiler.Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
+                }
             } else {
                 var id = assignmentNode.getChildren()[0].getValue();
                 var value = assignmentNode.getChildren()[1].getValue();
