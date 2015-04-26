@@ -179,7 +179,24 @@ module Compiler {
                     // Assigning an id
                     else if(rightChildNode.getTokenType() === TokenType[TokenType.T_ID]) {
 
-                        Logger.logVerbose("Inserting Integer Assignment of id " + value + " to id " + id + " (NOT IMPLEMENTED)");
+                        Logger.logVerbose("Inserting Integer Assignment of id " + value + " to id " + id);
+
+                        var rhsId: string = rightChildNode.getValue();
+                        var rhsScopeLevel: number = rightChildNode.getSymbolTableEntry().getScopeLevel();
+                        var rhsTempName: string = this.getEntryNameById(rhsId, rhsScopeLevel);
+
+                        // Load the data at the address of the RHS id into the accumulator
+                        this.setCode("AD");
+                        this.setCode(rhsTempName);
+                        this.setCode("XX");
+
+                        var lhsScopeLevel: number = idNode.getSymbolTableEntry().getScopeLevel();
+                        var lhsTempName: string = this.getEntryNameById(id, lhsScopeLevel);
+
+                        // Store the data in the accumulator at the address of the LHS id
+                        this.setCode("8D");
+                        this.setCode(lhsTempName);
+                        this.setCode("XX");
                     }
                 }
 

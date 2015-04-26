@@ -52,7 +52,7 @@ Final Project Checklist
 		- [x] String
 	- [ ] Assignment Statements
 		- [x] Int Literal
-		- [ ] Int Id
+		- [x] Int Id
 		- [ ] Int Addition
 		- [x] Boolean Literal
 		- [ ] Boolean Id
