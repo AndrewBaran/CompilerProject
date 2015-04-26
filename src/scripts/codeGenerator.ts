@@ -10,14 +10,18 @@ module Compiler {
 
         private static tempTable: TempTableEntry [];
 
+        private static heapPointer: number;
+
         public static generateCode(abstractSyntaxTree: AbstractSyntaxTree, symbolTable: SymbolTable): string [] {
 
-            Logger.log("Generating 6502a Assembly Code (NOT IMPLEMENTED)");
+            Logger.log("Generating 6502a Assembly Code (NOT FINISHED)");
             Logger.log("");
 
             this.setupEnvironment(abstractSyntaxTree, symbolTable);
 
             this.buildCode(abstractSyntaxTree.getRoot());
+
+            Logger.logVerbose("Inserting Break Statement");
             this.setCode("00"); // Program break
 
             this.backPatchCode();
@@ -45,6 +49,8 @@ module Compiler {
             this.currentIndex = 0;
 
             this.tempTable = [];
+
+            this.heapPointer = _Constants.MAX_CODE_SIZE - 1;
         }
 
         private static buildCode(root: ASTNode): void {
@@ -53,19 +59,16 @@ module Compiler {
 
             switch(root.getValue()) {
 
+                // TODO: Actually go down a scope level
                 case astNodeTypes.BLOCK:
 
-                    Logger.log("Block node");
+                    Logger.logVerbose("Block node encountered: Going down to a new scope");
                     break;
 
                 case astNodeTypes.VAR_DECLARATION:
 
-                    Logger.log("Variable declaration");
-
                     var type: string = root.getChildren()[0].getTypeInfo();
                     var idName: string = root.getChildren()[1].getValue();
-
-                    Logger.log(type + " " + idName);
 
                     this.varDeclarationTemplate(type, idName);
 
@@ -73,12 +76,10 @@ module Compiler {
 
                 case astNodeTypes.ASSIGNMENT_STATEMENT:
 
-                    Logger.log("Assignment statement");
-
                     var idName: string = root.getChildren()[0].getValue();
                     var type: string = root.getChildren()[0].getSymbolTableEntry().getIdType();
 
-                    // TODO: Doesn't work for 1 + 2 + 3 + a + ... cases
+                    // TODO: Doesn't work for addition chains or boolean expresions
                     var value: string = root.getChildren()[1].getValue();
 
                     this.assignmentDeclarationTemplate(idName, type, value);
@@ -100,12 +101,11 @@ module Compiler {
             }
         }
 
-        // TODO: Case where string declared, then int/bool causes int/bool to skip a space in static space
         private static varDeclarationTemplate(type: string, idName: string): void {
 
-            Logger.log("Template for variable declaration");
-
             if(type === types.INT || type === types.BOOLEAN) {
+
+                Logger.logVerbose("Inserting Int / Boolean Declaration of id " + idName);
 
                 // Load accumulator with 0
                 this.setCode("A9");
@@ -127,18 +127,17 @@ module Compiler {
                 this.setCode("XX");
             }
 
-            // TODO: Not right?
             else {
 
-                // TODO: Remove after testing
-                Logger.log("String declaration");
+                Logger.logVerbose("Inserting String Declaration of id " + idName);
 
                 var tempName: string = "T" + this.tempTable.length.toString();
+                var tempOffset: number = this.tempTable.length;
 
                 var newEntry: TempTableEntry = new TempTableEntry();
                 newEntry.tempName = tempName;
                 newEntry.idName = idName;
-                newEntry.addressOffset = -1;
+                newEntry.addressOffset = tempOffset;
 
                 this.tempTable.push(newEntry);
             }
@@ -149,18 +148,25 @@ module Compiler {
 
             if(idType === types.INT) {
 
-                Logger.log("Int assignment (NOT IMPLEMENTED)");
+                Logger.logVerbose("Inserting Integer Assignment (NOT IMPLEMENTED)");
             }
 
             else if(idType === types.BOOLEAN) {
 
                 // TODO: Convert value to 0 (false) or 1 (true)
-                Logger.log("Bool assignment (NOT IMPLEMENTED)");
+                Logger.logVerbose("Inserting Boolean Assignment (NOT IMPLEMENTED)");
             }
 
             // String
             else {
-                Logger.log("String assignment (NOT IMPLEMENTED)");
+
+                Logger.logVerbose("Inserting String Assignment (NOT IMPLEMENTED)");
+
+
+
+
+
+
             }
         }
 
@@ -171,11 +177,13 @@ module Compiler {
             // TODO: Compound expression (addition or comparisons involved)
             if(firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
 
-                Logger.log("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
+                Logger.logVerbose("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
             }
 
             // Single digit
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_DIGIT]) {
+
+                Logger.logVerbose("Inserting Print Statement of Integer Literal");
 
                 // Pad digit with 0 (digits range from 0-9 only)
                 var digitToPrint: string = "0" + firstChildNode.getValue();
@@ -193,7 +201,10 @@ module Compiler {
             }
 
             // Single ID
+            // TODO: Make it work with strings
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_ID]) {
+
+                Logger.logVerbose("Inserting Print Statement of id with type " + firstChildNode.getSymbolTableEntry().getIdType());
 
                 var id: string = firstChildNode.getValue();
                 var tempName: string = this.getEntryNameById(id);
@@ -213,6 +224,8 @@ module Compiler {
 
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_TRUE]){
 
+                Logger.logVerbose("Inserting Print Statement of Literal True");
+
                 // True is equivalent to 1
                 var digitToPrint: string = "01";
 
@@ -229,6 +242,8 @@ module Compiler {
             }
 
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_FALSE]) {
+
+                Logger.logVerbose("Inserting Print Statement of Literal False");
 
                 // False is equivalent to 0
                 var digitToPrint: string = "00";
@@ -247,7 +262,6 @@ module Compiler {
 
             // TODO: Add string case
             else {
-
             }
 
 
@@ -266,6 +280,8 @@ module Compiler {
 
         private static backPatchCode(): void {
 
+            Logger.logVerbose("Backpatching the code and resolving addresses");
+
             // currentIndex should point to beginning of static code
             var currentCodeByte: string = "";
             var staticAreaStart: number = this.currentIndex;
@@ -283,8 +299,8 @@ module Compiler {
                     var newIndex: number = staticAreaStart + tempTableEntry.addressOffset;
                     var hexLocation: string = Utils.decimalToHex(newIndex);
 
-                    // TODO: Remove after testing (or make verbose only)
-                    Logger.log("New index for entry " + currentCodeByte + " is: " + hexLocation);
+                    Logger.logVerbose("New index for entry " + currentCodeByte + " is: " + hexLocation);
+
                     tempTableEntry.resolvedAddress = hexLocation;
 
                     this.setCodeAtIndex(cursorIndex, hexLocation);
@@ -350,6 +366,7 @@ module Compiler {
 
         public tempName: string;
         public idName: string;
+        public scopeLevel: number;
         public addressOffset: number;
         public resolvedAddress: string;
 
@@ -357,6 +374,7 @@ module Compiler {
 
             this.tempName = "";
             this.idName = "";
+            this.scopeLevel = -1;
             this.addressOffset = -1;
             this.resolvedAddress = "";
 

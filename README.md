@@ -57,11 +57,14 @@ Final Project Checklist
 		- [ ] Boolean Comparisons
 		- [ ] String
 	- [ ] Print Statements
-		- [ ] Int
+		- [x] Int
 		- [ ] Int Addition
-		- [ ] Boolean
+		- [x] Boolean
 		- [ ] Boolean Comparisons
 		- [ ] String
+		- [x] Int Id
+		- [x] Boolean Id
+		- [ ] String Id
 	- [ ] While Statements
 	- [ ] If Statements
 	- [ ] Backpatching
