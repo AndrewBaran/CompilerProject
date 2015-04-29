@@ -1,0 +1,84 @@
+Andrew Baran
+Professor Labouseur
+Design of Compilers
+April 29, 2015
+
+Lab 9:
+
+Crafting a Compiler:
+
+5.5.
+
+Transform this grammar into LL(1)
+
+DeclList 		 -> DeclList ; Decl
+		 		 -> Decl
+Decl	 		 -> IdList : Type
+IdList	 		 -> IdList , id
+		 		 -> id
+Type	 	 	 -> ScalarType
+         		 -> array ( ScalarTypeList ) of Type
+ScalarType       -> id
+                 -> Bound .. Bound
+Bound         	 -> Sign intconstant
+              	 -> id
+Sign          	 -> +
+              	 -> -
+			  	 -> epsilon)
+ScalarTypelist	 -> ScalarTypeList , ScalarType
+				 -> ScalarTypeList
+
+
+TODO: Waiting for class
+
+
+Dragon:
+
+4.5.3.
+
+Bottom-up parse of input 000111 from following grammar:
+
+Grammar:
+
+S -> 0 S 1
+  -> 0 1
+
+Bottom-up parse:
+0 0 0 1 1 1
+0 0 S 1 1
+0 S 1
+S
+
+
+Bottom-up parse of input aaa*a++ from following grammar:
+
+Grammar:
+
+S -> S S +
+  -> S S *
+  -> a
+
+
+
+Bottom-up parse:
+
+a a a * a + +
+a a a * S + +
+a a S * S + +
+a S S * S + +
+a S S + +
+a S +
+S S +
+S
+
+
+4.6.5.
+
+Show that the following grammar is LL(1), but not SLR(1)
+
+S -> A a A b | B b B a
+A -> epsilon
+B -> epsilon
+
+
+TODO: Waiting for class
