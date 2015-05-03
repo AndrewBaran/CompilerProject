@@ -9,27 +9,36 @@ Crafting a Compiler:
 
 5.5.
 
-Transform this grammar into LL(1)
-
-DeclList 		 -> DeclList ; Decl
-		 		 -> Decl
-Decl	 		 -> IdList : Type
-IdList	 		 -> IdList , id
-		 		 -> id
-Type	 	 	 -> ScalarType
-         		 -> array ( ScalarTypeList ) of Type
-ScalarType       -> id
-                 -> Bound .. Bound
-Bound         	 -> Sign intconstant
-              	 -> id
-Sign          	 -> +
-              	 -> -
-			  	 -> epsilon)
-ScalarTypelist	 -> ScalarTypeList , ScalarType
-				 -> ScalarTypeList
+Transform the grammar into LL(1)
 
 
-TODO: Waiting for class
+Fixed version:
+
+DeclList		-> Decl DeclList'
+DeclList'		-> , DeclList
+				-> epsilon
+
+Decl			-> IdList : Type
+IdList			-> id IdList'
+IdList'			-> , IdList
+				-> epsilon
+
+Type			-> ScalarType
+				-> array ( ScalarTypeList ) of Type
+
+ScalarType		-> id
+				-> Bound .. Bound
+
+Bound			-> Sign intconstant
+				-> id
+
+Sign			-> +
+				-> -
+				-> epsilon
+
+ScalarTypeList	-> ScalarType ScalarTypeList'
+ScalarTypeList'	-> , ScalarTypeList
+				-> epsilon
 
 
 Dragon:
