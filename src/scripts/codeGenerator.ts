@@ -1,10 +1,8 @@
 module Compiler {
 
-    // TODO: Do I need the symbol table? I don't think I do
     export class CodeGenerator {
 
         private static abstractSyntaxTree: AbstractSyntaxTree;
-        private static symbolTable: SymbolTable;
 
         private static codeList: string [];
         private static currentIndex: number;
@@ -14,12 +12,12 @@ module Compiler {
         private static heapPointer: number;
 
 
-        public static generateCode(abstractSyntaxTree: AbstractSyntaxTree, symbolTable: SymbolTable): string [] {
+        public static generateCode(abstractSyntaxTree: AbstractSyntaxTree): string [] {
 
             Logger.log("Generating 6502a Assembly Code (NOT FINISHED)");
             Logger.log("");
 
-            this.setupEnvironment(abstractSyntaxTree, symbolTable);
+            this.setupEnvironment(abstractSyntaxTree);
 
             this.buildCode(abstractSyntaxTree.getRoot());
 
@@ -37,10 +35,9 @@ module Compiler {
             return this.codeList;
         }
 
-        private static setupEnvironment(abstractSyntaxTree: AbstractSyntaxTree, symbolTable: SymbolTable): void {
+        private static setupEnvironment(abstractSyntaxTree: AbstractSyntaxTree): void {
 
             this.abstractSyntaxTree = abstractSyntaxTree;
-            this.symbolTable = symbolTable;
 
             this.codeList = [];
 
@@ -111,7 +108,7 @@ module Compiler {
 
                 Logger.logVerbose("Inserting Int / Boolean Declaration of id " + idName);
 
-                // Load accumulator with 0
+                // Load accumulator with 0 (the default value for ints and booleans (false))
                 this.setCode("A9");
                 this.setCode("00");
 
@@ -133,7 +130,7 @@ module Compiler {
                 newEntry.idName = idName;
                 newEntry.scopeLevel = scopeLevel;
 
-                // Load accumulator with 0, the null string
+                // Load accumulator with 00, the null string
                 this.setCode("A9");
                 this.setCode("00");
 
@@ -507,6 +504,7 @@ module Compiler {
                 this.setCode("FF");
             }
 
+            // TODO: Delete after testing
             else {
 
                 Logger.log("This shouldn't happen. Should have covered all the print statement scenarios");
@@ -515,6 +513,8 @@ module Compiler {
 
         }
 
+        // Inserts the code to add each digit / id being summed together into memory
+        // Return list of those addresses being summed together
         private static insertAddLocations(rootNode: ASTNode, addressesToAdd: string []): string [] {
 
             if(rootNode.getNodeType() === treeNodeTypes.LEAF) {
@@ -565,7 +565,8 @@ module Compiler {
             return addressesToAdd;
         }
 
-        // Insert the Add with Carry instructions into code; return address of location of sum
+        // Insert the Add with Carry instructions into code
+        // Return address of location of sum
         private static insertAddCode(addLocations: string []): string {
 
             // Set accumulator to 0 so you can start adding
@@ -682,8 +683,6 @@ module Compiler {
             var endStaticSpace: number = this.currentIndex;
 
             if(startHeapAddress >= endStaticSpace) {
-
-                Logger.logVerbose("Heap address " + startHeapAddress + " does not clash with static address " + endStaticSpace);
 
                 for(var i: number = 0; i < stringLength; i++) {
 

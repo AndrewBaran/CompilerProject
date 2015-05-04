@@ -78,7 +78,7 @@ module Compiler {
 
 				try {
 
-                    var codeList: string[] = CodeGenerator.generateCode(abstractSyntaxTree, symbolTable);
+                    var codeList: string[] = CodeGenerator.generateCode(abstractSyntaxTree);
                     codeGenResult = true;
 				}
 

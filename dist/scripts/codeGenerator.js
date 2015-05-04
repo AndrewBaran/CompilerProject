@@ -1,14 +1,13 @@
 var Compiler;
 (function (Compiler) {
-    // TODO: Do I need the symbol table? I don't think I do
     var CodeGenerator = (function () {
         function CodeGenerator() {
         }
-        CodeGenerator.generateCode = function (abstractSyntaxTree, symbolTable) {
+        CodeGenerator.generateCode = function (abstractSyntaxTree) {
             Compiler.Logger.log("Generating 6502a Assembly Code (NOT FINISHED)");
             Compiler.Logger.log("");
 
-            this.setupEnvironment(abstractSyntaxTree, symbolTable);
+            this.setupEnvironment(abstractSyntaxTree);
 
             this.buildCode(abstractSyntaxTree.getRoot());
 
@@ -26,9 +25,8 @@ var Compiler;
             return this.codeList;
         };
 
-        CodeGenerator.setupEnvironment = function (abstractSyntaxTree, symbolTable) {
+        CodeGenerator.setupEnvironment = function (abstractSyntaxTree) {
             this.abstractSyntaxTree = abstractSyntaxTree;
-            this.symbolTable = symbolTable;
 
             this.codeList = [];
 
@@ -87,7 +85,7 @@ var Compiler;
             if (type === types.INT || type === types.BOOLEAN) {
                 Compiler.Logger.logVerbose("Inserting Int / Boolean Declaration of id " + idName);
 
-                // Load accumulator with 0
+                // Load accumulator with 0 (the default value for ints and booleans (false))
                 this.setCode("A9");
                 this.setCode("00");
 
@@ -106,7 +104,7 @@ var Compiler;
                 newEntry.idName = idName;
                 newEntry.scopeLevel = scopeLevel;
 
-                // Load accumulator with 0, the null string
+                // Load accumulator with 00, the null string
                 this.setCode("A9");
                 this.setCode("00");
 
@@ -417,6 +415,8 @@ var Compiler;
             }
         };
 
+        // Inserts the code to add each digit / id being summed together into memory
+        // Return list of those addresses being summed together
         CodeGenerator.insertAddLocations = function (rootNode, addressesToAdd) {
             if (rootNode.getNodeType() === treeNodeTypes.LEAF) {
                 if (rootNode.getTokenType() === TokenType[12 /* T_ID */]) {
@@ -460,7 +460,8 @@ var Compiler;
             return addressesToAdd;
         };
 
-        // Insert the Add with Carry instructions into code; return address of location of sum
+        // Insert the Add with Carry instructions into code
+        // Return address of location of sum
         CodeGenerator.insertAddCode = function (addLocations) {
             // Set accumulator to 0 so you can start adding
             this.setCode("A9");
@@ -554,8 +555,6 @@ var Compiler;
             var endStaticSpace = this.currentIndex;
 
             if (startHeapAddress >= endStaticSpace) {
-                Compiler.Logger.logVerbose("Heap address " + startHeapAddress + " does not clash with static address " + endStaticSpace);
-
                 for (var i = 0; i < stringLength; i++) {
                     var hexCode = Compiler.Utils.decimalToHex(stringValue.charCodeAt(i));
                     this.setCodeAtIndex(hexCode, startHeapAddress + i);

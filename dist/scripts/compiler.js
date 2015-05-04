@@ -58,7 +58,7 @@ var Compiler;
                 }
 
                 try  {
-                    var codeList = _Compiler.CodeGenerator.generateCode(abstractSyntaxTree, symbolTable);
+                    var codeList = _Compiler.CodeGenerator.generateCode(abstractSyntaxTree);
                     codeGenResult = true;
                 } catch (exception) {
                     codeGenResult = false;
