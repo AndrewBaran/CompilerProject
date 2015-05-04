@@ -207,7 +207,6 @@ module Compiler {
 
                 else {
 
-                    // TODO: Assigning an addition expression
                     Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id);
 
                     var addressesToAdd: string[] = [];
@@ -365,10 +364,29 @@ module Compiler {
 
             var firstChildNode: ASTNode = printNode.getChildren()[0];
 
-            // TODO: Integer addition
+            // Integer addition
             if(firstChildNode.getValue() === astNodeTypes.ADD) {
 
-                Logger.logVerbose("Inserting Print Statement of Integer Addition (NOT IMPLEMENTED)");
+                Logger.logVerbose("Inserting Print Statement of Integer Addition");
+
+                var addressesToAdd: string [] = [];
+                addressesToAdd = this.insertAddLocations(firstChildNode, addressesToAdd);
+
+                var addressOfSum: string = this.insertAddCode(addressesToAdd);
+                var firstByte: string = addressOfSum.split(" ")[0];
+                var secondByte: string = addressOfSum.split(" ")[1];
+
+                // Load Y register with the number being printed
+                this.setCode("AC");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
             }
 
             // TODO: Boolean expression

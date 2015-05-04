@@ -168,7 +168,6 @@ var Compiler;
                         this.setCode("XX");
                     }
                 } else {
-                    // TODO: Assigning an addition expression
                     Compiler.Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id);
 
                     var addressesToAdd = [];
@@ -298,9 +297,28 @@ var Compiler;
         CodeGenerator.printStatementTemplate = function (printNode) {
             var firstChildNode = printNode.getChildren()[0];
 
-            // TODO: Integer addition
+            // Integer addition
             if (firstChildNode.getValue() === astNodeTypes.ADD) {
-                Compiler.Logger.logVerbose("Inserting Print Statement of Integer Addition (NOT IMPLEMENTED)");
+                Compiler.Logger.logVerbose("Inserting Print Statement of Integer Addition");
+
+                var addressesToAdd = [];
+                addressesToAdd = this.insertAddLocations(firstChildNode, addressesToAdd);
+
+                var addressOfSum = this.insertAddCode(addressesToAdd);
+                var firstByte = addressOfSum.split(" ")[0];
+                var secondByte = addressOfSum.split(" ")[1];
+
+                // Load Y register with the number being printed
+                this.setCode("AC");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+
+                // Load 1 into X register to get ready to print an int
+                this.setCode("A2");
+                this.setCode("01");
+
+                // System call
+                this.setCode("FF");
             } else if (firstChildNode.getValue() === astNodeTypes.EQUAL || firstChildNode.getValue() === astNodeTypes.NOT_EQUAL) {
                 Compiler.Logger.logVerbose("Inserting Print Statement of Boolean Expression (== or !=) (NOT IMPLEMENTED)");
             } else if (firstChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
