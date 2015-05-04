@@ -1,6 +1,6 @@
 var Compiler;
 (function (Compiler) {
-    // TODO: Do I need the symbol table?
+    // TODO: Do I need the symbol table? I don't think I do
     var CodeGenerator = (function () {
         function CodeGenerator() {
         }
@@ -43,6 +43,7 @@ var Compiler;
             this.heapPointer = _Constants.MAX_CODE_SIZE;
         };
 
+        // TODO: Add while and if statements
         CodeGenerator.buildCode = function (root) {
             switch (root.getValue()) {
                 case astNodeTypes.BLOCK:
@@ -59,6 +60,14 @@ var Compiler;
 
                 case astNodeTypes.PRINT_STATEMENT:
                     this.printStatementTemplate(root);
+                    break;
+
+                case astNodeTypes.IF_STATEMENT:
+                    Compiler.Logger.logVerbose("If statement (NOT IMPLEMENTED)");
+                    break;
+
+                case astNodeTypes.WHILE_STATEMENT:
+                    Compiler.Logger.logVerbose("While statement (NOT IMPLEMENTED)");
                     break;
 
                 default:
@@ -164,8 +173,13 @@ var Compiler;
                         this.setCode("XX");
                     }
                 } else {
-                    // Assigning an addition expression
+                    // TODO: Assigning an addition expression
                     Compiler.Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
+
+                    var addressesToAdd = [];
+
+                    addressesToAdd = this.insertAddLocations(rightChildNode, addressesToAdd);
+                    this.insertAddCode(addressesToAdd);
                 }
             } else if (idType === types.BOOLEAN) {
                 var rightChildNode = assignmentNode.getChildren()[1];
@@ -274,9 +288,11 @@ var Compiler;
         CodeGenerator.printStatementTemplate = function (printNode) {
             var firstChildNode = printNode.getChildren()[0];
 
-            // TODO: Compound expression (addition or comparisons involved)
-            if (firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
-                Compiler.Logger.logVerbose("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
+            // TODO: Integer addition
+            if (firstChildNode.getValue() === astNodeTypes.ADD) {
+                Compiler.Logger.logVerbose("Inserting Print Statement of Integer Addition (NOT IMPLEMENTED)");
+            } else if (firstChildNode.getValue() === astNodeTypes.EQUAL || firstChildNode.getValue() === astNodeTypes.NOT_EQUAL) {
+                Compiler.Logger.logVerbose("Inserting Print Statement of Boolean Expression (== or !=) (NOT IMPLEMENTED)");
             } else if (firstChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
                 Compiler.Logger.logVerbose("Inserting Print Statement of Integer Literal");
 
@@ -373,6 +389,96 @@ var Compiler;
             }
         };
 
+        CodeGenerator.insertAddLocations = function (rootNode, addressesToAdd) {
+            if (rootNode.getNodeType() === treeNodeTypes.LEAF) {
+                Compiler.Logger.logVerbose("Leaf found: " + rootNode.getValue());
+
+                if (rootNode.getTokenType() === TokenType[12 /* T_ID */]) {
+                    Compiler.Logger.logVerbose("Id");
+
+                    // Get tempName of id
+                    var id = rootNode.getValue();
+                    var scopeLevel = rootNode.getSymbolTableEntry().getScopeLevel();
+                    var tempName = this.getEntryNameById(id, scopeLevel);
+
+                    var address = tempName + " " + "XX";
+
+                    // Add tempName to list to be added
+                    addressesToAdd.push(address);
+                } else if (rootNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
+                    Compiler.Logger.logVerbose("Digit");
+
+                    var intLiteral = "0" + rootNode.getValue();
+
+                    // Load the accumulator with the int literal value
+                    this.setCode("A9");
+                    this.setCode(intLiteral);
+
+                    // Create new temp table entry for the int literal (inefficient, but it works)
+                    var tempName = "T" + this.tempTable.length.toString();
+                    var tempOffset = this.tempTable.length;
+
+                    var newEntry = new TempTableEntry();
+                    newEntry.tempName = tempName;
+                    newEntry.addressOffset = tempOffset;
+
+                    this.tempTable.push(newEntry);
+
+                    // Store the accumulator at a new temp address
+                    this.setCode("8D");
+                    this.setCode(tempName);
+                    this.setCode("XX");
+
+                    var address = tempName + " " + "XX";
+                    addressesToAdd.push(address);
+                }
+            }
+
+            for (var i = 0; i < rootNode.getChildren().length; i++) {
+                addressesToAdd = this.insertAddLocations(rootNode.getChildren()[i], addressesToAdd);
+            }
+
+            return addressesToAdd;
+        };
+
+        // Insert the Add with Carry instructions into code; return address of location of sum
+        CodeGenerator.insertAddCode = function (addLocations) {
+            // Set accumulator to 0 so you can start adding
+            this.setCode("A9");
+            this.setCode("00");
+
+            while (addLocations.length > 0) {
+                var address = addLocations.pop();
+
+                var firstByte = address.split(" ")[0];
+                var secondByte = address.split(" ")[1];
+
+                // TODO: Remove after testing
+                Compiler.Logger.log("First: " + firstByte + " | Second: " + secondByte);
+
+                // Add contents of the address to the accumulator
+                this.setCode("6D");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+            }
+
+            // Store the accumulator, now holding the sum, at an address in memory and return that address
+            var tempName = "T" + this.tempTable.length.toString();
+            var tempOffset = this.tempTable.length;
+
+            var newEntry = new TempTableEntry();
+            newEntry.tempName = tempName;
+            newEntry.addressOffset = tempOffset;
+
+            this.tempTable.push(newEntry);
+
+            this.setCode("8D");
+            this.setCode(tempName);
+            this.setCode("XX");
+
+            return tempName + " " + "XX";
+        };
+
         // TODO: Add check to see if static space hits heap space
         CodeGenerator.setCode = function (input) {
             if ((this.currentIndex + 1) <= this.heapPointer) {
@@ -393,7 +499,6 @@ var Compiler;
         CodeGenerator.backPatchCode = function () {
             Compiler.Logger.logVerbose("Backpatching the code and resolving addresses");
 
-            // currentIndex should point to beginning of static code
             var currentCodeByte = "";
             var staticAreaStart = this.currentIndex;
 
@@ -408,12 +513,14 @@ var Compiler;
                     var newIndex = staticAreaStart + tempTableEntry.addressOffset;
                     var hexLocation = Compiler.Utils.decimalToHex(newIndex);
 
-                    Compiler.Logger.logVerbose("New index for entry " + currentCodeByte + " is: " + hexLocation);
+                    Compiler.Logger.logVerbose("Resolving entry of " + currentCodeByte + " to: " + hexLocation);
 
                     tempTableEntry.resolvedAddress = hexLocation;
 
                     this.setCodeAtIndex(hexLocation, cursorIndex);
                     this.setCodeAtIndex("00", cursorIndex + 1);
+                } else if (/^J/.test(currentCodeByte)) {
+                    Compiler.Logger.logVerbose("Backpatching jump address for name: " + currentCodeByte + " (NOT IMPLEMENTED)");
                 }
             }
         };
@@ -449,6 +556,19 @@ var Compiler;
             return this.heapPointer;
         };
 
+        CodeGenerator.insertNewTempEntry = function () {
+            var tempName = "T" + this.tempTable.length.toString();
+            var tempOffset = this.tempTable.length;
+
+            var newEntry = new TempTableEntry();
+            newEntry.tempName = tempName;
+            newEntry.addressOffset = tempOffset;
+
+            this.tempTable.push(newEntry);
+
+            return newEntry;
+        };
+
         // TODO: Delete after testing
         CodeGenerator.debugPrintTempTable = function () {
             if (this.tempTable.length > 0) {
@@ -465,8 +585,6 @@ var Compiler;
         };
 
         CodeGenerator.getEntryNameById = function (idName, scopeLevel) {
-            Compiler.Logger.logVerbose("Looking for id " + idName + " in scope " + scopeLevel);
-
             var currentEntry = null;
             var entryFound = false;
 
@@ -474,8 +592,6 @@ var Compiler;
                 currentEntry = this.tempTable[i];
 
                 if (currentEntry.idName === idName && currentEntry.scopeLevel === scopeLevel) {
-                    Compiler.Logger.logVerbose("Id " + idName + " in scope " + scopeLevel + " was found");
-
                     entryFound = true;
                     break;
                 }

@@ -1,6 +1,6 @@
 module Compiler {
 
-    // TODO: Do I need the symbol table?
+    // TODO: Do I need the symbol table? I don't think I do
     export class CodeGenerator {
 
         private static abstractSyntaxTree: AbstractSyntaxTree;
@@ -12,6 +12,7 @@ module Compiler {
         private static tempTable: TempTableEntry [];
 
         private static heapPointer: number;
+
 
         public static generateCode(abstractSyntaxTree: AbstractSyntaxTree, symbolTable: SymbolTable): string [] {
 
@@ -54,6 +55,7 @@ module Compiler {
             this.heapPointer = _Constants.MAX_CODE_SIZE;
         }
 
+        // TODO: Add while and if statements
         private static buildCode(root: ASTNode): void {
 
             switch(root.getValue()) {
@@ -77,6 +79,16 @@ module Compiler {
                 case astNodeTypes.PRINT_STATEMENT:
 
                     this.printStatementTemplate(root);
+                    break;
+
+                case astNodeTypes.IF_STATEMENT:
+
+                    Logger.logVerbose("If statement (NOT IMPLEMENTED)");
+                    break;
+
+                case astNodeTypes.WHILE_STATEMENT:
+
+                    Logger.logVerbose("While statement (NOT IMPLEMENTED)");
                     break;
 
                 default:
@@ -200,8 +212,14 @@ module Compiler {
 
                 else {
 
-                    // Assigning an addition expression
+                    // TODO: Assigning an addition expression
                     Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
+
+                    var addressesToAdd: string[] = [];
+
+                    addressesToAdd = this.insertAddLocations(rightChildNode, addressesToAdd);
+                    this.insertAddCode(addressesToAdd);
+
                 }
 
             }
@@ -272,7 +290,7 @@ module Compiler {
                     }
                 }
 
-                // Assigning a boolean expression
+                // TODO: Assigning a boolean expression
                 else {
                     Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
                 }
@@ -338,10 +356,16 @@ module Compiler {
 
             var firstChildNode: ASTNode = printNode.getChildren()[0];
 
-            // TODO: Compound expression (addition or comparisons involved)
-            if(firstChildNode.getNodeType() === treeNodeTypes.INTERIOR) {
+            // TODO: Integer addition
+            if(firstChildNode.getValue() === astNodeTypes.ADD) {
 
-                Logger.logVerbose("Printing found interior node, so doing addition (NOT IMPLEMENTED)");
+                Logger.logVerbose("Inserting Print Statement of Integer Addition (NOT IMPLEMENTED)");
+            }
+
+            // TODO: Boolean expression
+            else if(firstChildNode.getValue() === astNodeTypes.EQUAL || firstChildNode.getValue() === astNodeTypes.NOT_EQUAL) {
+
+                Logger.logVerbose("Inserting Print Statement of Boolean Expression (== or !=) (NOT IMPLEMENTED)");
             }
 
             // Single digit
@@ -462,7 +486,106 @@ module Compiler {
                 throw "";
             }
 
+        }
 
+        private static insertAddLocations(rootNode: ASTNode, addressesToAdd: string []): string [] {
+
+            if(rootNode.getNodeType() === treeNodeTypes.LEAF) {
+
+                Logger.logVerbose("Leaf found: " + rootNode.getValue());
+
+                if(rootNode.getTokenType() === TokenType[TokenType.T_ID]) {
+
+                    Logger.logVerbose("Id");
+
+                    // Get tempName of id
+                    var id: string = rootNode.getValue();
+                    var scopeLevel: number = rootNode.getSymbolTableEntry().getScopeLevel();
+                    var tempName: string = this.getEntryNameById(id, scopeLevel);
+
+                    var address: string = tempName + " " + "XX";
+
+                    // Add tempName to list to be added
+                    addressesToAdd.push(address);
+                }
+
+                else if(rootNode.getTokenType() === TokenType[TokenType.T_DIGIT]) {
+
+                    Logger.logVerbose("Digit");
+
+                    var intLiteral: string = "0" + rootNode.getValue();
+
+                    // Load the accumulator with the int literal value
+                    this.setCode("A9");
+                    this.setCode(intLiteral);
+
+                    // Create new temp table entry for the int literal (inefficient, but it works)
+                    var tempName: string = "T" + this.tempTable.length.toString();
+                    var tempOffset: number = this.tempTable.length;
+
+                    var newEntry: TempTableEntry = new TempTableEntry();
+                    newEntry.tempName = tempName;
+                    newEntry.addressOffset = tempOffset;
+
+                    this.tempTable.push(newEntry);
+
+                    // Store the accumulator at a new temp address
+                    this.setCode("8D");
+                    this.setCode(tempName);
+                    this.setCode("XX");
+
+                    var address: string = tempName + " " + "XX";
+                    addressesToAdd.push(address);
+                }
+            }
+
+
+            for(var i: number = 0; i < rootNode.getChildren().length; i++) {
+                addressesToAdd = this.insertAddLocations(rootNode.getChildren()[i], addressesToAdd);
+            }
+
+            return addressesToAdd;
+        }
+
+        // Insert the Add with Carry instructions into code; return address of location of sum
+        private static insertAddCode(addLocations: string []): string {
+
+            // Set accumulator to 0 so you can start adding
+            this.setCode("A9");
+            this.setCode("00");
+
+            // Add them in reverse order they were added on to stack (precedence rules, even though its all addition)
+            while(addLocations.length > 0) {
+
+                var address: string = addLocations.pop();
+
+                var firstByte: string = address.split(" ")[0];
+                var secondByte: string = address.split(" ")[1];
+
+                // TODO: Remove after testing
+                Logger.log("First: " + firstByte + " | Second: " + secondByte);
+
+                // Add contents of the address to the accumulator
+                this.setCode("6D");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+            }
+
+            // Store the accumulator, now holding the sum, at an address in memory and return that address
+            var tempName: string = "T" + this.tempTable.length.toString();
+            var tempOffset: number = this.tempTable.length;
+
+            var newEntry: TempTableEntry = new TempTableEntry();
+            newEntry.tempName = tempName;
+            newEntry.addressOffset = tempOffset;
+
+            this.tempTable.push(newEntry);
+
+            this.setCode("8D");
+            this.setCode(tempName);
+            this.setCode("XX");
+
+            return tempName + " " + "XX";
         }
 
         // TODO: Add check to see if static space hits heap space
@@ -492,7 +615,6 @@ module Compiler {
 
             Logger.logVerbose("Backpatching the code and resolving addresses");
 
-            // currentIndex should point to beginning of static code
             var currentCodeByte: string = "";
             var staticAreaStart: number = this.currentIndex;
 
@@ -509,12 +631,19 @@ module Compiler {
                     var newIndex: number = staticAreaStart + tempTableEntry.addressOffset;
                     var hexLocation: string = Utils.decimalToHex(newIndex);
 
-                    Logger.logVerbose("New index for entry " + currentCodeByte + " is: " + hexLocation);
+                    Logger.logVerbose("Resolving entry of " + currentCodeByte + " to: " + hexLocation);
 
                     tempTableEntry.resolvedAddress = hexLocation;
 
                     this.setCodeAtIndex(hexLocation, cursorIndex);
                     this.setCodeAtIndex("00", cursorIndex + 1);
+                }
+
+                // TODO: Implement Jump patching
+                // All jump locations start with J
+                else if(/^J/.test(currentCodeByte)) {
+
+                    Logger.logVerbose("Backpatching jump address for name: " + currentCodeByte + " (NOT IMPLEMENTED)");
                 }
             }
         }
@@ -556,6 +685,20 @@ module Compiler {
             return this.heapPointer;
         }
 
+        private static insertNewTempEntry(): TempTableEntry {
+
+            var tempName: string = "T" + this.tempTable.length.toString();
+            var tempOffset: number = this.tempTable.length;
+
+            var newEntry: TempTableEntry = new TempTableEntry();
+            newEntry.tempName = tempName;
+            newEntry.addressOffset = tempOffset;
+
+            this.tempTable.push(newEntry);
+
+            return newEntry;
+        }
+
         // TODO: Delete after testing
         private static debugPrintTempTable(): void {
 
@@ -576,8 +719,6 @@ module Compiler {
 
         private static getEntryNameById(idName: string, scopeLevel: number): string {
 
-            Logger.logVerbose("Looking for id " + idName + " in scope " + scopeLevel);
-
             var currentEntry: TempTableEntry = null;
             var entryFound: boolean = false;
 
@@ -586,8 +727,6 @@ module Compiler {
                 currentEntry = this.tempTable[i];
 
                 if(currentEntry.idName === idName && currentEntry.scopeLevel === scopeLevel) {
-
-                    Logger.logVerbose("Id " + idName + " in scope " + scopeLevel + " was found");
 
                     entryFound = true;
                     break;
