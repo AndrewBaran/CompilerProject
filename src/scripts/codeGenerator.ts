@@ -115,20 +115,13 @@ module Compiler {
                 this.setCode("A9");
                 this.setCode("00");
 
-                var tempName: string = "T" + this.tempTable.length.toString();
-                var tempOffset: number = this.tempTable.length;
-
-                var newEntry: TempTableEntry = new TempTableEntry();
-                newEntry.tempName = tempName;
+                var newEntry: TempTableEntry = this.insertNewTempEntry();
                 newEntry.idName = idName;
                 newEntry.scopeLevel = scopeLevel;
-                newEntry.addressOffset = tempOffset;
-
-                this.tempTable.push(newEntry);
 
                 // Store accumulator at address of id (placeholder address for now)
                 this.setCode("8D");
-                this.setCode(tempName);
+                this.setCode(newEntry.tempName);
                 this.setCode("XX");
             }
 
@@ -136,16 +129,18 @@ module Compiler {
 
                 Logger.logVerbose("Inserting String Declaration of id " + idName);
 
-                var tempName: string = "T" + this.tempTable.length.toString();
-                var tempOffset: number = this.tempTable.length;
-
-                var newEntry: TempTableEntry = new TempTableEntry();
-                newEntry.tempName = tempName;
+                var newEntry: TempTableEntry = this.insertNewTempEntry();
                 newEntry.idName = idName;
                 newEntry.scopeLevel = scopeLevel;
-                newEntry.addressOffset = tempOffset;
 
-                this.tempTable.push(newEntry);
+                // Load accumulator with 0, the null string
+                this.setCode("A9");
+                this.setCode("00");
+
+                // Store the accumulator at the address of the string id
+                this.setCode("8D");
+                this.setCode(newEntry.tempName);
+                this.setCode("XX");
             }
 
         }
@@ -213,13 +208,27 @@ module Compiler {
                 else {
 
                     // TODO: Assigning an addition expression
-                    Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id + " (NOT IMPLEMENTED)");
+                    Logger.logVerbose("Inserting Integer Assignment of addition result to id " + id);
 
                     var addressesToAdd: string[] = [];
-
                     addressesToAdd = this.insertAddLocations(rightChildNode, addressesToAdd);
-                    this.insertAddCode(addressesToAdd);
 
+                    var addressOfSum: string = this.insertAddCode(addressesToAdd);
+                    var firstByte: string = addressOfSum.split(" ")[0];
+                    var secondByte: string = addressOfSum.split(" ")[1];
+
+                    // Load contents of the address of the sum to accumulator
+                    this.setCode("AD");
+                    this.setCode(firstByte);
+                    this.setCode(secondByte);
+
+                    var lhsScopeLevel: number = idNode.getSymbolTableEntry().getScopeLevel();
+                    var tempName: string = this.getEntryNameById(id, lhsScopeLevel);
+
+                    // Store contents of the accumulator (containing sum of addition) in address of LHS id
+                    this.setCode("8D");
+                    this.setCode(tempName);
+                    this.setCode("XX");
                 }
 
             }
@@ -492,26 +501,22 @@ module Compiler {
 
             if(rootNode.getNodeType() === treeNodeTypes.LEAF) {
 
-                Logger.logVerbose("Leaf found: " + rootNode.getValue());
-
                 if(rootNode.getTokenType() === TokenType[TokenType.T_ID]) {
-
-                    Logger.logVerbose("Id");
 
                     // Get tempName of id
                     var id: string = rootNode.getValue();
                     var scopeLevel: number = rootNode.getSymbolTableEntry().getScopeLevel();
                     var tempName: string = this.getEntryNameById(id, scopeLevel);
 
+                    Logger.logVerbose("Found id " + id + " to add");
+
                     var address: string = tempName + " " + "XX";
 
-                    // Add tempName to list to be added
+                    // Add address of tempName to list to be added together
                     addressesToAdd.push(address);
                 }
 
                 else if(rootNode.getTokenType() === TokenType[TokenType.T_DIGIT]) {
-
-                    Logger.logVerbose("Digit");
 
                     var intLiteral: string = "0" + rootNode.getValue();
 
@@ -520,21 +525,16 @@ module Compiler {
                     this.setCode(intLiteral);
 
                     // Create new temp table entry for the int literal (inefficient, but it works)
-                    var tempName: string = "T" + this.tempTable.length.toString();
-                    var tempOffset: number = this.tempTable.length;
-
-                    var newEntry: TempTableEntry = new TempTableEntry();
-                    newEntry.tempName = tempName;
-                    newEntry.addressOffset = tempOffset;
-
-                    this.tempTable.push(newEntry);
+                    var newEntry: TempTableEntry = this.insertNewTempEntry();
 
                     // Store the accumulator at a new temp address
                     this.setCode("8D");
-                    this.setCode(tempName);
+                    this.setCode(newEntry.tempName);
                     this.setCode("XX");
 
-                    var address: string = tempName + " " + "XX";
+                    Logger.logVerbose("Found digit " + intLiteral + " to add");
+
+                    var address: string = newEntry.tempName + " " + "XX";
                     addressesToAdd.push(address);
                 }
             }
@@ -562,33 +562,23 @@ module Compiler {
                 var firstByte: string = address.split(" ")[0];
                 var secondByte: string = address.split(" ")[1];
 
-                // TODO: Remove after testing
-                Logger.log("First: " + firstByte + " | Second: " + secondByte);
-
                 // Add contents of the address to the accumulator
                 this.setCode("6D");
                 this.setCode(firstByte);
                 this.setCode(secondByte);
             }
 
+            // Create new entry for the location of the sum
+            var newEntry: TempTableEntry = this.insertNewTempEntry();
+
             // Store the accumulator, now holding the sum, at an address in memory and return that address
-            var tempName: string = "T" + this.tempTable.length.toString();
-            var tempOffset: number = this.tempTable.length;
-
-            var newEntry: TempTableEntry = new TempTableEntry();
-            newEntry.tempName = tempName;
-            newEntry.addressOffset = tempOffset;
-
-            this.tempTable.push(newEntry);
-
             this.setCode("8D");
-            this.setCode(tempName);
+            this.setCode(newEntry.tempName);
             this.setCode("XX");
 
-            return tempName + " " + "XX";
+            return newEntry.tempName + " " + "XX";
         }
 
-        // TODO: Add check to see if static space hits heap space
         private static setCode(input: string): void {
 
             if((this.currentIndex + 1) <= this.heapPointer) {
@@ -631,12 +621,24 @@ module Compiler {
                     var newIndex: number = staticAreaStart + tempTableEntry.addressOffset;
                     var hexLocation: string = Utils.decimalToHex(newIndex);
 
-                    Logger.logVerbose("Resolving entry of " + currentCodeByte + " to: " + hexLocation);
+                    if(parseInt(hexLocation, 16) < this.heapPointer) {
 
-                    tempTableEntry.resolvedAddress = hexLocation;
+                        Logger.logVerbose("Resolving entry of " + currentCodeByte + " to: " + hexLocation);
 
-                    this.setCodeAtIndex(hexLocation, cursorIndex);
-                    this.setCodeAtIndex("00", cursorIndex + 1);
+                        tempTableEntry.resolvedAddress = hexLocation;
+
+                        this.setCodeAtIndex(hexLocation, cursorIndex);
+                        this.setCodeAtIndex("00", cursorIndex + 1);
+                    }
+
+                    else {
+
+                        var errorMessage: string = "Error! Static space is clashing with heap space (beginning at " + Utils.decimalToHex(this.heapPointer) + ") when " + tempTableEntry.tempName + " was resolved to address " + hexLocation;
+
+                        Logger.log(errorMessage);
+                        throw errorMessage;
+                    }
+
                 }
 
                 // TODO: Implement Jump patching
@@ -685,6 +687,7 @@ module Compiler {
             return this.heapPointer;
         }
 
+        // Created new entry in table, and return entry
         private static insertNewTempEntry(): TempTableEntry {
 
             var tempName: string = "T" + this.tempTable.length.toString();
