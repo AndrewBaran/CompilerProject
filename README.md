@@ -70,6 +70,14 @@ Final Project Checklist
 		- [x] String Id
 	- [ ] While Statements
 	- [ ] If Statements
+	- [ ] Comparisons
+		- [ ] Int Literal to Int Literal
+		- [ ] Int Literal to Int Id
+		- [ ] Int Id to Int Id
+		- [ ] Boolean Literal to Boolean Literal
+		- [ ] Boolean Literal to Boolean Id
+		- [ ] Boolean Id to Boolean Id
+		- [ ] String Id to String Id
 	- [ ] Backpatching
 		- [x] Temp Var Table
 		- [ ] Jump Table

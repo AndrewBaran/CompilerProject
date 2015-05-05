@@ -21,6 +21,7 @@ var Compiler;
 
             // TODO: Delete after testing
             this.debugPrintTempTable();
+            this.debugPrintJumpTable();
 
             return this.codeList;
         };
@@ -37,12 +38,16 @@ var Compiler;
             this.currentIndex = 0;
 
             this.tempTable = [];
+            this.jumpTable = [];
 
             this.heapPointer = _Constants.MAX_CODE_SIZE;
         };
 
         // TODO: Add while and if statements
         CodeGenerator.buildCode = function (root) {
+            var conditionalBlockEntered = false;
+            var startAddressOfBlock = -1;
+
             switch (root.getValue()) {
                 case astNodeTypes.BLOCK:
                     Compiler.Logger.logVerbose("Block node encountered: Going down to a new scope");
@@ -62,6 +67,13 @@ var Compiler;
 
                 case astNodeTypes.IF_STATEMENT:
                     Compiler.Logger.logVerbose("If statement (NOT IMPLEMENTED)");
+
+                    var leftChildNode = root.getChildren()[0];
+                    startAddressOfBlock = this.evaluateBooleanCondition(leftChildNode);
+
+                    // Set root to right child I think?
+                    conditionalBlockEntered = true;
+
                     break;
 
                 case astNodeTypes.WHILE_STATEMENT:
@@ -74,6 +86,20 @@ var Compiler;
 
             for (var i = 0; i < root.getChildren().length; i++) {
                 this.buildCode(root.getChildren()[i]);
+            }
+
+            // Set the proper distance to jump to be backpatched later
+            if (conditionalBlockEntered) {
+                for (var i = 0; i < this.jumpTable.length; i++) {
+                    var currentEntry = this.jumpTable[i];
+
+                    if (currentEntry.distance === -1) {
+                        currentEntry.distance = this.currentIndex - startAddressOfBlock;
+                        break;
+                    }
+                }
+
+                conditionalBlockEntered = false;
             }
         };
 
@@ -490,6 +516,75 @@ var Compiler;
             return newEntry.tempName + " " + "XX";
         };
 
+        // Return address of the beginning of the block, so we can backpatch jump code later
+        CodeGenerator.evaluateBooleanCondition = function (root) {
+            Compiler.Logger.logVerbose("Evaluating condition for if / while statement");
+
+            if (root.getTokenType() === TokenType[25 /* T_TRUE */]) {
+                Compiler.Logger.logVerbose("Condition of if / while statement is true");
+
+                // Load accumulator with 1 (true)
+                this.setCode("A9");
+                this.setCode("01");
+
+                var tempEntry = this.insertNewTempEntry();
+
+                // Store the accumulator at an address in memory to be compared against
+                this.setCode("8D");
+                this.setCode(tempEntry.tempName);
+                this.setCode("XX");
+
+                // Load X register with 0 (false)
+                this.setCode("A2");
+                this.setCode("01");
+
+                // Compare X register and address in memory (1 == 1, so Z-flag is set to 1)
+                this.setCode("EC");
+                this.setCode(tempEntry.tempName);
+                this.setCode("XX");
+
+                var jumpEntry = this.insertNewJumpEntry();
+
+                // Z-flag will be set to 1, so it won't branch
+                this.setCode("D0");
+                this.setCode(jumpEntry.tempName);
+
+                return this.currentIndex;
+            } else if (root.getTokenType() === TokenType[24 /* T_FALSE */]) {
+                Compiler.Logger.logVerbose("Condition of if / while statement is false");
+
+                // Load accumulator with 0 (false)
+                this.setCode("A9");
+                this.setCode("00");
+
+                var tempEntry = this.insertNewTempEntry();
+
+                // Store the accumulator at an address in memory to be compared against
+                this.setCode("8D");
+                this.setCode(tempEntry.tempName);
+                this.setCode("XX");
+
+                // Load X register with 1 (true)
+                this.setCode("A2");
+                this.setCode("01");
+
+                // Compare X register and address in memory (0 != 1, so Z-flag is set to 0)
+                this.setCode("EC");
+                this.setCode(tempEntry.tempName);
+                this.setCode("XX");
+
+                var jumpEntry = this.insertNewJumpEntry();
+
+                // Z-flag will be set to 0, so we will always branch
+                this.setCode("D0");
+                this.setCode(jumpEntry.tempName);
+
+                return this.currentIndex;
+            } else if (root.getNodeType() === treeNodeTypes.INTERIOR) {
+                Compiler.Logger.logVerbose("Condition of if / while statement is a boolean expression (NOT IMPLEMENTED)");
+            }
+        };
+
         CodeGenerator.setCode = function (input) {
             if ((this.currentIndex + 1) <= this.heapPointer) {
                 this.codeList[this.currentIndex] = input;
@@ -538,6 +633,19 @@ var Compiler;
                     }
                 } else if (/^J/.test(currentCodeByte)) {
                     Compiler.Logger.logVerbose("Backpatching jump address for name: " + currentCodeByte + " (NOT IMPLEMENTED)");
+
+                    var substringIndex = parseInt(currentCodeByte.substring(1), 10);
+                    var jumpTableEntry = this.jumpTable[substringIndex];
+
+                    var distanceToJump = jumpTableEntry.distance.toString();
+
+                    // Pad appropriately
+                    if (distanceToJump.length === 1) {
+                        distanceToJump = "0" + distanceToJump;
+                    }
+
+                    Compiler.Logger.logVerbose("Resolving jump entry of " + currentCodeByte + " to: " + distanceToJump);
+                    this.setCodeAtIndex(distanceToJump, cursorIndex);
                 }
             }
         };
@@ -585,17 +693,44 @@ var Compiler;
             return newEntry;
         };
 
+        // Create a new jump entry in the table, and return the entry
+        CodeGenerator.insertNewJumpEntry = function () {
+            var tempName = "J" + this.jumpTable.length.toString();
+
+            var newEntry = new JumpTableEntry();
+            newEntry.tempName = tempName;
+
+            this.jumpTable.push(newEntry);
+
+            return newEntry;
+        };
+
         // TODO: Delete after testing
         CodeGenerator.debugPrintTempTable = function () {
             if (this.tempTable.length > 0) {
-                Compiler.Logger.log("");
-                Compiler.Logger.log("Temp Table");
-                Compiler.Logger.log("--------------------------------");
+                Compiler.Logger.logVerbose("");
+                Compiler.Logger.logVerbose("Temp Table");
+                Compiler.Logger.logVerbose("--------------------------------");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
                     var entry = this.tempTable[i];
 
-                    Compiler.Logger.log(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress + " | " + entry.scopeLevel);
+                    Compiler.Logger.logVerbose(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress + " | " + entry.scopeLevel);
+                }
+            }
+        };
+
+        // TODO: Delete after testing
+        CodeGenerator.debugPrintJumpTable = function () {
+            if (this.jumpTable.length > 0) {
+                Compiler.Logger.logVerbose("");
+                Compiler.Logger.logVerbose("Jump Table");
+                Compiler.Logger.logVerbose("--------------------------------");
+
+                for (var i = 0; i < this.jumpTable.length; i++) {
+                    var entry = this.jumpTable[i];
+
+                    Compiler.Logger.logVerbose(entry.tempName + " | " + entry.distance);
                 }
             }
         };
@@ -636,5 +771,13 @@ var Compiler;
             this.resolvedAddress = "";
         }
         return TempTableEntry;
+    })();
+
+    var JumpTableEntry = (function () {
+        function JumpTableEntry() {
+            this.tempName = "";
+            this.distance = -1;
+        }
+        return JumpTableEntry;
     })();
 })(Compiler || (Compiler = {}));
