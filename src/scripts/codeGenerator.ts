@@ -59,7 +59,7 @@ module Compiler {
         private static buildCode(root: ASTNode): void {
 
             var conditionalBlockEntered: boolean = false;
-            var startAddressOfBlock: number = -1;
+            var jumpPatchInfo: JumpPatchInfo = null;
 
             switch(root.getValue()) {
 
@@ -89,7 +89,7 @@ module Compiler {
                     Logger.logVerbose("If statement (NOT IMPLEMENTED)");
 
                     var leftChildNode: ASTNode = root.getChildren()[0];
-                    startAddressOfBlock = this.evaluateBooleanCondition(leftChildNode);
+                    jumpPatchInfo = this.evaluateBooleanCondition(leftChildNode);
 
                     // Set root to right child I think?
 
@@ -114,16 +114,10 @@ module Compiler {
             // Set the proper distance to jump to be backpatched later
             if(conditionalBlockEntered) {
 
-                // TODO: I think this is broken with nested-ifs
-                for (var i: number = 0; i < this.jumpTable.length; i++) {
+                var substringIndex: number = parseInt(jumpPatchInfo.tempName.substring(1));
 
-                    var currentEntry: JumpTableEntry = this.jumpTable[i];
-
-                    if(currentEntry.distance === -1) {
-                        currentEntry.distance = this.currentIndex - startAddressOfBlock;
-                        break;
-                    }
-                }
+                var jumpEntry: JumpTableEntry = this.jumpTable[substringIndex];
+                jumpEntry.distance = this.currentIndex - jumpPatchInfo.startAddressOfBlock;
 
                 conditionalBlockEntered = false;
             }
@@ -630,7 +624,7 @@ module Compiler {
         }
 
         // Return address of the beginning of the block, so we can backpatch jump code later
-        private static evaluateBooleanCondition(root: ASTNode): number {
+        private static evaluateBooleanCondition(root: ASTNode): JumpPatchInfo {
 
             Logger.logVerbose("Evaluating condition for if / while statement");
 
@@ -664,7 +658,11 @@ module Compiler {
                 this.setCode("D0");
                 this.setCode(jumpEntry.tempName);
 
-                return this.currentIndex;
+                var jumpInfo: JumpPatchInfo = new JumpPatchInfo();
+                jumpInfo.tempName = jumpEntry.tempName;
+                jumpInfo.startAddressOfBlock = this.currentIndex;
+
+                return jumpInfo;
             }
 
             else if(root.getTokenType() === TokenType[TokenType.T_FALSE]) {
@@ -697,7 +695,11 @@ module Compiler {
                 this.setCode("D0");
                 this.setCode(jumpEntry.tempName);
 
-                return this.currentIndex;
+                var jumpInfo: JumpPatchInfo = new JumpPatchInfo();
+                jumpInfo.tempName = jumpEntry.tempName;
+                jumpInfo.startAddressOfBlock = this.currentIndex;
+
+                return jumpInfo;
             }
 
             // == or != involved (boolean expression)
@@ -769,7 +771,6 @@ module Compiler {
 
                 }
 
-                // TODO: Implement Jump patching
                 // All jump locations start with J
                 else if(/^J/.test(currentCodeByte)) {
 
@@ -950,6 +951,17 @@ module Compiler {
         constructor() {
             this.tempName = "";
             this.distance = -1;
+        }
+    }
+
+    class JumpPatchInfo {
+
+        public tempName: string;
+        public startAddressOfBlock: number;
+
+        constructor() {
+            this.tempName = "";
+            this.startAddressOfBlock = -1;
         }
     }
 }

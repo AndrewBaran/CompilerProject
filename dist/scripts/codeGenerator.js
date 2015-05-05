@@ -46,7 +46,7 @@ var Compiler;
         // TODO: Add while and if statements
         CodeGenerator.buildCode = function (root) {
             var conditionalBlockEntered = false;
-            var startAddressOfBlock = -1;
+            var jumpPatchInfo = null;
 
             switch (root.getValue()) {
                 case astNodeTypes.BLOCK:
@@ -69,7 +69,7 @@ var Compiler;
                     Compiler.Logger.logVerbose("If statement (NOT IMPLEMENTED)");
 
                     var leftChildNode = root.getChildren()[0];
-                    startAddressOfBlock = this.evaluateBooleanCondition(leftChildNode);
+                    jumpPatchInfo = this.evaluateBooleanCondition(leftChildNode);
 
                     // Set root to right child I think?
                     conditionalBlockEntered = true;
@@ -90,14 +90,10 @@ var Compiler;
 
             // Set the proper distance to jump to be backpatched later
             if (conditionalBlockEntered) {
-                for (var i = 0; i < this.jumpTable.length; i++) {
-                    var currentEntry = this.jumpTable[i];
+                var substringIndex = parseInt(jumpPatchInfo.tempName.substring(1));
 
-                    if (currentEntry.distance === -1) {
-                        currentEntry.distance = this.currentIndex - startAddressOfBlock;
-                        break;
-                    }
-                }
+                var jumpEntry = this.jumpTable[substringIndex];
+                jumpEntry.distance = this.currentIndex - jumpPatchInfo.startAddressOfBlock;
 
                 conditionalBlockEntered = false;
             }
@@ -549,7 +545,11 @@ var Compiler;
                 this.setCode("D0");
                 this.setCode(jumpEntry.tempName);
 
-                return this.currentIndex;
+                var jumpInfo = new JumpPatchInfo();
+                jumpInfo.tempName = jumpEntry.tempName;
+                jumpInfo.startAddressOfBlock = this.currentIndex;
+
+                return jumpInfo;
             } else if (root.getTokenType() === TokenType[24 /* T_FALSE */]) {
                 Compiler.Logger.logVerbose("Condition of if / while statement is false");
 
@@ -579,7 +579,11 @@ var Compiler;
                 this.setCode("D0");
                 this.setCode(jumpEntry.tempName);
 
-                return this.currentIndex;
+                var jumpInfo = new JumpPatchInfo();
+                jumpInfo.tempName = jumpEntry.tempName;
+                jumpInfo.startAddressOfBlock = this.currentIndex;
+
+                return jumpInfo;
             } else if (root.getNodeType() === treeNodeTypes.INTERIOR) {
                 Compiler.Logger.logVerbose("Condition of if / while statement is a boolean expression (NOT IMPLEMENTED)");
             }
@@ -779,5 +783,13 @@ var Compiler;
             this.distance = -1;
         }
         return JumpTableEntry;
+    })();
+
+    var JumpPatchInfo = (function () {
+        function JumpPatchInfo() {
+            this.tempName = "";
+            this.startAddressOfBlock = -1;
+        }
+        return JumpPatchInfo;
     })();
 })(Compiler || (Compiler = {}));
