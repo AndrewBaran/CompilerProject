@@ -49,10 +49,6 @@ var Compiler;
             var jumpPatchInfo = null;
 
             switch (root.getValue()) {
-                case astNodeTypes.BLOCK:
-                    Compiler.Logger.logVerbose("Block node encountered: Going down to a new scope");
-                    break;
-
                 case astNodeTypes.VAR_DECLARATION:
                     this.varDeclarationTemplate(root);
                     break;
@@ -66,12 +62,11 @@ var Compiler;
                     break;
 
                 case astNodeTypes.IF_STATEMENT:
-                    Compiler.Logger.logVerbose("If statement (NOT IMPLEMENTED)");
+                    Compiler.Logger.logVerbose("If statement (NOT FULLY IMPLEMENTED)");
 
                     var leftChildNode = root.getChildren()[0];
                     jumpPatchInfo = this.evaluateBooleanCondition(leftChildNode);
 
-                    // Set root to right child I think?
                     conditionalBlockEntered = true;
 
                     break;
@@ -90,7 +85,7 @@ var Compiler;
 
             // Set the proper distance to jump to be backpatched later
             if (conditionalBlockEntered) {
-                var substringIndex = parseInt(jumpPatchInfo.tempName.substring(1));
+                var substringIndex = parseInt(jumpPatchInfo.tempName.substring(1), 10);
 
                 var jumpEntry = this.jumpTable[substringIndex];
                 jumpEntry.distance = this.currentIndex - jumpPatchInfo.startAddressOfBlock;
@@ -641,7 +636,7 @@ var Compiler;
                     var substringIndex = parseInt(currentCodeByte.substring(1), 10);
                     var jumpTableEntry = this.jumpTable[substringIndex];
 
-                    var distanceToJump = jumpTableEntry.distance.toString();
+                    var distanceToJump = jumpTableEntry.distance.toString(16);
 
                     // Pad appropriately
                     if (distanceToJump.length === 1) {
@@ -734,7 +729,7 @@ var Compiler;
                 for (var i = 0; i < this.jumpTable.length; i++) {
                     var entry = this.jumpTable[i];
 
-                    Compiler.Logger.logVerbose(entry.tempName + " | " + entry.distance);
+                    Compiler.Logger.logVerbose(entry.tempName + " | " + entry.distance + " (Decimal)");
                 }
             }
         };

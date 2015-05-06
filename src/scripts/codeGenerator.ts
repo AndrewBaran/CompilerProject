@@ -63,12 +63,6 @@ module Compiler {
 
             switch(root.getValue()) {
 
-                // TODO: Probably don't need anything here
-                case astNodeTypes.BLOCK:
-
-                    Logger.logVerbose("Block node encountered: Going down to a new scope");
-                    break;
-
                 case astNodeTypes.VAR_DECLARATION:
 
                     this.varDeclarationTemplate(root);
@@ -86,12 +80,10 @@ module Compiler {
 
                 case astNodeTypes.IF_STATEMENT:
 
-                    Logger.logVerbose("If statement (NOT IMPLEMENTED)");
+                    Logger.logVerbose("If statement (NOT FULLY IMPLEMENTED)");
 
                     var leftChildNode: ASTNode = root.getChildren()[0];
                     jumpPatchInfo = this.evaluateBooleanCondition(leftChildNode);
-
-                    // Set root to right child I think?
 
                     conditionalBlockEntered = true;
 
@@ -114,7 +106,7 @@ module Compiler {
             // Set the proper distance to jump to be backpatched later
             if(conditionalBlockEntered) {
 
-                var substringIndex: number = parseInt(jumpPatchInfo.tempName.substring(1));
+                var substringIndex: number = parseInt(jumpPatchInfo.tempName.substring(1), 10);
 
                 var jumpEntry: JumpTableEntry = this.jumpTable[substringIndex];
                 jumpEntry.distance = this.currentIndex - jumpPatchInfo.startAddressOfBlock;
@@ -779,7 +771,7 @@ module Compiler {
                     var substringIndex: number = parseInt(currentCodeByte.substring(1), 10);
                     var jumpTableEntry: JumpTableEntry = this.jumpTable[substringIndex];
 
-                    var distanceToJump: string = jumpTableEntry.distance.toString();
+                    var distanceToJump: string = jumpTableEntry.distance.toString(16);
 
                     // Pad appropriately
                     if(distanceToJump.length === 1) {
@@ -886,7 +878,7 @@ module Compiler {
 
                     var entry: JumpTableEntry = this.jumpTable[i];
 
-                    Logger.logVerbose(entry.tempName + " | " + entry.distance);
+                    Logger.logVerbose(entry.tempName + " | " + entry.distance + " (Decimal)");
                 }
             }
         }
