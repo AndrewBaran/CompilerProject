@@ -84,6 +84,8 @@ var Compiler;
 
             this.parent = null;
             this.childList = [];
+
+            this.usedInAST = false;
         }
         CSTNode.prototype.getValue = function () {
             return this.value;
@@ -136,6 +138,14 @@ var Compiler;
         CSTNode.prototype.addChild = function (child) {
             child.setParent(this);
             this.childList.push(child);
+        };
+
+        CSTNode.prototype.getUsedInAST = function () {
+            return this.usedInAST;
+        };
+
+        CSTNode.prototype.setUsedInAST = function () {
+            this.usedInAST = true;
         };
 
         CSTNode.prototype.printPreOrder = function (root) {
@@ -218,12 +228,18 @@ var Compiler;
                         break;
 
                     case cstNodeTypes.BOOLEAN_EXPRESSION:
-                        if (this.contains(this, "==")) {
-                            interiorNodePath = astNodeTypes.EQUAL;
-                            abstractSyntaxTree.insertInteriorNode(interiorNodePath);
-                        } else if (this.contains(this, "!=")) {
-                            interiorNodePath = astNodeTypes.NOT_EQUAL;
-                            abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                        var comparisonOperatorNode = null;
+                        comparisonOperatorNode = this.findNextComparisonOperator(root, comparisonOperatorNode);
+
+                        // == or != found
+                        if (comparisonOperatorNode !== null) {
+                            if (comparisonOperatorNode.getValue() === "==") {
+                                interiorNodePath = astNodeTypes.EQUAL;
+                                abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                            } else if (comparisonOperatorNode.getValue() === "!=") {
+                                interiorNodePath = astNodeTypes.NOT_EQUAL;
+                                abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+                            }
                         } else {
                             interiorNodePath = astNodeTypes.BOOLEAN_EXPRESSION;
                         }
@@ -311,7 +327,7 @@ var Compiler;
             }
         };
 
-        // Searchs the root nodes subtree for the desired value in any of its descendent nodes
+        // Searchs the root nodes subtree for the desired value in any of its descendent nodes (used in addition)
         CSTNode.prototype.contains = function (root, desiredValue) {
             if (root !== null) {
                 if (root.getNodeType() === treeNodeTypes.LEAF && root.getValue() === desiredValue) {
@@ -329,6 +345,23 @@ var Compiler;
                 }
 
                 return result;
+            }
+        };
+
+        CSTNode.prototype.findNextComparisonOperator = function (root, nodeFound) {
+            if (root !== null) {
+                if (root.getNodeType() === treeNodeTypes.LEAF && !root.getUsedInAST()) {
+                    if (root.getValue() === "==" || root.getValue() === "!=") {
+                        root.setUsedInAST();
+                        nodeFound = root;
+                    }
+                } else if (nodeFound === null) {
+                    for (var i = 0; i < root.childList.length; i++) {
+                        nodeFound = this.findNextComparisonOperator(root.childList[i], nodeFound);
+                    }
+                }
+
+                return nodeFound;
             }
         };
         return CSTNode;

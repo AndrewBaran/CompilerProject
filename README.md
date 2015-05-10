@@ -50,13 +50,13 @@ Final Project Checklist
 		- [x] Int
 		- [x] Boolean
 		- [x] String
-	- [ ] Assignment Statements
+	- [x] Assignment Statements
 		- [x] Int Literal
 		- [x] Int Id
 		- [x] Int Addition
 		- [x] Boolean Literal
 		- [x] Boolean Id
-		- [ ] Boolean Comparisons
+		- [x] Boolean Comparisons
 		- [x] String
 		- [x] String Id
 	- [ ] Print Statements
@@ -74,10 +74,10 @@ Final Project Checklist
 		- [ ] Int Literal to Int Literal
 		- [ ] Int Literal to Int Id
 		- [ ] Int Id to Int Id
-		- [ ] Boolean Literal to Boolean Literal
-		- [ ] Boolean Literal to Boolean Id
-		- [ ] Boolean Id to Boolean Id
+		- [x] Boolean Literal to Boolean Literal
+		- [x] Boolean Literal to Boolean Id
+		- [x] Boolean Id to Boolean Id
 		- [ ] String Id to String Id
-	- [ ] Backpatching
+	- [x] Backpatching
 		- [x] Temp Var Table
-		- [ ] Jump Table
+		- [x] Jump Table

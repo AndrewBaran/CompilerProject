@@ -27,12 +27,12 @@ module Compiler {
 
             this.backPatchCode();
 
-            Logger.logVerbose("");
-            Logger.log("Code Generation Completed");
-
             // TODO: Delete after testing
             this.debugPrintTempTable();
             this.debugPrintJumpTable();
+
+            Logger.logVerbose("");
+            Logger.log("Code Generation Completed");
 
             return this.codeList;
         }
@@ -731,7 +731,6 @@ module Compiler {
 
         // Postorder traversal of boolean expression subtree
         // After visiting children, send up address of result back to parent
-        // WARNING: Brain damage will take place shortly
         private static parseBooleanTree(root: ASTNode): string {
 
             var resultAddress: string = "";
@@ -745,10 +744,6 @@ module Compiler {
 
                     leftAddress = this.parseBooleanTree(root.getChildren()[0]);
                     rightAddress = this.parseBooleanTree(root.getChildren()[1]);
-
-                    Logger.logVerbose("Node: " + root.getValue() + " | Interior");
-                    Logger.logVerbose("Left address: " + leftAddress);
-                    Logger.logVerbose("Right address: " + rightAddress);
 
                     if(leftAddress !== "" && rightAddress !== "") {
 
@@ -768,6 +763,7 @@ module Compiler {
                         this.setCode(rightFirstByte);
                         this.setCode(rightSecondByte);
 
+                        // Lot of duplicate code, but I have a lot of brain damage trying to work this out, so...
                         if(root.getValue() === astNodeTypes.EQUAL) {
 
                             Logger.logVerbose("Evaluating if " + leftFirstByte + " == " + rightFirstByte);
@@ -795,7 +791,7 @@ module Compiler {
                             this.setCode("D0");
                             this.setCode(jumpEntryNotEqual.tempName);
 
-                            var indexAfterJumpNotEqual: number = this.currentIndex;
+                            var firstJumpIndex: number = this.currentIndex;
 
                             // Case where true == true or false == false; both evaluate to true
                             // Load accumulator with 1 (true)
@@ -808,7 +804,7 @@ module Compiler {
                             this.setCode("XX");
 
                             // Set distance to jump after branch not equal 
-                            jumpEntryNotEqual.distance = this.currentIndex - indexAfterJumpNotEqual;
+                            jumpEntryNotEqual.distance = this.currentIndex - firstJumpIndex;
 
                             // Set up for next jump
                             // Load X register with 0
@@ -824,7 +820,7 @@ module Compiler {
                             this.setCode("D0");
                             this.setCode(jumpEntryEqual.tempName);
 
-                            var indexAfterJumpEqual: number = this.currentIndex;
+                            var secondJumpIndex: number = this.currentIndex;
 
                             // Case where true == false or false == true; both evaluate to false
                             // Load accumulator with 0 (false)
@@ -836,18 +832,82 @@ module Compiler {
                             this.setCode(tempEntry.tempName);
                             this.setCode("XX");
 
-                            jumpEntryEqual.distance = this.currentIndex - indexAfterJumpEqual;
-
-                            Logger.logVerbose("Setting first jump distance to " + jumpEntryNotEqual.distance.toString(16));
-                            Logger.logVerbose("Setting second jump distance to " + jumpEntryEqual.distance.toString(16));
+                            jumpEntryEqual.distance = this.currentIndex - secondJumpIndex;
 
                             resultAddress = tempEntry.tempName + " " + "XX";
                         }
 
-                        // Z flag set to 0 if not equal
                         else if(root.getValue() === astNodeTypes.NOT_EQUAL) {
 
                             Logger.logVerbose("Evaluating if " + leftFirstByte + " != " + rightFirstByte);
+
+                            // Result address
+                            var tempEntry: TempTableEntry = this.insertNewTempEntry();
+
+                            var jumpEntryNotEqual: JumpTableEntry = this.insertNewJumpEntry();
+                            var jumpEntryEqual: JumpTableEntry = this.insertNewJumpEntry();
+
+                            this.jumpTable.push(jumpEntryNotEqual);
+                            this.jumpTable.push(jumpEntryEqual);
+
+                            // Store 1 in the result address as default
+                            // Load accumulator with 1
+                            this.setCode("A9");
+                            this.setCode("01");
+
+                            // Store the accumulator at result address
+                            this.setCode("8D");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            // Branch around if z = 0 (true != false or false != true)
+                            this.setCode("D0");
+                            this.setCode(jumpEntryNotEqual.tempName);
+
+                            var firstJumpIndex: number = this.currentIndex;
+
+                            // Case where true != true or false != false; both evaluate to false
+                            // Load accumulator with 0 (false)
+                            this.setCode("A9");
+                            this.setCode("00");
+
+                            // Store accumulator at temp address
+                            this.setCode("8D");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            // Set distance to jump after branch not equal 
+                            jumpEntryNotEqual.distance = this.currentIndex - firstJumpIndex;
+
+                            // Set up for next jump
+                            // Load X register with 1
+                            this.setCode("A2");
+                            this.setCode("01");
+
+                            // Compare X register and result address
+                            this.setCode("EC");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            // Branch around if z = 0 (If we did above case, where true != true or false != false)
+                            this.setCode("D0");
+                            this.setCode(jumpEntryEqual.tempName);
+
+                            var secondJumpIndex: number = this.currentIndex;
+
+                            // Case where true != false or false != true; both evaluate to true
+                            // Load accumulator with 1 (true)
+                            this.setCode("A9");
+                            this.setCode("01");
+
+                            // Store accumulator at temp address
+                            this.setCode("8D");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            jumpEntryEqual.distance = this.currentIndex - secondJumpIndex;
+
+                            resultAddress = tempEntry.tempName + " " + "XX";
                         }
 
                     }
@@ -855,12 +915,10 @@ module Compiler {
 
                 else if(root.getNodeType() === treeNodeTypes.LEAF) {
 
-                    Logger.logVerbose("Node: " + root.getValue() + " | Leaf");
-
-                    // Synthesize the address of node to parent
+                    // TODO: Add cases for strings and such
                     if(root.getTokenType() === TokenType[TokenType.T_DIGIT]) {
 
-                        Logger.logVerbose("Propagating addresss of digit");
+                        Logger.logVerbose("Propagating addresss of digit (NOT SUPPORTED?)");
                     }
 
                     else if(root.getTokenType() === TokenType[TokenType.T_TRUE]) {
@@ -898,14 +956,20 @@ module Compiler {
                         this.setCode(tempEntry.tempName);
                         this.setCode("XX");
 
-                        Logger.logVerbose("Address being propagated: " + tempEntry.tempName);
-
                         resultAddress = tempEntry.tempName + " " + "XX";
                     }
 
                     else if(root.getTokenType() === TokenType[TokenType.T_ID]) {
 
-                        Logger.logVerbose("Propagating addresss of id " + root.getValue());
+                        var idName: string = root.getValue();
+                        var scopeLevel: number = root.getSymbolTableEntry().getScopeLevel();
+
+                        var idTempName: string = this.getEntryNameById(idName, scopeLevel);
+
+                        Logger.logVerbose("Propagating address of id " + idName);
+
+                        // Pass back address of id, as it is already in memory
+                        resultAddress = idTempName + " " + "XX";
                     }
                 }
             }
@@ -932,7 +996,18 @@ module Compiler {
         }
 
         private static setCodeAtIndex(input: string, index: number): void {
-            this.codeList[index] = input;
+
+            if((index + 1) <= this.heapPointer) {
+                this.codeList[index] = input;
+            }
+
+            else {
+
+                var errorMessage: string = "Error! Stack overflow at address " + Utils.decimalToHex(this.currentIndex + 1) + " when attempting to insert the code " + input;
+
+                Logger.log(errorMessage);
+                throw errorMessage;
+            }
         }
 
         private static backPatchCode(): void {
@@ -977,8 +1052,6 @@ module Compiler {
 
                 // All jump locations start with J
                 else if(/^J/.test(currentCodeByte)) {
-
-                    Logger.logVerbose("Backpatching jump address for name: " + currentCodeByte + " (NOT IMPLEMENTED)");
 
                     var substringIndex: number = parseInt(currentCodeByte.substring(1), 10);
                     var jumpTableEntry: JumpTableEntry = this.jumpTable[substringIndex];
@@ -1095,6 +1168,7 @@ module Compiler {
             }
         }
 
+        // Gets the tempName of the id at the specified scope
         private static getEntryNameById(idName: string, scopeLevel: number): string {
 
             var currentEntry: TempTableEntry = null;

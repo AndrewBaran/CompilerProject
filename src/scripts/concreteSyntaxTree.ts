@@ -110,6 +110,8 @@ module Compiler {
 		private parent: CSTNode;
 		private childList: CSTNode [];
 
+        private usedInAST: boolean;
+
 		constructor() {
 
 			this.type = "";
@@ -120,6 +122,8 @@ module Compiler {
 
 			this.parent = null;
 			this.childList = [];
+
+            this.usedInAST = false;
 		}
 
 		public getValue(): string {
@@ -175,6 +179,14 @@ module Compiler {
 			child.setParent(this);
 			this.childList.push(child);
 		}
+
+        public getUsedInAST(): boolean {
+            return this.usedInAST;
+        }
+
+        public setUsedInAST(): void {
+            this.usedInAST = true;
+        }
 
 		public printPreOrder(root: CSTNode): void {
 
@@ -277,17 +289,24 @@ module Compiler {
 
 					case cstNodeTypes.BOOLEAN_EXPRESSION:
 
-						if(this.contains(this, "==")) {
+                        var comparisonOperatorNode: CSTNode = null;
+                        comparisonOperatorNode = this.findNextComparisonOperator(root, comparisonOperatorNode);
 
-							interiorNodePath = astNodeTypes.EQUAL;
-							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
-						}
+                        // == or != found
+                        if(comparisonOperatorNode !== null) {
 
-						else if(this.contains(this, "!=")) {
+    						if(comparisonOperatorNode.getValue() === "==") {
+     
+    							interiorNodePath = astNodeTypes.EQUAL;
+    							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+    						}
 
-							interiorNodePath = astNodeTypes.NOT_EQUAL;
-							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
-						}
+    						else if(comparisonOperatorNode.getValue() === "!=") {
+
+    							interiorNodePath = astNodeTypes.NOT_EQUAL;
+    							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+    						}
+                        }
 
 						// Add single boolval leaf
 						else {
@@ -391,7 +410,7 @@ module Compiler {
 			}
 		}
 
-		// Searchs the root nodes subtree for the desired value in any of its descendent nodes
+		// Searchs the root nodes subtree for the desired value in any of its descendent nodes (used in addition)
 		public contains(root: CSTNode, desiredValue: string): boolean {
 
 			if(root !== null) {
@@ -414,5 +433,29 @@ module Compiler {
 				return result;
 			}
 		}
+
+        private findNextComparisonOperator(root: CSTNode, nodeFound: CSTNode): CSTNode {
+
+            if(root !== null) {
+
+                if(root.getNodeType() === treeNodeTypes.LEAF && !root.getUsedInAST()) {
+
+                    if(root.getValue() === "==" || root.getValue() === "!=") {
+
+                        root.setUsedInAST();
+                        nodeFound = root;
+                    }
+                }
+
+                else if(nodeFound === null) {
+
+                    for(var i: number = 0; i < root.childList.length; i++) {
+                        nodeFound = this.findNextComparisonOperator(root.childList[i], nodeFound);
+                    }
+                }
+
+                return nodeFound;
+            }
+        }
 	}
 }
