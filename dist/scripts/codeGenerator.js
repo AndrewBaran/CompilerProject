@@ -355,8 +355,24 @@ var Compiler;
                 // System call
                 this.setCode("FF");
             } else if (firstChildNode.getValue() === astNodeTypes.EQUAL || firstChildNode.getValue() === astNodeTypes.NOT_EQUAL) {
-                Compiler.Logger.logVerbose("Inserting Print Statement of Boolean Expression (== or !=) (NOT IMPLEMENTED)");
-                throw "";
+                Compiler.Logger.logVerbose("Inserting Print Statement of Boolean Expression");
+
+                var addressOfResult = this.parseBooleanTree(firstChildNode);
+
+                var firstByte = addressOfResult.split(" ")[0];
+                var secondByte = addressOfResult.split(" ")[1];
+
+                // Load X register with 1 to get ready to print int (same representation as true / false)
+                this.setCode("A2");
+                this.setCode("01");
+
+                // Load Y register with address of result of the boolean operation
+                this.setCode("AC");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+
+                // System call
+                this.setCode("FF");
             } else if (firstChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
                 Compiler.Logger.logVerbose("Inserting Print Statement of Integer Literal");
 

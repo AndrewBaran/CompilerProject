@@ -423,11 +423,26 @@ module Compiler {
                 this.setCode("FF");
             }
 
-            // TODO: Boolean expression
             else if(firstChildNode.getValue() === astNodeTypes.EQUAL || firstChildNode.getValue() === astNodeTypes.NOT_EQUAL) {
 
-                Logger.logVerbose("Inserting Print Statement of Boolean Expression (== or !=) (NOT IMPLEMENTED)");
-                throw "";
+                Logger.logVerbose("Inserting Print Statement of Boolean Expression");
+
+                var addressOfResult: string = this.parseBooleanTree(firstChildNode);
+
+                var firstByte: string = addressOfResult.split(" ")[0];
+                var secondByte: string = addressOfResult.split(" ")[1];
+
+                // Load X register with 1 to get ready to print int (same representation as true / false)
+                this.setCode("A2");
+                this.setCode("01");
+
+                // Load Y register with address of result of the boolean operation
+                this.setCode("AC");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+
+                // System call
+                this.setCode("FF");
             }
 
             // Single digit
