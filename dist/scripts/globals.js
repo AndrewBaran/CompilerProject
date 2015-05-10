@@ -24,7 +24,6 @@ var _testCodeList = [
     { name: "If 2", code: "{\n\tif (1 == 1) {\n\t\tint a\n\t\ta = 1\n\t}\n} $" },
     { name: "If 3", code: "{\n\tif (1 != 2) {\n\t\tint a\n\t\ta = 1\n\t}\n} $" },
     { name: "If 4", code: "{\n\tint a\n\ta = 1\n\n\tif(a == 1) {\n\t\ta = 2\n\t}\n\n\tif(a != 1) {\n\t\ta = 3\n\t}\n} $" },
-    { name: "Compare 1", code: "{\n\tif(\"abc\" == \"abc\") {\n\t\tint a\n\t}\n\n\tif(\"x\" != \"y\") {\n\t\tint b\n\t}\n} $" },
     { name: "While 1", code: "{\n\tint x\n\tx = 0\n\n\twhile false {\n\t\tx = 1 + x\n\t}\n} $" },
     { name: "While 2", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) {\n\t\tx = 1 + x\n\t}\n} $" },
     { name: "Boolean 1", code: "{\n\tboolean b\n\tb = true\n\tb = false\n} $" },
