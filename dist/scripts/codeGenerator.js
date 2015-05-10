@@ -73,6 +73,8 @@ var Compiler;
 
                 case astNodeTypes.WHILE_STATEMENT:
                     Compiler.Logger.logVerbose("While statement (NOT IMPLEMENTED)");
+
+                    throw "";
                     break;
 
                 default:
@@ -260,6 +262,29 @@ var Compiler;
                     }
                 } else {
                     Compiler.Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
+
+                    // TODO: Delete after testing
+                    Compiler.Logger.logVerbose("TESTING PARSING BOOLEAN TREE (IN ASSIGNMENT OF BOOLEAN EXPRESSION)");
+
+                    var addressOfResult = this.parseBooleanTree(rightChildNode);
+
+                    var resultFirstByte = addressOfResult.split(" ")[0];
+                    var resultSecondByte = addressOfResult.split(" ")[1];
+
+                    Compiler.Logger.logVerbose("Outside that crazy function. Address of result is: " + addressOfResult);
+
+                    // Load accumulator with address of result
+                    this.setCode("AD");
+                    this.setCode(resultFirstByte);
+                    this.setCode(resultSecondByte);
+
+                    var lhsScopeLevel = idNode.getSymbolTableEntry().getScopeLevel();
+                    var lhsTempName = this.getEntryNameById(id, lhsScopeLevel);
+
+                    // Store accumulator at address of id in assignment
+                    this.setCode("8D");
+                    this.setCode(lhsTempName);
+                    this.setCode("XX");
                 }
             } else {
                 var leftChildNode = assignmentNode.getChildren()[0];
@@ -336,6 +361,7 @@ var Compiler;
                 this.setCode("FF");
             } else if (firstChildNode.getValue() === astNodeTypes.EQUAL || firstChildNode.getValue() === astNodeTypes.NOT_EQUAL) {
                 Compiler.Logger.logVerbose("Inserting Print Statement of Boolean Expression (== or !=) (NOT IMPLEMENTED)");
+                throw "";
             } else if (firstChildNode.getTokenType() === TokenType[11 /* T_DIGIT */]) {
                 Compiler.Logger.logVerbose("Inserting Print Statement of Integer Literal");
 
@@ -581,7 +607,169 @@ var Compiler;
                 return jumpInfo;
             } else if (root.getNodeType() === treeNodeTypes.INTERIOR) {
                 Compiler.Logger.logVerbose("Condition of if / while statement is a boolean expression (NOT IMPLEMENTED)");
+                throw "";
             }
+        };
+
+        // Postorder traversal of boolean expression subtree
+        // After visiting children, send up address of result back to parent
+        // WARNING: Brain damage will take place shortly
+        CodeGenerator.parseBooleanTree = function (root) {
+            var resultAddress = "";
+
+            if (root !== null) {
+                var leftAddress = "";
+                var rightAddress = "";
+
+                if (root.getNodeType() === treeNodeTypes.INTERIOR) {
+                    leftAddress = this.parseBooleanTree(root.getChildren()[0]);
+                    rightAddress = this.parseBooleanTree(root.getChildren()[1]);
+
+                    Compiler.Logger.logVerbose("Node: " + root.getValue() + " | Interior");
+                    Compiler.Logger.logVerbose("Left address: " + leftAddress);
+                    Compiler.Logger.logVerbose("Right address: " + rightAddress);
+
+                    if (leftAddress !== "" && rightAddress !== "") {
+                        var leftFirstByte = leftAddress.split(" ")[0];
+                        var leftSecondByte = leftAddress.split(" ")[1];
+
+                        var rightFirstByte = rightAddress.split(" ")[0];
+                        var rightSecondByte = rightAddress.split(" ")[1];
+
+                        // Load left address into X register
+                        this.setCode("AE");
+                        this.setCode(leftFirstByte);
+                        this.setCode(leftSecondByte);
+
+                        // Compare the right address to the left (which is in the X register)
+                        this.setCode("EC");
+                        this.setCode(rightFirstByte);
+                        this.setCode(rightSecondByte);
+
+                        if (root.getValue() === astNodeTypes.EQUAL) {
+                            Compiler.Logger.logVerbose("Evaluating if " + leftFirstByte + " == " + rightFirstByte);
+
+                            // Result address
+                            var tempEntry = this.insertNewTempEntry();
+
+                            var jumpEntryNotEqual = this.insertNewJumpEntry();
+                            var jumpEntryEqual = this.insertNewJumpEntry();
+
+                            this.jumpTable.push(jumpEntryNotEqual);
+                            this.jumpTable.push(jumpEntryEqual);
+
+                            // Store 0 in the result address as default
+                            // Load accumulator with 0
+                            this.setCode("A9");
+                            this.setCode("00");
+
+                            // Store the accumulator at result address
+                            this.setCode("8D");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            // Branch around if z = 0 (true == false or false == true)
+                            this.setCode("D0");
+                            this.setCode(jumpEntryNotEqual.tempName);
+
+                            var indexAfterJumpNotEqual = this.currentIndex;
+
+                            // Case where true == true or false == false; both evaluate to true
+                            // Load accumulator with 1 (true)
+                            this.setCode("A9");
+                            this.setCode("01");
+
+                            // Store accumulator at temp address
+                            this.setCode("8D");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            // Set distance to jump after branch not equal
+                            jumpEntryNotEqual.distance = this.currentIndex - indexAfterJumpNotEqual;
+
+                            // Set up for next jump
+                            // Load X register with 0
+                            this.setCode("A2");
+                            this.setCode("00");
+
+                            // Compare X register and result address
+                            this.setCode("EC");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            // Branch around if z = 0 (If we did above case, where true == true or false == false)
+                            this.setCode("D0");
+                            this.setCode(jumpEntryEqual.tempName);
+
+                            var indexAfterJumpEqual = this.currentIndex;
+
+                            // Case where true == false or false == true; both evaluate to false
+                            // Load accumulator with 0 (false)
+                            this.setCode("A9");
+                            this.setCode("00");
+
+                            // Store accumulator at temp address
+                            this.setCode("8D");
+                            this.setCode(tempEntry.tempName);
+                            this.setCode("XX");
+
+                            jumpEntryEqual.distance = this.currentIndex - indexAfterJumpEqual;
+
+                            Compiler.Logger.logVerbose("Setting first jump distance to " + jumpEntryNotEqual.distance.toString(16));
+                            Compiler.Logger.logVerbose("Setting second jump distance to " + jumpEntryEqual.distance.toString(16));
+
+                            resultAddress = tempEntry.tempName + " " + "XX";
+                        } else if (root.getValue() === astNodeTypes.NOT_EQUAL) {
+                            Compiler.Logger.logVerbose("Evaluating if " + leftFirstByte + " != " + rightFirstByte);
+                        }
+                    }
+                } else if (root.getNodeType() === treeNodeTypes.LEAF) {
+                    Compiler.Logger.logVerbose("Node: " + root.getValue() + " | Leaf");
+
+                    // Synthesize the address of node to parent
+                    if (root.getTokenType() === TokenType[11 /* T_DIGIT */]) {
+                        Compiler.Logger.logVerbose("Propagating addresss of digit");
+                    } else if (root.getTokenType() === TokenType[25 /* T_TRUE */]) {
+                        Compiler.Logger.logVerbose("Propagating addresss of true");
+
+                        // Load the accumulator with 1 (true)
+                        this.setCode("A9");
+                        this.setCode("01");
+
+                        var tempEntry = this.insertNewTempEntry();
+
+                        // Store the accumulator at a temp address
+                        this.setCode("8D");
+                        this.setCode(tempEntry.tempName);
+                        this.setCode("XX");
+
+                        Compiler.Logger.logVerbose("Address being propagated: " + tempEntry.tempName);
+
+                        resultAddress = tempEntry.tempName + " " + "XX";
+                    } else if (root.getTokenType() === TokenType[24 /* T_FALSE */]) {
+                        Compiler.Logger.logVerbose("Propagating addresss of false");
+
+                        // Load the accumulator with 0 (false)
+                        this.setCode("A9");
+                        this.setCode("00");
+
+                        var tempEntry = this.insertNewTempEntry();
+
+                        // Store the accumulator at a temp address
+                        this.setCode("8D");
+                        this.setCode(tempEntry.tempName);
+                        this.setCode("XX");
+
+                        Compiler.Logger.logVerbose("Address being propagated: " + tempEntry.tempName);
+
+                        resultAddress = tempEntry.tempName + " " + "XX";
+                    } else if (root.getTokenType() === TokenType[12 /* T_ID */]) {
+                        Compiler.Logger.logVerbose("Propagating addresss of id " + root.getValue());
+                    }
+                }
+            }
+
+            return resultAddress;
         };
 
         CodeGenerator.setCode = function (input) {
