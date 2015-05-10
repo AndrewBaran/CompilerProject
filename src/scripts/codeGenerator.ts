@@ -314,20 +314,14 @@ module Compiler {
                     }
                 }
 
-                // TODO: Assigning a boolean expression
                 else {
 
-                    Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
-
-                    // TODO: Delete after testing
-                    Logger.logVerbose("TESTING PARSING BOOLEAN TREE (IN ASSIGNMENT OF BOOLEAN EXPRESSION)");
+                    Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id);
 
                     var addressOfResult: string = this.parseBooleanTree(rightChildNode);
 
                     var resultFirstByte: string = addressOfResult.split(" ")[0];
                     var resultSecondByte: string = addressOfResult.split(" ")[1];
-
-                    Logger.logVerbose("Outside that crazy function. Address of result is: " + addressOfResult);
 
                     // Load accumulator with address of result
                     this.setCode("AD");
@@ -910,15 +904,36 @@ module Compiler {
                             resultAddress = tempEntry.tempName + " " + "XX";
                         }
 
+                        // TODO: Do last if I have time
+                        else if(root.getValue() === astNodeTypes.ADD) {
+
+                            var errorMessage: string = "Error! Comparison involving addition on line " + root.getLineNumber() + "is currently unsupported.";
+
+                            Logger.log(errorMessage);
+                            throw errorMessage;
+                        }
+
                     }
                 }
 
                 else if(root.getNodeType() === treeNodeTypes.LEAF) {
 
-                    // TODO: Add cases for strings and such
                     if(root.getTokenType() === TokenType[TokenType.T_DIGIT]) {
 
-                        Logger.logVerbose("Propagating addresss of digit (NOT SUPPORTED?)");
+                        Logger.logVerbose("Propagating addresss of digit");
+
+                        // Load accumulator with value of digit
+                        this.setCode("A9");
+                        this.setCode("0" + root.getValue());
+
+                        var tempEntry: TempTableEntry = this.insertNewTempEntry();
+
+                        // Store the accumulator at a temp address
+                        this.setCode("8D");
+                        this.setCode(tempEntry.tempName);
+                        this.setCode("XX");
+
+                        resultAddress = tempEntry.tempName + " " + "XX";
                     }
 
                     else if(root.getTokenType() === TokenType[TokenType.T_TRUE]) {
@@ -970,6 +985,14 @@ module Compiler {
 
                         // Pass back address of id, as it is already in memory
                         resultAddress = idTempName + " " + "XX";
+                    }
+
+                    else if(root.getTokenType() === TokenType[TokenType.T_STRING_EXPRESSION]) {
+
+                        var errorMessage: string = "Error! Comparison involving string literal on line " + root.getLineNumber() + " is currently unsupported.";
+
+                        Logger.log(errorMessage);
+                        throw errorMessage;
                     }
                 }
             }

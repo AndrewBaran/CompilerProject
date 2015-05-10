@@ -261,17 +261,12 @@ var Compiler;
                         this.setCode("XX");
                     }
                 } else {
-                    Compiler.Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id + " (NOT IMPLEMENTED)");
-
-                    // TODO: Delete after testing
-                    Compiler.Logger.logVerbose("TESTING PARSING BOOLEAN TREE (IN ASSIGNMENT OF BOOLEAN EXPRESSION)");
+                    Compiler.Logger.logVerbose("Inserting Boolean Assignment of Boolean Expression to id " + id);
 
                     var addressOfResult = this.parseBooleanTree(rightChildNode);
 
                     var resultFirstByte = addressOfResult.split(" ")[0];
                     var resultSecondByte = addressOfResult.split(" ")[1];
-
-                    Compiler.Logger.logVerbose("Outside that crazy function. Address of result is: " + addressOfResult);
 
                     // Load accumulator with address of result
                     this.setCode("AD");
@@ -624,11 +619,6 @@ var Compiler;
                     leftAddress = this.parseBooleanTree(root.getChildren()[0]);
                     rightAddress = this.parseBooleanTree(root.getChildren()[1]);
 
-                    // TODO: Remove after testing
-                    Compiler.Logger.logVerbose("Node: " + root.getValue() + " | Interior");
-                    Compiler.Logger.logVerbose("Left address: " + leftAddress);
-                    Compiler.Logger.logVerbose("Right address: " + rightAddress);
-
                     if (leftAddress !== "" && rightAddress !== "") {
                         var leftFirstByte = leftAddress.split(" ")[0];
                         var leftSecondByte = leftAddress.split(" ")[1];
@@ -787,12 +777,29 @@ var Compiler;
                             jumpEntryEqual.distance = this.currentIndex - secondJumpIndex;
 
                             resultAddress = tempEntry.tempName + " " + "XX";
+                        } else if (root.getValue() === astNodeTypes.ADD) {
+                            var errorMessage = "Error! Comparison involving addition on line " + root.getLineNumber() + "is currently unsupported.";
+
+                            Compiler.Logger.log(errorMessage);
+                            throw errorMessage;
                         }
                     }
                 } else if (root.getNodeType() === treeNodeTypes.LEAF) {
-                    // TODO: Add cases for strings and such
                     if (root.getTokenType() === TokenType[11 /* T_DIGIT */]) {
-                        Compiler.Logger.logVerbose("Propagating addresss of digit (NOT SUPPORTED?)");
+                        Compiler.Logger.logVerbose("Propagating addresss of digit");
+
+                        // Load accumulator with value of digit
+                        this.setCode("A9");
+                        this.setCode("0" + root.getValue());
+
+                        var tempEntry = this.insertNewTempEntry();
+
+                        // Store the accumulator at a temp address
+                        this.setCode("8D");
+                        this.setCode(tempEntry.tempName);
+                        this.setCode("XX");
+
+                        resultAddress = tempEntry.tempName + " " + "XX";
                     } else if (root.getTokenType() === TokenType[25 /* T_TRUE */]) {
                         Compiler.Logger.logVerbose("Propagating addresss of true");
 
@@ -835,6 +842,11 @@ var Compiler;
 
                         // Pass back address of id, as it is already in memory
                         resultAddress = idTempName + " " + "XX";
+                    } else if (root.getTokenType() === TokenType[27 /* T_STRING_EXPRESSION */]) {
+                        var errorMessage = "Error! Comparison involving string literal on line " + root.getLineNumber() + " is currently unsupported.";
+
+                        Compiler.Logger.log(errorMessage);
+                        throw errorMessage;
                     }
                 }
             }
