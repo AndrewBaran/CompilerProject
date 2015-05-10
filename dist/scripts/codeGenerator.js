@@ -617,8 +617,33 @@ var Compiler;
 
                 return jumpInfo;
             } else if (root.getNodeType() === treeNodeTypes.INTERIOR) {
-                Compiler.Logger.logVerbose("Condition of if / while statement is a boolean expression (NOT IMPLEMENTED)");
-                throw "";
+                Compiler.Logger.logVerbose("Condition of if / while statement is a boolean expression");
+
+                var addressOfResult = this.parseBooleanTree(root);
+
+                var firstByte = addressOfResult.split(" ")[0];
+                var secondByte = addressOfResult.split(" ")[1];
+
+                // Load the X register with 1 for comparison (true condition will execute loop)
+                this.setCode("A2");
+                this.setCode("01");
+
+                // Compare X register with address of the result of the boolean condition
+                this.setCode("EC");
+                this.setCode(firstByte);
+                this.setCode(secondByte);
+
+                var jumpEntry = this.insertNewJumpEntry();
+
+                // Branch not equal around block of while / if
+                this.setCode("D0");
+                this.setCode(jumpEntry.tempName);
+
+                var jumpInfo = new JumpPatchInfo();
+                jumpInfo.tempName = jumpEntry.tempName;
+                jumpInfo.startAddressOfBlock = this.currentIndex;
+
+                return jumpInfo;
             }
         };
 
@@ -927,12 +952,7 @@ var Compiler;
                     var substringIndex = parseInt(currentCodeByte.substring(1), 10);
                     var jumpTableEntry = this.jumpTable[substringIndex];
 
-                    var distanceToJump = jumpTableEntry.distance.toString(16);
-
-                    // Pad appropriately
-                    if (distanceToJump.length === 1) {
-                        distanceToJump = "0" + distanceToJump;
-                    }
+                    var distanceToJump = Compiler.Utils.decimalToHex(jumpTableEntry.distance);
 
                     Compiler.Logger.logVerbose("Resolving jump entry of " + currentCodeByte + " to: " + distanceToJump);
                     this.setCodeAtIndex(distanceToJump, cursorIndex);

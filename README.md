@@ -69,7 +69,7 @@ Final Project Checklist
 		- [x] String Literal
 		- [x] String Id
 	- [ ] While Statements
-	- [ ] If Statements
+	- [x] If Statements
 	- [x] Comparisons
 		- [x] Int Literal to Int Literal
 		- [x] Int Literal to Int Id
