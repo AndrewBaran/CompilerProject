@@ -162,42 +162,20 @@ module Compiler {
             var idName: string = declarationNode.getChildren()[1].getValue();
             var scopeLevel: number = declarationNode.getChildren()[1].getSymbolTableEntry().getScopeLevel();
 
-            if(type === types.INT || type === types.BOOLEAN) {
+            Logger.logVerbose("Inserting Declararation of id " + idName);
 
-                Logger.logVerbose("Inserting Int / Boolean Declaration of id " + idName);
+            // Load accumulator with 0 (Default value for all types (int = 0; boolean = false; string = ""))
+            this.setCode("A9");
+            this.setCode("00");
 
-                // Load accumulator with 0 (the default value for ints and booleans (false))
-                this.setCode("A9");
-                this.setCode("00");
+            var newEntry: TempTableEntry = this.insertNewTempEntry();
+            newEntry.idName = idName;
+            newEntry.scopeLevel = scopeLevel;
 
-                var newEntry: TempTableEntry = this.insertNewTempEntry();
-                newEntry.idName = idName;
-                newEntry.scopeLevel = scopeLevel;
-
-                // Store accumulator at address of id (placeholder address for now)
-                this.setCode("8D");
-                this.setCode(newEntry.tempName);
-                this.setCode("XX");
-            }
-
-            else {
-
-                Logger.logVerbose("Inserting String Declaration of id " + idName);
-
-                var newEntry: TempTableEntry = this.insertNewTempEntry();
-                newEntry.idName = idName;
-                newEntry.scopeLevel = scopeLevel;
-
-                // Load accumulator with 00, the null string
-                this.setCode("A9");
-                this.setCode("00");
-
-                // Store the accumulator at the address of the string id
-                this.setCode("8D");
-                this.setCode(newEntry.tempName);
-                this.setCode("XX");
-            }
-
+            // Store accumulator at address of id (placeholder address for now)
+            this.setCode("8D");
+            this.setCode(newEntry.tempName);
+            this.setCode("XX");
         }
 
         private static assignmentDeclarationTemplate(assignmentNode: ASTNode): void {
@@ -421,12 +399,12 @@ module Compiler {
 
                     Logger.logVerbose("Inserting String Assignment of id " + rhsId + " to id " + lhsId);
 
-                    // Load accumulator with the address of the rhs string
+                    // Load accumulator with the address of the RHS string
                     this.setCode("AD");
                     this.setCode(rhsTempName);
                     this.setCode("XX");
 
-                    // Store value in accumulator as the address of the lhs string
+                    // Store value in accumulator as the address of the LHS string
                     this.setCode("8D");
                     this.setCode(lhsTempName);
                     this.setCode("XX");
@@ -488,7 +466,7 @@ module Compiler {
             // Single digit
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_DIGIT]) {
 
-                Logger.logVerbose("Inserting Print Statement of Integer Literal");
+                Logger.logVerbose("Inserting Print Statement of Integer Literal " + firstChildNode.getValue());
 
                 // Pad digit with 0 (digits range from 0-9 only)
                 var digitToPrint: string = "0" + firstChildNode.getValue();
@@ -705,7 +683,7 @@ module Compiler {
                 this.setCode(tempEntry.tempName);
                 this.setCode("XX");
 
-                // Load X register with 0 (false)
+                // Load X register with 1 (true)
                 this.setCode("A2");
                 this.setCode("01");
 
@@ -767,7 +745,7 @@ module Compiler {
             // == or != involved (boolean expression)
             else if(root.getNodeType() === treeNodeTypes.INTERIOR) {
 
-                Logger.logVerbose("Condition of if / while statement is a boolean expression");
+                Logger.logVerbose("Condition of if / while statement is a Boolean Expression");
 
                 var addressOfResult: string = this.parseBooleanTree(root);
 
@@ -995,7 +973,7 @@ module Compiler {
 
                     if(root.getTokenType() === TokenType[TokenType.T_DIGIT]) {
 
-                        Logger.logVerbose("Propagating addresss of digit");
+                        Logger.logVerbose("Propagating addresss of Int literal " + root.getValue());
 
                         // Load accumulator with value of digit
                         this.setCode("A9");
@@ -1013,7 +991,7 @@ module Compiler {
 
                     else if(root.getTokenType() === TokenType[TokenType.T_TRUE]) {
 
-                        Logger.logVerbose("Propagating addresss of true");
+                        Logger.logVerbose("Propagating addresss of Literal true");
 
                         // Load the accumulator with 1 (true)
                         this.setCode("A9");
@@ -1031,7 +1009,7 @@ module Compiler {
 
                     else if(root.getTokenType() === TokenType[TokenType.T_FALSE]) {
 
-                        Logger.logVerbose("Propagating addresss of false");
+                        Logger.logVerbose("Propagating addresss of Literal false");
 
                         // Load the accumulator with 0 (false)
                         this.setCode("A9");
@@ -1062,7 +1040,7 @@ module Compiler {
 
                     else if(root.getTokenType() === TokenType[TokenType.T_STRING_EXPRESSION]) {
 
-                        var errorMessage: string = "Error! Comparison involving string literal on line " + root.getLineNumber() + " is currently unsupported.";
+                        var errorMessage: string = "Error! Comparison involving string literal on line " + root.getLineNumber() + " is not supported.";
 
                         Logger.log(errorMessage);
                         throw errorMessage;
@@ -1197,7 +1175,7 @@ module Compiler {
             return this.heapPointer;
         }
 
-        // Created new entry in table, and return the entry
+        // Created new variable entry in the table, and return the entry
         private static insertNewTempEntry(): TempTableEntry {
 
             var tempName: string = "T" + this.tempTable.length.toString();
