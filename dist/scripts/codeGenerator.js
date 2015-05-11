@@ -327,10 +327,11 @@ var Compiler;
                 if (rightChildNode.getTokenType() === TokenType[27 /* T_STRING_EXPRESSION */]) {
                     var id = leftChildNode.getValue();
                     var value = rightChildNode.getValue();
+                    var lineNumber = rightChildNode.getLineNumber();
 
                     Compiler.Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
 
-                    var startAddress = Compiler.Utils.decimalToHex(this.addToHeap(value));
+                    var startAddress = Compiler.Utils.decimalToHex(this.addToHeap(value, lineNumber));
 
                     var scopeLevel = leftChildNode.getSymbolTableEntry().getScopeLevel();
                     var tempName = this.getEntryNameById(id, scopeLevel);
@@ -486,10 +487,11 @@ var Compiler;
                 this.setCode("FF");
             } else if (firstChildNode.getTokenType() === TokenType[27 /* T_STRING_EXPRESSION */]) {
                 var valueToPrint = firstChildNode.getValue();
+                var lineNumber = firstChildNode.getLineNumber();
 
                 Compiler.Logger.logVerbose("Inserting Print Statement of Literal String \"" + valueToPrint + "\"");
 
-                var hexAddress = Compiler.Utils.decimalToHex(this.addToHeap(valueToPrint));
+                var hexAddress = Compiler.Utils.decimalToHex(this.addToHeap(valueToPrint, lineNumber));
 
                 // Load the Y register with the starting address of the string being printed
                 this.setCode("A0");
@@ -995,8 +997,8 @@ var Compiler;
             }
         };
 
-        CodeGenerator.addToHeap = function (stringValue) {
-            Compiler.Logger.logVerbose("Adding the string \"" + stringValue + "\" to the heap");
+        CodeGenerator.addToHeap = function (stringValue, lineNumber) {
+            Compiler.Logger.logVerbose("Adding the string \"" + stringValue + "\" on line " + lineNumber + " to the heap");
 
             // Add null terminator
             stringValue = stringValue + "\0";

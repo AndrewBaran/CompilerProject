@@ -389,10 +389,11 @@ module Compiler {
 
                     var id: string = leftChildNode.getValue();
                     var value: string = rightChildNode.getValue();
+                    var lineNumber: number = rightChildNode.getLineNumber();
 
                     Logger.logVerbose("Inserting String Assignment of id " + id + " to string \"" + value + "\"");
 
-                    var startAddress: string = Utils.decimalToHex(this.addToHeap(value));
+                    var startAddress: string = Utils.decimalToHex(this.addToHeap(value, lineNumber));
 
                     var scopeLevel: number = leftChildNode.getSymbolTableEntry().getScopeLevel();
                     var tempName: string = this.getEntryNameById(id, scopeLevel);
@@ -579,10 +580,11 @@ module Compiler {
             else if(firstChildNode.getTokenType() === TokenType[TokenType.T_STRING_EXPRESSION]) {
 
                 var valueToPrint: string = firstChildNode.getValue();
+                var lineNumber: number = firstChildNode.getLineNumber();
 
                 Logger.logVerbose("Inserting Print Statement of Literal String \"" + valueToPrint + "\"");
 
-                var hexAddress: string = Utils.decimalToHex(this.addToHeap(valueToPrint));
+                var hexAddress: string = Utils.decimalToHex(this.addToHeap(valueToPrint, lineNumber));
 
                 // Load the Y register with the starting address of the string being printed
                 this.setCode("A0");
@@ -1159,9 +1161,9 @@ module Compiler {
             }
         }
 
-        private static addToHeap(stringValue: string): number {
+        private static addToHeap(stringValue: string, lineNumber: number): number {
 
-            Logger.logVerbose("Adding the string \"" + stringValue + "\" to the heap");
+            Logger.logVerbose("Adding the string \"" + stringValue + "\" on line " + lineNumber + " to the heap");
 
             // Add null terminator
             stringValue = stringValue + "\0";
