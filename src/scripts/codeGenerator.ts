@@ -978,13 +978,14 @@ module Compiler {
                             resultAddress = tempEntry.tempName + " " + "XX";
                         }
 
-                        // TODO: Do last if I have time
                         else if(root.getValue() === astNodeTypes.ADD) {
 
-                            var errorMessage: string = "Error! Comparison involving addition on line " + root.getChildren()[0].getLineNumber() + " is currently unsupported.";
+                            var addressesToAdd: string [] = [];
+                            addressesToAdd = this.insertAddLocations(root, addressesToAdd);
 
-                            Logger.log(errorMessage);
-                            throw errorMessage;
+                            var addressOfSum: string = this.insertAddCode(addressesToAdd);
+
+                            resultAddress = addressOfSum + " " + "XX";
                         }
 
                     }
@@ -1187,7 +1188,7 @@ module Compiler {
 
             else {
 
-                var errorMessage: string = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"" + " around address " + startHeapAddress;
+                var errorMessage: string = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\" on line " + lineNumber + " around the address " + Utils.decimalToHex(startHeapAddress);
 
                 Logger.log(errorMessage);
                 throw errorMessage;
@@ -1196,7 +1197,7 @@ module Compiler {
             return this.heapPointer;
         }
 
-        // Created new entry in table, and return entry
+        // Created new entry in table, and return the entry
         private static insertNewTempEntry(): TempTableEntry {
 
             var tempName: string = "T" + this.tempTable.length.toString();
@@ -1230,7 +1231,7 @@ module Compiler {
 
                 Logger.logVerbose("");
                 Logger.logVerbose("Temp Table");
-                Logger.logVerbose("Name | Id | Offset | Resolved Address");
+                Logger.logVerbose("Name | Id | Offset | Resolved Address | Scope Level");
                 Logger.logVerbose("--------------------------------");
 
                 for(var i: number = 0; i < this.tempTable.length; i++) {

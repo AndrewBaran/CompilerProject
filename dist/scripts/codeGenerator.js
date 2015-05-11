@@ -856,10 +856,12 @@ var Compiler;
 
                             resultAddress = tempEntry.tempName + " " + "XX";
                         } else if (root.getValue() === astNodeTypes.ADD) {
-                            var errorMessage = "Error! Comparison involving addition on line " + root.getChildren()[0].getLineNumber() + " is currently unsupported.";
+                            var addressesToAdd = [];
+                            addressesToAdd = this.insertAddLocations(root, addressesToAdd);
 
-                            Compiler.Logger.log(errorMessage);
-                            throw errorMessage;
+                            var addressOfSum = this.insertAddCode(addressesToAdd);
+
+                            resultAddress = addressOfSum + " " + "XX";
                         }
                     }
                 } else if (root.getNodeType() === treeNodeTypes.LEAF) {
@@ -1017,7 +1019,7 @@ var Compiler;
 
                 this.heapPointer = startHeapAddress;
             } else {
-                var errorMessage = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"" + " around address " + startHeapAddress;
+                var errorMessage = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\" on line " + lineNumber + " around the address " + Compiler.Utils.decimalToHex(startHeapAddress);
 
                 Compiler.Logger.log(errorMessage);
                 throw errorMessage;
@@ -1026,7 +1028,7 @@ var Compiler;
             return this.heapPointer;
         };
 
-        // Created new entry in table, and return entry
+        // Created new entry in table, and return the entry
         CodeGenerator.insertNewTempEntry = function () {
             var tempName = "T" + this.tempTable.length.toString();
             var tempOffset = this.tempTable.length;
@@ -1056,7 +1058,7 @@ var Compiler;
             if (this.tempTable.length > 0) {
                 Compiler.Logger.logVerbose("");
                 Compiler.Logger.logVerbose("Temp Table");
-                Compiler.Logger.logVerbose("Name | Id | Offset | Resolved Address");
+                Compiler.Logger.logVerbose("Name | Id | Offset | Resolved Address | Scope Level");
                 Compiler.Logger.logVerbose("--------------------------------");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
