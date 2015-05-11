@@ -4,7 +4,7 @@ var Compiler;
         function CodeGenerator() {
         }
         CodeGenerator.generateCode = function (abstractSyntaxTree) {
-            Compiler.Logger.log("Generating 6502a Assembly Code (NOT FINISHED)");
+            Compiler.Logger.log("Generating 6502a Assembly Code");
             Compiler.Logger.log("");
 
             this.setupEnvironment(abstractSyntaxTree);
@@ -16,9 +16,9 @@ var Compiler;
 
             this.backPatchCode();
 
-            // TODO: Delete after testing
-            this.debugPrintTempTable();
-            this.debugPrintJumpTable();
+            if (Compiler.Control.verboseMode) {
+                this.debugPrintTempTable();
+            }
 
             Compiler.Logger.logVerbose("");
             Compiler.Logger.log("Code Generation Completed");
@@ -43,7 +43,6 @@ var Compiler;
             this.heapPointer = _Constants.MAX_CODE_SIZE;
         };
 
-        // TODO: Add while and if statements
         CodeGenerator.buildCode = function (root) {
             var conditionalBlockEntered = false;
             var jumpPatchInfo = null;
@@ -89,7 +88,7 @@ var Compiler;
                 this.buildCode(root.getChildren()[i]);
             }
 
-            // Set the proper distance to jump to be backpatched later
+            // Set the proper distances of jumps to be backpatched later
             if (conditionalBlockEntered) {
                 // Set the proper distance for jumping back to testing conditional (for while)
                 if (jumpBackIndex !== -1) {
@@ -110,7 +109,7 @@ var Compiler;
                     this.setCode(tempEntry.tempName);
                     this.setCode("XX");
 
-                    // Compare X Register (0) and Temp Entry (1). Will always set Z flag to 0, so we will always branch
+                    // Compare X Register (0) and Temp Entry (1) => Will always set Z flag to 0, so we will always branch back
                     this.setCode("EC");
                     this.setCode(tempEntry.tempName);
                     this.setCode("XX");
@@ -125,7 +124,7 @@ var Compiler;
                     jumpBackEntry.distance = (_Constants.MAX_CODE_SIZE - (this.currentIndex - jumpBackIndex));
                 }
 
-                // Set the proper distance to jump for branch not equal (block was not executed)
+                // Set the proper distance to jump for branch not equal (conditional was false, so block was not executed)
                 var substringIndex = parseInt(jumpPatchInfo.tempName.substring(1), 10);
 
                 var jumpEntry = this.jumpTable[substringIndex];
@@ -502,9 +501,6 @@ var Compiler;
 
                 // System call
                 this.setCode("FF");
-            } else {
-                Compiler.Logger.log("This shouldn't happen. Should have covered all the print statement scenarios");
-                throw "";
             }
         };
 
@@ -858,7 +854,7 @@ var Compiler;
 
                             resultAddress = tempEntry.tempName + " " + "XX";
                         } else if (root.getValue() === astNodeTypes.ADD) {
-                            var errorMessage = "Error! Comparison involving addition on line " + root.getLineNumber() + "is currently unsupported.";
+                            var errorMessage = "Error! Comparison involving addition on line " + root.getChildren()[0].getLineNumber() + " is currently unsupported.";
 
                             Compiler.Logger.log(errorMessage);
                             throw errorMessage;
@@ -893,8 +889,6 @@ var Compiler;
                         this.setCode("8D");
                         this.setCode(tempEntry.tempName);
                         this.setCode("XX");
-
-                        Compiler.Logger.logVerbose("Address being propagated: " + tempEntry.tempName);
 
                         resultAddress = tempEntry.tempName + " " + "XX";
                     } else if (root.getTokenType() === TokenType[24 /* T_FALSE */]) {
@@ -958,6 +952,7 @@ var Compiler;
         };
 
         CodeGenerator.backPatchCode = function () {
+            Compiler.Logger.logVerbose("");
             Compiler.Logger.logVerbose("Backpatching the code and resolving addresses");
 
             var currentCodeByte = "";
@@ -994,6 +989,7 @@ var Compiler;
                     var distanceToJump = Compiler.Utils.decimalToHex(jumpTableEntry.distance);
 
                     Compiler.Logger.logVerbose("Resolving jump entry of " + currentCodeByte + " to: " + distanceToJump);
+
                     this.setCodeAtIndex(distanceToJump, cursorIndex);
                 }
             }
@@ -1019,7 +1015,7 @@ var Compiler;
 
                 this.heapPointer = startHeapAddress;
             } else {
-                var errorMessage = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"";
+                var errorMessage = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"" + " around address " + startHeapAddress;
 
                 Compiler.Logger.log(errorMessage);
                 throw errorMessage;
@@ -1054,32 +1050,17 @@ var Compiler;
             return newEntry;
         };
 
-        // TODO: Delete after testing
         CodeGenerator.debugPrintTempTable = function () {
             if (this.tempTable.length > 0) {
                 Compiler.Logger.logVerbose("");
                 Compiler.Logger.logVerbose("Temp Table");
+                Compiler.Logger.logVerbose("Name | Id | Offset | Resolved Address");
                 Compiler.Logger.logVerbose("--------------------------------");
 
                 for (var i = 0; i < this.tempTable.length; i++) {
                     var entry = this.tempTable[i];
 
                     Compiler.Logger.logVerbose(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress + " | " + entry.scopeLevel);
-                }
-            }
-        };
-
-        // TODO: Delete after testing
-        CodeGenerator.debugPrintJumpTable = function () {
-            if (this.jumpTable.length > 0) {
-                Compiler.Logger.logVerbose("");
-                Compiler.Logger.logVerbose("Jump Table");
-                Compiler.Logger.logVerbose("--------------------------------");
-
-                for (var i = 0; i < this.jumpTable.length; i++) {
-                    var entry = this.jumpTable[i];
-
-                    Compiler.Logger.logVerbose(entry.tempName + " | " + entry.distance + " (Decimal)");
                 }
             }
         };
@@ -1111,7 +1092,6 @@ var Compiler;
     })();
     Compiler.CodeGenerator = CodeGenerator;
 
-    // TODO: Remove resolvedAddress after testing
     var TempTableEntry = (function () {
         function TempTableEntry() {
             this.tempName = "";

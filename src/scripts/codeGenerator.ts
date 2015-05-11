@@ -15,7 +15,7 @@ module Compiler {
 
         public static generateCode(abstractSyntaxTree: AbstractSyntaxTree): string [] {
 
-            Logger.log("Generating 6502a Assembly Code (NOT FINISHED)");
+            Logger.log("Generating 6502a Assembly Code");
             Logger.log("");
 
             this.setupEnvironment(abstractSyntaxTree);
@@ -27,9 +27,9 @@ module Compiler {
 
             this.backPatchCode();
 
-            // TODO: Delete after testing
-            this.debugPrintTempTable();
-            this.debugPrintJumpTable();
+            if(Control.verboseMode) {
+                this.debugPrintTempTable();
+            }
 
             Logger.logVerbose("");
             Logger.log("Code Generation Completed");
@@ -55,7 +55,6 @@ module Compiler {
             this.heapPointer = _Constants.MAX_CODE_SIZE;
         }
 
-        // TODO: Add while and if statements
         private static buildCode(root: ASTNode): void {
 
             var conditionalBlockEntered: boolean = false;
@@ -109,7 +108,7 @@ module Compiler {
                 this.buildCode(root.getChildren()[i]);
             }
 
-            // Set the proper distance to jump to be backpatched later
+            // Set the proper distances of jumps to be backpatched later
             if(conditionalBlockEntered) {
 
                 // Set the proper distance for jumping back to testing conditional (for while)
@@ -132,7 +131,7 @@ module Compiler {
                     this.setCode(tempEntry.tempName);
                     this.setCode("XX");
 
-                    // Compare X Register (0) and Temp Entry (1). Will always set Z flag to 0, so we will always branch
+                    // Compare X Register (0) and Temp Entry (1) => Will always set Z flag to 0, so we will always branch back
                     this.setCode("EC");
                     this.setCode(tempEntry.tempName);
                     this.setCode("XX");
@@ -147,7 +146,7 @@ module Compiler {
                     jumpBackEntry.distance = (_Constants.MAX_CODE_SIZE - (this.currentIndex - jumpBackIndex));
                 }
 
-                // Set the proper distance to jump for branch not equal (block was not executed)
+                // Set the proper distance to jump for branch not equal (conditional was false, so block was not executed)
                 var substringIndex: number = parseInt(jumpPatchInfo.tempName.substring(1), 10);
 
                 var jumpEntry: JumpTableEntry = this.jumpTable[substringIndex];
@@ -597,13 +596,6 @@ module Compiler {
                 this.setCode("FF");
             }
 
-            // TODO: Delete after testing
-            else {
-
-                Logger.log("This shouldn't happen. Should have covered all the print statement scenarios");
-                throw "";
-            }
-
         }
 
         // Inserts the code to add each digit / id being summed together into memory
@@ -987,7 +979,7 @@ module Compiler {
                         // TODO: Do last if I have time
                         else if(root.getValue() === astNodeTypes.ADD) {
 
-                            var errorMessage: string = "Error! Comparison involving addition on line " + root.getLineNumber() + "is currently unsupported.";
+                            var errorMessage: string = "Error! Comparison involving addition on line " + root.getChildren()[0].getLineNumber() + " is currently unsupported.";
 
                             Logger.log(errorMessage);
                             throw errorMessage;
@@ -1030,8 +1022,6 @@ module Compiler {
                         this.setCode("8D");
                         this.setCode(tempEntry.tempName);
                         this.setCode("XX");
-
-                        Logger.logVerbose("Address being propagated: " + tempEntry.tempName);
 
                         resultAddress = tempEntry.tempName + " " + "XX";
                     }
@@ -1115,6 +1105,7 @@ module Compiler {
 
         private static backPatchCode(): void {
 
+            Logger.logVerbose("");
             Logger.logVerbose("Backpatching the code and resolving addresses");
 
             var currentCodeByte: string = "";
@@ -1162,6 +1153,7 @@ module Compiler {
                     var distanceToJump: string = Utils.decimalToHex(jumpTableEntry.distance);
 
                     Logger.logVerbose("Resolving jump entry of " + currentCodeByte + " to: " + distanceToJump);
+
                     this.setCodeAtIndex(distanceToJump, cursorIndex);
                 }
             }
@@ -1193,7 +1185,7 @@ module Compiler {
 
             else {
 
-                var errorMessage: string = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"";
+                var errorMessage: string = "Error! Heap overflow occured when trying to add string \"" + stringValue + "\"" + " around address " + startHeapAddress;
 
                 Logger.log(errorMessage);
                 throw errorMessage;
@@ -1230,13 +1222,13 @@ module Compiler {
             return newEntry;
         }
 
-        // TODO: Delete after testing
         private static debugPrintTempTable(): void {
 
             if(this.tempTable.length > 0) {
 
                 Logger.logVerbose("");
                 Logger.logVerbose("Temp Table");
+                Logger.logVerbose("Name | Id | Offset | Resolved Address");
                 Logger.logVerbose("--------------------------------");
 
                 for(var i: number = 0; i < this.tempTable.length; i++) {
@@ -1244,24 +1236,6 @@ module Compiler {
                     var entry: TempTableEntry = this.tempTable[i];
 
                     Logger.logVerbose(entry.tempName + " | " + entry.idName + " | " + entry.addressOffset + " | " + entry.resolvedAddress + " | " + entry.scopeLevel);
-                }
-            }
-        }
-
-        // TODO: Delete after testing
-        private static debugPrintJumpTable(): void {
-
-            if(this.jumpTable.length > 0) {
-
-                Logger.logVerbose("");
-                Logger.logVerbose("Jump Table");
-                Logger.logVerbose("--------------------------------");
-
-                for (var i: number = 0; i < this.jumpTable.length; i++) {
-
-                    var entry: JumpTableEntry = this.jumpTable[i];
-
-                    Logger.logVerbose(entry.tempName + " | " + entry.distance + " (Decimal)");
                 }
             }
         }
@@ -1299,7 +1273,6 @@ module Compiler {
     }
 
 
-    // TODO: Remove resolvedAddress after testing
     class TempTableEntry {
 
         public tempName: string;

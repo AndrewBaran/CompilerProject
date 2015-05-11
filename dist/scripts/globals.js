@@ -25,7 +25,7 @@ var _testCodeList = [
     { name: "If 3", code: "{\n\tif (1 != 2) {\n\t\tint a\n\t\ta = 1\n\t}\n} $" },
     { name: "If 4", code: "{\n\tint a\n\ta = 1\n\n\tif(a == 1) {\n\t\ta = 2\n\t}\n\n\tif(a != 1) {\n\t\ta = 3\n\t}\n} $" },
     { name: "While 1", code: "{\n\tint x\n\tx = 0\n\n\twhile (x != 5) \n\t{\n\t\tprint(x)\n\t\tx = 1 + x\n\t}\n} $" },
-    { name: "Infinite Loop", code: "{\n\tint x\n\tx = 0\n\n\twhile true {\n\t\tx = 1 + x\n\t}\n} $" },
+    { name: "Infinite Loop", code: "{\n\tint x\n\tx = 0\n\n\twhile true {\n\t\tx = 1 + x\n\t\tprint(x)\n\t}\n} $" },
     { name: "Boolean 1", code: "{\n\tboolean b\n\tb = true\n\tb = false\n} $" },
     { name: "Boolean 2", code: "{\n\tboolean b\n\tb = (true == true)\n\tb = (false != false)\n} $" },
     { name: "Boolean 3", code: "{\n\tboolean b\n\tb = (true == (true != (false == false)))\n} $" },

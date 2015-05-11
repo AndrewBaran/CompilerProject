@@ -73,17 +73,9 @@ var Compiler;
             this.clearSemanticWarnings();
             this.clearCodeGen();
 
-            // TODO: Remove after code gen testing
-            var oldVerboseFlag = this.verboseMode;
-            this.verboseMode = true;
-
             // Compile the program
             var code = document.getElementById("textboxInputCode").value;
             var compileResult = Compiler.Compiler.compile(code);
-
-            // TODO: Remove after code gen testing
-            document.getElementById("textboxLog").focus();
-            this.verboseMode = oldVerboseFlag;
 
             this.enableButtons();
         };
