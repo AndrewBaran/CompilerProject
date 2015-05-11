@@ -60,6 +60,7 @@ module Compiler {
 
             var conditionalBlockEntered: boolean = false;
             var jumpPatchInfo: JumpPatchInfo = null;
+            var jumpBackIndex: number = -1;
 
             switch(root.getValue()) {
 
@@ -80,8 +81,6 @@ module Compiler {
 
                 case astNodeTypes.IF_STATEMENT:
 
-                    Logger.logVerbose("If statement (NOT FULLY IMPLEMENTED)");
-
                     var leftChildNode: ASTNode = root.getChildren()[0];
                     jumpPatchInfo = this.evaluateBooleanCondition(leftChildNode);
 
@@ -91,9 +90,14 @@ module Compiler {
 
                 case astNodeTypes.WHILE_STATEMENT:
 
-                    Logger.logVerbose("While statement (NOT IMPLEMENTED)");
+                    // Set jump point back to here after while block is done
+                    jumpBackIndex = this.currentIndex;
 
-                    throw "";
+                    var leftChildNode: ASTNode = root.getChildren()[0];
+                    jumpPatchInfo = this.evaluateBooleanCondition(leftChildNode);
+
+                    conditionalBlockEntered = true;
+
                     break;
 
                 default:
@@ -108,6 +112,42 @@ module Compiler {
             // Set the proper distance to jump to be backpatched later
             if(conditionalBlockEntered) {
 
+                // Set the proper distance for jumping back to testing conditional (for while)
+                if(jumpBackIndex !== -1) {
+
+                    // Ensure we always jump back to beginning of while conditional
+                    // Load X register with 0
+                    this.setCode("A2");
+                    this.setCode("00");
+
+                    // Use a new temp variable to store 1, so we can always branch back
+                    var tempEntry: TempTableEntry = this.insertNewTempEntry();
+
+                    // Load accumulator with 1
+                    this.setCode("A9");
+                    this.setCode("01");
+
+                    // Store accumulator at address of conditional result
+                    this.setCode("8D");
+                    this.setCode(tempEntry.tempName);
+                    this.setCode("XX");
+
+                    // Compare X Register (0) and Temp Entry (1). Will always set Z flag to 0, so we will always branch
+                    this.setCode("EC");
+                    this.setCode(tempEntry.tempName);
+                    this.setCode("XX");
+
+                    var jumpBackEntry: JumpTableEntry = this.insertNewJumpEntry();
+
+                    // Branch back to beginning of while loop
+                    this.setCode("D0");
+                    this.setCode(jumpBackEntry.tempName);
+
+                    // Wrap around back to start of while's conditional
+                    jumpBackEntry.distance = (_Constants.MAX_CODE_SIZE - (this.currentIndex - jumpBackIndex));
+                }
+
+                // Set the proper distance to jump for branch not equal (block was not executed)
                 var substringIndex: number = parseInt(jumpPatchInfo.tempName.substring(1), 10);
 
                 var jumpEntry: JumpTableEntry = this.jumpTable[substringIndex];
@@ -1285,6 +1325,7 @@ module Compiler {
         public distance: number;
 
         constructor() {
+
             this.tempName = "";
             this.distance = -1;
         }
@@ -1296,6 +1337,7 @@ module Compiler {
         public startAddressOfBlock: number;
 
         constructor() {
+
             this.tempName = "";
             this.startAddressOfBlock = -1;
         }

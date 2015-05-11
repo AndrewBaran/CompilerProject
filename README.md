@@ -45,7 +45,7 @@ Project 2 Checklist
 Final Project Checklist
 =======================
 
-- [ ] Write a code generator that takes your AST and generates 6502a machine code for our grammar 
+- [x] Write a code generator that takes your AST and generates 6502a machine code for our grammar 
 	- [x] Variable Declarations
 		- [x] Int
 		- [x] Boolean
@@ -68,7 +68,7 @@ Final Project Checklist
 		- [x] Boolean Id
 		- [x] String Literal
 		- [x] String Id
-	- [ ] While Statements
+	- [x] While Statements
 	- [x] If Statements
 	- [x] Comparisons
 		- [x] Int Literal to Int Literal
