@@ -81,7 +81,7 @@ var Compiler;
     })();
     _Compiler.Compiler = Compiler;
 
-    // Structs
+    // Struct
     var TokenInfo = (function () {
         function TokenInfo() {
         }
