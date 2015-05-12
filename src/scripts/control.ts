@@ -15,13 +15,7 @@ module Compiler {
 			this.clearAST();
             this.clearSemanticWarnings();
             this.clearCodeGen();
-
-			// Reset any tables that were created on the last run
-			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
-
-			for(var i: number = 0; i < tablesToClear.length; i++) {
-				this.clearTable(tablesToClear[i]);
-			}
+            this.clearAllTables();
 
 			this.enableButtons();
 		}
@@ -77,6 +71,7 @@ module Compiler {
 			this.clearAST();
             this.clearSemanticWarnings();
             this.clearCodeGen();
+            this.clearAllTables();
 
 			// Compile the program
 			var code: string = (<HTMLInputElement> document.getElementById("textboxInputCode")).value;
@@ -91,6 +86,7 @@ module Compiler {
 
 			this.clearLog();
 			this.clearCompilerResults();
+			this.clearAllTables();
 
 			this.runTests();
 
@@ -223,6 +219,15 @@ module Compiler {
 				while(table.rows.length > 1) {
 					table.deleteRow(-1);
 				}
+			}
+		}
+
+		private static clearAllTables(): void {
+
+			var tablesToClear: string[] = ["tokenTable", "symbolTable"];
+
+			for(var i: number = 0; i < tablesToClear.length; i++) {
+				this.clearTable(tablesToClear[i]);
 			}
 		}
 
