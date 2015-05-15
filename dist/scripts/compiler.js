@@ -54,7 +54,6 @@ var Compiler;
             if (semanticResult) {
                 if (!this.testMode) {
                     _Compiler.Control.displaySymbolTable(symbolTable);
-                    _Compiler.Control.displayAST(abstractSyntaxTree);
                 }
 
                 try  {

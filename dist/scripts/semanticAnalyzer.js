@@ -10,6 +10,8 @@ var Compiler;
             this.setupAnalysisEnvironment(symbolTable);
 
             this.createAST(concreteSyntaxTree);
+            Compiler.Control.displayAST(this.abstractSyntaxTree);
+
             this.scopeCheck();
             this.typeCheck();
 

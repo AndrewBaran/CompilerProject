@@ -71,9 +71,7 @@ module Compiler {
 			if(semanticResult) {
 
 				if(!this.testMode) {
-
 					Control.displaySymbolTable(symbolTable);
-					Control.displayAST(abstractSyntaxTree);
 				}
 
 				try {

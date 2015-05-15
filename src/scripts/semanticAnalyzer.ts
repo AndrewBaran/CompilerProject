@@ -14,6 +14,8 @@ module Compiler {
 			this.setupAnalysisEnvironment(symbolTable);
 
 			this.createAST(concreteSyntaxTree);
+			Control.displayAST(this.abstractSyntaxTree);
+			
 			this.scopeCheck();
 			this.typeCheck();
 
