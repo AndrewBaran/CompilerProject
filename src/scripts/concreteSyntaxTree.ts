@@ -289,27 +289,31 @@ module Compiler {
 
 					case cstNodeTypes.BOOLEAN_EXPRESSION:
 
-                        var comparisonOperatorNode: CSTNode = null;
-                        comparisonOperatorNode = this.findNextComparisonOperator(root, comparisonOperatorNode);
+                        var comparisonOpFound: boolean = false;
 
-                        // == or != found
-                        if(comparisonOperatorNode !== null) {
+                        // Find boolean operator on next level of tree if it exists
+                        for (var i: number = 0; i < root.childList.length && !comparisonOpFound; i++) {
 
-    						if(comparisonOperatorNode.getValue() === "==") {
-     
-    							interiorNodePath = astNodeTypes.EQUAL;
-    							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
-    						}
+							var currentNode: CSTNode = root.childList[i];
 
-    						else if(comparisonOperatorNode.getValue() === "!=") {
+							if(currentNode.getValue() === "==") {
+
+								interiorNodePath = astNodeTypes.EQUAL;
+								abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
+								comparisonOpFound = true;
+							}
+
+							else if(currentNode.getValue() === "!=") {
 
     							interiorNodePath = astNodeTypes.NOT_EQUAL;
     							abstractSyntaxTree.insertInteriorNode(interiorNodePath);
-    						}
+
+								comparisonOpFound = true;
+							}
                         }
 
-						// Add single boolval leaf
-						else {
+                        if(!comparisonOpFound) {
 							interiorNodePath = astNodeTypes.BOOLEAN_EXPRESSION;
 						}
 
@@ -433,29 +437,5 @@ module Compiler {
 				return result;
 			}
 		}
-
-        private findNextComparisonOperator(root: CSTNode, nodeFound: CSTNode): CSTNode {
-
-            if(root !== null) {
-
-                if(root.getNodeType() === treeNodeTypes.LEAF && !root.getUsedInAST()) {
-
-                    if(root.getValue() === "==" || root.getValue() === "!=") {
-
-                        root.setUsedInAST();
-                        nodeFound = root;
-                    }
-                }
-
-                else if(nodeFound === null) {
-
-                    for(var i: number = 0; i < root.childList.length; i++) {
-                        nodeFound = this.findNextComparisonOperator(root.childList[i], nodeFound);
-                    }
-                }
-
-                return nodeFound;
-            }
-        }
 	}
 }

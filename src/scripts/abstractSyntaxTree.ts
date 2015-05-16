@@ -492,7 +492,7 @@ module Compiler {
 
             else {
 
-                var errorMessage: string = "Error! Attempt was made to synthesize a type to a parent with its left and right types already set.";
+                var errorMessage: string = "Error! Attempt was made to synthesize a type to a parent with its left and right types already set. Verify AST was created successfully, as this will only occur if a node has more than 2 children.";
 
                 Logger.log(errorMessage);
                 throw errorMessage;

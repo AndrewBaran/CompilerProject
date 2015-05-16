@@ -228,19 +228,25 @@ var Compiler;
                         break;
 
                     case cstNodeTypes.BOOLEAN_EXPRESSION:
-                        var comparisonOperatorNode = null;
-                        comparisonOperatorNode = this.findNextComparisonOperator(root, comparisonOperatorNode);
+                        var comparisonOpFound = false;
 
-                        // == or != found
-                        if (comparisonOperatorNode !== null) {
-                            if (comparisonOperatorNode.getValue() === "==") {
+                        for (var i = 0; i < root.childList.length && !comparisonOpFound; i++) {
+                            var currentNode = root.childList[i];
+
+                            if (currentNode.getValue() === "==") {
                                 interiorNodePath = astNodeTypes.EQUAL;
                                 abstractSyntaxTree.insertInteriorNode(interiorNodePath);
-                            } else if (comparisonOperatorNode.getValue() === "!=") {
+
+                                comparisonOpFound = true;
+                            } else if (currentNode.getValue() === "!=") {
                                 interiorNodePath = astNodeTypes.NOT_EQUAL;
                                 abstractSyntaxTree.insertInteriorNode(interiorNodePath);
+
+                                comparisonOpFound = true;
                             }
-                        } else {
+                        }
+
+                        if (!comparisonOpFound) {
                             interiorNodePath = astNodeTypes.BOOLEAN_EXPRESSION;
                         }
 
@@ -345,23 +351,6 @@ var Compiler;
                 }
 
                 return result;
-            }
-        };
-
-        CSTNode.prototype.findNextComparisonOperator = function (root, nodeFound) {
-            if (root !== null) {
-                if (root.getNodeType() === treeNodeTypes.LEAF && !root.getUsedInAST()) {
-                    if (root.getValue() === "==" || root.getValue() === "!=") {
-                        root.setUsedInAST();
-                        nodeFound = root;
-                    }
-                } else if (nodeFound === null) {
-                    for (var i = 0; i < root.childList.length; i++) {
-                        nodeFound = this.findNextComparisonOperator(root.childList[i], nodeFound);
-                    }
-                }
-
-                return nodeFound;
             }
         };
         return CSTNode;

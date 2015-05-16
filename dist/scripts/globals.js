@@ -30,6 +30,7 @@ var _testCodeList = [
     { name: "Boolean 2", code: "{\n\tboolean b\n\tb = (true == true)\n\tb = (false != false)\n} $" },
     { name: "Boolean 3", code: "{\n\tboolean b\n\tb = (true == (true != (false == false)))\n} $" },
     { name: "Boolean 4", code: "{\n\tint a\n\ta = 1\n\n\tboolean b\n\tb = (true == (true != (false == (true != (false != (a == a))))))\n\n\tprint(b)\n} $" },
+    { name: "Boolean 5", code: "{\n\tboolean b\n\tb = ((true == false) != (true == true))\n\tprint(b)\n}$" },
     { name: "Scope 1", code: "{\n\tint a\n\ta = 1\n\n\tint b\n\tb = 2\n\n\t{\n\t\tint c\n\n\t\tc = 3\n\t\ta = 8\n\t\tb = 9\n\t}\n} $" },
     { name: "Scope 2", code: "{\n\tint x\n\tx = 1\n\n\t{\n\n\t\tint x\n\t\tx = 2\n\n\t\t{\n\t\t\tx = 5\n\t\t}\n\n\t\tprint(x)\n\t}\n\n\tprint(x)\n} $" }
 ];
